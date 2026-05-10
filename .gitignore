@@ -1,0 +1,55 @@
+# =========================
+# Visual Studio
+# =========================
+.vs/
+*.VC.db
+*.VC.opendb
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# Build results
+Debug/
+Release/
+x64/
+x86/
+build/
+out/
+
+# Generated project files
+*.vcxproj.user
+
+# =========================
+# Object / Binary files
+# =========================
+*.obj
+*.o
+*.lo
+*.sbr
+*.pch
+*.pdb
+*.ilk
+*.idb
+*.lib
+*.dll
+*.exe
+*.exp
+
+# =========================
+# OpenGL / LearnOpenGL
+# =========================
+
+# If using copied dependencies
+libs/
+include/
+
+# =========================
+# ImGui
+# =========================
+imgui.ini
+
+# =========================
+# Logs
+# =========================
+*.log

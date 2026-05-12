@@ -447,7 +447,7 @@ int main(void)
 		glm::mat4 model;
 		glm::mat4 model_normal;
 		model = glm::translate(model, cubePos);
-		model_normal = glm::transpose(glm::inverse(model));
+		model_normal = glm::transpose(glm::inverse(view * model));
 
 
 		cubeProgram.setVec3("objectColor", 1.0f, 0.5f, 0.31f);

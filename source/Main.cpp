@@ -449,9 +449,24 @@ int main(void)
 		model = glm::translate(model, cubePos);
 		model_normal = glm::transpose(glm::inverse(view * model));
 
+		cubeProgram.setVec3("material.ambient", 0.1745, 0.01175, 0.01175);
+		cubeProgram.setVec3("material.diffuse", 0.61424, 0.04136, 0.04136);
+		cubeProgram.setVec3("material.specular", 0.727811, 0.626959, 0.626959);
+		cubeProgram.setFloat("material.shininess", 0.6 * 128);
 
-		cubeProgram.setVec3("objectColor", 1.0f, 0.5f, 0.31f);
-		cubeProgram.setVec3("lightColor", 1.0f, 1.0f, 1.0f);
+		glm::vec3 lightColor;
+		lightColor = glm::vec3(1.f);
+		//lightColor.x = sin(glfwGetTime() * 2.0f);
+		//lightColor.y = sin(glfwGetTime() * 0.7f);
+		//lightColor.z = sin(glfwGetTime() * 1.3f);
+
+		glm::vec3 ambientColor = lightColor * glm::vec3(0.3f);
+		glm::vec3 diffuseColor = lightColor * glm::vec3(1.f);
+
+		cubeProgram.setVec3("light.ambient", ambientColor);
+		cubeProgram.setVec3("light.diffuse", diffuseColor);
+		cubeProgram.setVec3("light.specular", 1.0f, 1.0f, 1.0f);
+
 		cubeProgram.setMat4("model", 1, GL_FALSE, glm::value_ptr(model));
 		cubeProgram.setMat4("model_normal", 1, GL_FALSE, glm::value_ptr(model_normal));
 		glDrawArrays(GL_TRIANGLES, 0, 36);

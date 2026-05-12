@@ -445,11 +445,15 @@ int main(void)
 
 		glBindVertexArray(VAO1);
 		glm::mat4 model;
+		glm::mat4 model_normal;
 		model = glm::translate(model, cubePos);
-		
+		model_normal = glm::transpose(glm::inverse(model));
+
+
 		cubeProgram.setVec3("objectColor", 1.0f, 0.5f, 0.31f);
 		cubeProgram.setVec3("lightColor", 1.0f, 1.0f, 1.0f);
 		cubeProgram.setMat4("model", 1, GL_FALSE, glm::value_ptr(model));
+		cubeProgram.setMat4("model_normal", 1, GL_FALSE, glm::value_ptr(model_normal));
 		glDrawArrays(GL_TRIANGLES, 0, 36);
 
 

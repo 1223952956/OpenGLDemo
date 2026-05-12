@@ -99,5 +99,11 @@
     <Image Include="content\images\container2_specular.png">
       <Filter>Resource Files\Images</Filter>
     </Image>
+    <Image Include="content\images\lighting_maps_specular_color.png">
+      <Filter>Resource Files\Images</Filter>
+    </Image>
+    <Image Include="content\images\matrix.jpg">
+      <Filter>Resource Files\Images</Filter>
+    </Image>
   </ItemGroup>
 </Project>

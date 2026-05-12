@@ -355,7 +355,7 @@ int main(void)
 
 	unsigned int diffuseMap = loadTexture(0, false, "content/images/container2.png");
 	unsigned int specularMap = loadTexture(1, false, "content/images/container2_specular.png");
-
+	unsigned int emissionMap = loadTexture(2, false, "content/images/matrix.jpg");
 
 	// remember: do NOT unbind the EBO while a VAO is active as the bound element buffer object IS stored in the VAO; keep the EBO bound.
 	//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
@@ -377,7 +377,7 @@ int main(void)
 	cubeProgram.use();
 	cubeProgram.setInt("material.diffuse", 0);
 	cubeProgram.setInt("material.specular", 1);
-
+	cubeProgram.setInt("material.emission", 2);
 
 
 	float deltaTime = 0.0f;
@@ -483,6 +483,9 @@ int main(void)
 
 		glActiveTexture(GL_TEXTURE1);
 		glBindTexture(GL_TEXTURE_2D, specularMap);
+
+		glActiveTexture(GL_TEXTURE2);
+		glBindTexture(GL_TEXTURE_2D, emissionMap);
 
 		glBindVertexArray(VAO1);
 		glDrawArrays(GL_TRIANGLES, 0, 36);

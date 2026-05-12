@@ -92,7 +92,7 @@ void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
 	MainCamera.Zoom(yoffset);
 }
 
-unsigned int loadTexture(unsigned int unitNum, GLenum format, bool flip, const char* filename)
+unsigned int loadTexture(unsigned int unitNum, bool flip, const char* filename)
 {
 	unsigned int texture;
 	int width, height, nrChannels;
@@ -105,6 +105,16 @@ unsigned int loadTexture(unsigned int unitNum, GLenum format, bool flip, const c
 		std::cout << "Failed to load texture" << std::endl;
 		return -1;
 	}
+
+	GLenum format;
+	if (nrChannels == 1)
+		format = GL_RED;
+	else if (nrChannels == 3)
+		format = GL_RGB;
+	else if (nrChannels == 4)
+		format = GL_RGBA;
+	else
+		format = GL_RGB;
 
 	glGenTextures(1, &texture);
 	glBindTexture(GL_TEXTURE_2D, texture);
@@ -231,48 +241,48 @@ int main(void)
 	};
 
 	float cubeVertices[] = {
-		//  ---- 位置 ----    // --- 法向量 ---
-		-0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
-		 0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
-		 0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
-		 0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
-		-0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
-		-0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
+		//  ---- 位置 ----    // --- 法向量 ---    - 纹理坐标 -
+		-0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  0.0f,  0.0f,
+		 0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  1.0f,  0.0f,
+		 0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  1.0f,  1.0f,
+		 0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  1.0f,  1.0f,
+		-0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  0.0f,  1.0f,
+		-0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  0.0f,  0.0f,
 
-		-0.5f, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
-		 0.5f, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
-		 0.5f,  0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
-		 0.5f,  0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
-		-0.5f,  0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
-		-0.5f, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
+		-0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  0.0f,  0.0f,
+		 0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  1.0f,  0.0f,
+		 0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  1.0f,  1.0f,
+		 0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  1.0f,  1.0f,
+		-0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  0.0f,  1.0f,
+		-0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  0.0f,  0.0f,
 
-		-0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,
-		-0.5f,  0.5f, -0.5f, -1.0f,  0.0f,  0.0f,
-		-0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,
-		-0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,
-		-0.5f, -0.5f,  0.5f, -1.0f,  0.0f,  0.0f,
-		-0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,
+		-0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,  1.0f,  0.0f,
+		-0.5f,  0.5f, -0.5f, -1.0f,  0.0f,  0.0f,  1.0f,  1.0f,
+		-0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,  0.0f,  1.0f,
+		-0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,  0.0f,  1.0f,
+		-0.5f, -0.5f,  0.5f, -1.0f,  0.0f,  0.0f,  0.0f,  0.0f,
+		-0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,  1.0f,  0.0f,
 
-		 0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,
-		 0.5f,  0.5f, -0.5f,  1.0f,  0.0f,  0.0f,
-		 0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,
-		 0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,
-		 0.5f, -0.5f,  0.5f,  1.0f,  0.0f,  0.0f,
-		 0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,
+		 0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  1.0f,  0.0f,
+		 0.5f,  0.5f, -0.5f,  1.0f,  0.0f,  0.0f,  1.0f,  1.0f,
+		 0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,  0.0f,  1.0f,
+		 0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,  0.0f,  1.0f,
+		 0.5f, -0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  0.0f,  0.0f,
+		 0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  1.0f,  0.0f,
 
-		-0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,
-		 0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,
-		 0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,
-		 0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,
-		-0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,
-		-0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,
+		-0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,  0.0f,  1.0f,
+		 0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,  1.0f,  1.0f,
+		 0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,  1.0f,  0.0f,
+		 0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,  1.0f,  0.0f,
+		-0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,  0.0f,  0.0f,
+		-0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,  0.0f,  1.0f,
 
-		-0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,
-		 0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,
-		 0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,
-		 0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,
-		-0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,
-		-0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f
+		-0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  0.0f,  1.0f,
+		 0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  1.0f,  1.0f,
+		 0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  1.0f,  0.0f,
+		 0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  1.0f,  0.0f,
+		-0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  0.0f,  0.0f,
+		-0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  0.0f,  1.0f
 	};
 
 	glm::vec3 cubePositions[] = {
@@ -306,8 +316,6 @@ int main(void)
 	//	1, 2, 3  // 第二个三角形
 	//};
 
-	//unsigned int texture1 = loadTexture(0, GL_RGB, false, "content/images/container.jpg");
-	//unsigned int texture2 = loadTexture(1, GL_RGBA, true, "content/images/awesomeface.png");
 
 	unsigned int VAO1, VAO2, VBO1, VBO2, EBO;
 	glGenVertexArrays(1, &VAO1);
@@ -324,10 +332,12 @@ int main(void)
 	//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
 	//glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
-	glEnableVertexAttribArray(0);
-	glEnableVertexAttribArray(1);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
+    glEnableVertexAttribArray(1);
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
+    glEnableVertexAttribArray(2);
 
 	//glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
 	//glEnableVertexAttribArray(1);
@@ -340,8 +350,11 @@ int main(void)
 	glBindBuffer(GL_ARRAY_BUFFER, VBO1);
 	//glBufferData(GL_ARRAY_BUFFER, sizeof(cubeVertices), cubeVertices, GL_STATIC_DRAW);
 
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
 	glEnableVertexAttribArray(0);
+
+	unsigned int diffuseMap = loadTexture(0, false, "content/images/container2.png");
+	unsigned int specularMap = loadTexture(1, false, "content/images/container2_specular.png");
 
 
 	// remember: do NOT unbind the EBO while a VAO is active as the bound element buffer object IS stored in the VAO; keep the EBO bound.
@@ -361,10 +374,9 @@ int main(void)
 
 	//glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-
-
-	//shaderProgram.setInt("texture1", 0);
-	//shaderProgram.setInt("texture2", 1);
+	cubeProgram.use();
+	cubeProgram.setInt("material.diffuse", 0);
+	cubeProgram.setInt("material.specular", 1);
 
 
 
@@ -379,6 +391,7 @@ int main(void)
 
 		processInput(window, deltaTime);
 
+		// imgui
 		// (Your code calls glfwPollEvents())
 		// ...
 		// Start the Dear ImGui frame
@@ -409,7 +422,7 @@ int main(void)
 		ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
 		ImGui::End();
 
-
+		// render
 		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -419,19 +432,17 @@ int main(void)
 		// shaderProgram.setFloat("horizontalOffset", offset);
 		//shaderProgram.setFloat("blend", blend);
 
-		//glActiveTexture(GL_TEXTURE0);
-		//glBindTexture(GL_TEXTURE_2D, texture1);
+
 
 		//glActiveTexture(GL_TEXTURE1);
 		//glBindTexture(GL_TEXTURE_2D, texture2);
 
-		glBindVertexArray(VAO1);
 
 		//unsigned int transformLoc = glGetUniformLocation(shaderProgram.ID, "transform");
 
 		// draw cube
-		cubeProgram.use();
 
+		cubeProgram.use();
 		cubeProgram.setVec3("lightPos", lightPos);
 		cubeProgram.setVec3("viewPos", MainCamera.Pos);
 
@@ -443,16 +454,13 @@ int main(void)
 		cubeProgram.setMat4("view", 1, GL_FALSE, glm::value_ptr(view));
 		cubeProgram.setMat4("projection", 1, GL_FALSE, glm::value_ptr(projection));
 
-		glBindVertexArray(VAO1);
+
 		glm::mat4 model;
 		glm::mat4 model_normal;
 		model = glm::translate(model, cubePos);
 		model_normal = glm::transpose(glm::inverse(view * model));
 
-		cubeProgram.setVec3("material.ambient", 0.1745, 0.01175, 0.01175);
-		cubeProgram.setVec3("material.diffuse", 0.61424, 0.04136, 0.04136);
-		cubeProgram.setVec3("material.specular", 0.727811, 0.626959, 0.626959);
-		cubeProgram.setFloat("material.shininess", 0.6 * 128);
+		cubeProgram.setFloat("material.shininess", 0.5 * 128);
 
 		glm::vec3 lightColor;
 		lightColor = glm::vec3(1.f);
@@ -460,8 +468,8 @@ int main(void)
 		//lightColor.y = sin(glfwGetTime() * 0.7f);
 		//lightColor.z = sin(glfwGetTime() * 1.3f);
 
-		glm::vec3 ambientColor = lightColor * glm::vec3(0.3f);
-		glm::vec3 diffuseColor = lightColor * glm::vec3(1.f);
+		glm::vec3 ambientColor = lightColor * glm::vec3(0.2f);
+		glm::vec3 diffuseColor = lightColor * glm::vec3(0.5f);
 
 		cubeProgram.setVec3("light.ambient", ambientColor);
 		cubeProgram.setVec3("light.diffuse", diffuseColor);
@@ -469,6 +477,14 @@ int main(void)
 
 		cubeProgram.setMat4("model", 1, GL_FALSE, glm::value_ptr(model));
 		cubeProgram.setMat4("model_normal", 1, GL_FALSE, glm::value_ptr(model_normal));
+
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, diffuseMap);
+
+		glActiveTexture(GL_TEXTURE1);
+		glBindTexture(GL_TEXTURE_2D, specularMap);
+
+		glBindVertexArray(VAO1);
 		glDrawArrays(GL_TRIANGLES, 0, 36);
 
 

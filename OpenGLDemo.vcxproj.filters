@@ -93,5 +93,11 @@
     <Image Include="content\images\container.jpg">
       <Filter>Resource Files\Images</Filter>
     </Image>
+    <Image Include="content\images\container2.png">
+      <Filter>Resource Files\Images</Filter>
+    </Image>
+    <Image Include="content\images\container2_specular.png">
+      <Filter>Resource Files\Images</Filter>
+    </Image>
   </ItemGroup>
 </Project>

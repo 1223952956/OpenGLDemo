@@ -1,4 +1,5 @@
 #include <iostream>
+#include <string>
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <stb_image.h>
@@ -302,6 +303,13 @@ int main(void)
 
 	glm::vec3 lightPos = glm::vec3(1.2f, 1.0f, 2.0f);
 
+	glm::vec3 pointLightPositions[] = {
+		glm::vec3(0.7f,  0.2f,  2.0f),
+		glm::vec3(2.3f, -3.3f, -4.0f),
+		glm::vec3(-4.0f,  2.0f, -12.0f),
+		glm::vec3(0.0f,  0.0f, -3.0f)
+	};
+
 	//float vertices2[] = {
 	//	0.0f, 0.8f, 0.0f,
 	//	0.8f, 0.8f, 0.0f,
@@ -355,7 +363,7 @@ int main(void)
 
 	unsigned int diffuseMap = loadTexture(0, false, "content/images/container2.png");
 	unsigned int specularMap = loadTexture(1, false, "content/images/container2_specular.png");
-	unsigned int emissionMap = loadTexture(2, false, "content/images/matrix.jpg");
+	//unsigned int emissionMap = loadTexture(2, false, "content/images/matrix.jpg");
 
 	// remember: do NOT unbind the EBO while a VAO is active as the bound element buffer object IS stored in the VAO; keep the EBO bound.
 	//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
@@ -377,7 +385,7 @@ int main(void)
 	cubeProgram.use();
 	cubeProgram.setInt("material.diffuse", 0);
 	cubeProgram.setInt("material.specular", 1);
-	cubeProgram.setInt("material.emission", 2);
+	//cubeProgram.setInt("material.emission", 2);
 
 
 	float deltaTime = 0.0f;
@@ -443,7 +451,7 @@ int main(void)
 		// draw cube
 
 		cubeProgram.use();
-		cubeProgram.setVec3("lightPos", lightPos);
+		//cubeProgram.setVec3("lightPos", lightPos);
 		cubeProgram.setVec3("viewPos", MainCamera.Pos);
 
 		glm::mat4 projection;
@@ -455,28 +463,40 @@ int main(void)
 		cubeProgram.setMat4("projection", 1, GL_FALSE, glm::value_ptr(projection));
 
 
-		glm::mat4 model;
-		glm::mat4 model_normal;
-		model = glm::translate(model, cubePos);
-		model_normal = glm::transpose(glm::inverse(view * model));
+		//glm::mat4 model;
+		//glm::mat4 model_normal;
+		//model = glm::translate(model, cubePos);
+		//model_normal = glm::transpose(glm::inverse(model));
 
 		cubeProgram.setFloat("material.shininess", 0.5 * 128);
 
-		glm::vec3 lightColor;
-		lightColor = glm::vec3(1.f);
-		//lightColor.x = sin(glfwGetTime() * 2.0f);
-		//lightColor.y = sin(glfwGetTime() * 0.7f);
-		//lightColor.z = sin(glfwGetTime() * 1.3f);
+		cubeProgram.setVec3("dirLight.direction", -0.2f, -1.0f, -0.3f);
+		cubeProgram.setVec3("dirLight.ambient", 0.2f, 0.2f, 0.2f);
+		cubeProgram.setVec3("dirLight.diffuse", 0.5f, 0.5f, 0.5f);
+		cubeProgram.setVec3("dirLight.specular", 1.0f, 1.0f, 1.0f);
 
-		glm::vec3 ambientColor = lightColor * glm::vec3(0.2f);
-		glm::vec3 diffuseColor = lightColor * glm::vec3(0.5f);
+		for (int i = 0; i < 4; ++i)
+		{
+			std::string name = "pointLights[" + std::to_string(i) + "].";
+			cubeProgram.setVec3(name + "position", pointLightPositions[i]);
+			cubeProgram.setVec3(name + "ambient", 0.2f, 0.2f, 0.2f);
+			cubeProgram.setVec3(name + "diffuse", 0.5f, 0.5f, 0.5f);
+			cubeProgram.setVec3(name + "specular", 1.0f, 1.0f, 1.0f);
+			cubeProgram.setFloat(name + "constant", 1.f);
+			cubeProgram.setFloat(name + "linear", 0.09f);
+			cubeProgram.setFloat(name + "quadratic", 0.032f);
+		}
 
-		cubeProgram.setVec3("light.ambient", ambientColor);
-		cubeProgram.setVec3("light.diffuse", diffuseColor);
-		cubeProgram.setVec3("light.specular", 1.0f, 1.0f, 1.0f);
+		cubeProgram.setVec3("spotlight.position", MainCamera.Pos);
+		cubeProgram.setVec3("spotlight.direction", MainCamera.GetFront());
+		cubeProgram.setFloat("spotlight.cutOff", glm::cos(glm::radians(12.5f)));
+		cubeProgram.setFloat("spotlight.outerCutOff", glm::cos(glm::radians(17.5f)));
+		cubeProgram.setVec3("spotlight.ambient", 0.2f, 0.2f, 0.2f);
+		cubeProgram.setVec3("spotlight.diffuse", 0.5f, 0.5f, 0.5f);
+		cubeProgram.setVec3("spotlight.specular", 1.0f, 1.0f, 1.0f);
 
-		cubeProgram.setMat4("model", 1, GL_FALSE, glm::value_ptr(model));
-		cubeProgram.setMat4("model_normal", 1, GL_FALSE, glm::value_ptr(model_normal));
+		//cubeProgram.setMat4("model", 1, GL_FALSE, glm::value_ptr(model));
+		//cubeProgram.setMat4("model_normal", 1, GL_FALSE, glm::value_ptr(model_normal));
 
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, diffuseMap);
@@ -484,10 +504,27 @@ int main(void)
 		glActiveTexture(GL_TEXTURE1);
 		glBindTexture(GL_TEXTURE_2D, specularMap);
 
-		glActiveTexture(GL_TEXTURE2);
-		glBindTexture(GL_TEXTURE_2D, emissionMap);
+		//glActiveTexture(GL_TEXTURE2);
+		//glBindTexture(GL_TEXTURE_2D, emissionMap);
+
 
 		glBindVertexArray(VAO1);
+		for (unsigned int i = 0; i < 10; i++)
+		{
+			glm::mat4 model;
+			glm::mat4 model_normal;
+			model = glm::translate(model, cubePositions[i]);
+
+			float angle = 20.0f * i;
+			model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
+			model_normal = glm::transpose(glm::inverse(model));
+			cubeProgram.setMat4("model", 1, GL_FALSE, glm::value_ptr(model));
+			cubeProgram.setMat4("model_normal", 1, GL_FALSE, glm::value_ptr(model_normal));
+
+			glDrawArrays(GL_TRIANGLES, 0, 36);
+		}
+
+
 		glDrawArrays(GL_TRIANGLES, 0, 36);
 
 
@@ -503,24 +540,6 @@ int main(void)
 
 		lightProgram.setMat4("model", 1, GL_FALSE, glm::value_ptr(lightModel));
 		glDrawArrays(GL_TRIANGLES, 0, 36);
-		//for (unsigned int i = 0; i < 10; i++)
-		//{
-		//	glm::mat4 model;
-		//	model = glm::translate(model, cubePositions[i]);
-		//	if ((i % 3) == 0)
-		//	{
-		//		model = glm::rotate(model, (float)glfwGetTime(), glm::vec3(1.0f, 0.3f, 0.5f));
-		//	}
-		//	else
-		//	{
-		//		float angle = 20.0f * i;
-		//		model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
-		//	}
-
-		//	shaderProgram.setMat4("model", 1, GL_FALSE, glm::value_ptr(model));
-
-		//	glDrawArrays(GL_TRIANGLES, 0, 36);
-		//}
 
 
 		// Rendering

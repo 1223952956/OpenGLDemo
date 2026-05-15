@@ -47,6 +47,7 @@ public:
 	void Rotate(float offsetX, float offsetY);
 	void Zoom(float value);
 	glm::mat4 GetViewMatrix();
-	float GetFoV() { return FoV; }
+	float GetFoV() const { return FoV; }
+	glm::vec3 GetFront() const { return Front; }
 };
 

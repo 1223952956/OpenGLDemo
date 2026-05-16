@@ -1,5 +1,6 @@
 #include <iostream>
 #include <string>
+#include <vector>
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <stb_image.h>
@@ -13,6 +14,9 @@
 
 #include "Shader.h"
 #include "Camera.h"
+#include "DirectionalLight.h"
+#include "PointLight.h"
+#include "SpotLight.h"
 
 float screenWidth = 800.0f;
 float screenHeight = 600.0f;
@@ -387,6 +391,14 @@ int main(void)
 	cubeProgram.setInt("material.specular", 1);
 	//cubeProgram.setInt("material.emission", 2);
 
+	// Light Initialize
+	DirectionalLight dirLight(glm::vec3(-0.2f, -1.0f, -0.3f), glm::vec3(0.2f, 0.2f, 0.2f), glm::vec3(0.5f, 0.5f, 0.5f), glm::vec3(1.0f, 1.0f, 1.0f));
+	std::vector<PointLight> pointLights;
+	for (int i = 0; i < 4; ++i)
+	{
+		pointLights.emplace_back(PointLight(pointLightPositions[i], glm::vec3(0.2f, 0.2f, 0.2f), glm::vec3(0.5f, 0.5f, 0.5f), glm::vec3(1.0f, 1.0f, 1.0f), 1.f, 0.09f, 0.032f));
+	}
+	SpotLight spotLight(MainCamera.Pos, MainCamera.GetFront(), glm::vec3(0.2f, 0.2f, 0.2f), glm::vec3(0.5f, 0.5f, 0.5f), glm::vec3(1.0f, 1.0f, 1.0f), glm::cos(glm::radians(12.5f)), glm::cos(glm::radians(17.5f)));
 
 	float deltaTime = 0.0f;
 	float lastFrameTime = 0.0f;
@@ -431,7 +443,7 @@ int main(void)
 		ImGui::End();
 
 		// render
-		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+		glClearColor(0.f, 0.f, 0.f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		// float timeValue = glfwGetTime();
@@ -470,30 +482,16 @@ int main(void)
 
 		cubeProgram.setFloat("material.shininess", 0.5 * 128);
 
-		cubeProgram.setVec3("dirLight.direction", -0.2f, -1.0f, -0.3f);
-		cubeProgram.setVec3("dirLight.ambient", 0.2f, 0.2f, 0.2f);
-		cubeProgram.setVec3("dirLight.diffuse", 0.5f, 0.5f, 0.5f);
-		cubeProgram.setVec3("dirLight.specular", 1.0f, 1.0f, 1.0f);
-
+		// Upload Light Data
+		dirLight.Upload(cubeProgram, "dirLight");
 		for (int i = 0; i < 4; ++i)
 		{
-			std::string name = "pointLights[" + std::to_string(i) + "].";
-			cubeProgram.setVec3(name + "position", pointLightPositions[i]);
-			cubeProgram.setVec3(name + "ambient", 0.2f, 0.2f, 0.2f);
-			cubeProgram.setVec3(name + "diffuse", 0.5f, 0.5f, 0.5f);
-			cubeProgram.setVec3(name + "specular", 1.0f, 1.0f, 1.0f);
-			cubeProgram.setFloat(name + "constant", 1.f);
-			cubeProgram.setFloat(name + "linear", 0.09f);
-			cubeProgram.setFloat(name + "quadratic", 0.032f);
+			std::string name = "pointLights[" + std::to_string(i) + "]";
+			pointLights[i].Upload(cubeProgram, name);
 		}
-
-		cubeProgram.setVec3("spotlight.position", MainCamera.Pos);
-		cubeProgram.setVec3("spotlight.direction", MainCamera.GetFront());
-		cubeProgram.setFloat("spotlight.cutOff", glm::cos(glm::radians(12.5f)));
-		cubeProgram.setFloat("spotlight.outerCutOff", glm::cos(glm::radians(17.5f)));
-		cubeProgram.setVec3("spotlight.ambient", 0.2f, 0.2f, 0.2f);
-		cubeProgram.setVec3("spotlight.diffuse", 0.5f, 0.5f, 0.5f);
-		cubeProgram.setVec3("spotlight.specular", 1.0f, 1.0f, 1.0f);
+		spotLight.SetPosition(MainCamera.Pos);
+		spotLight.SetDirection(MainCamera.GetFront());
+		spotLight.Upload(cubeProgram, "spotlight");
 
 		//cubeProgram.setMat4("model", 1, GL_FALSE, glm::value_ptr(model));
 		//cubeProgram.setMat4("model_normal", 1, GL_FALSE, glm::value_ptr(model_normal));

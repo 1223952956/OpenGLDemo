@@ -152,14 +152,22 @@
     <ClCompile Include="libs\imgui\imgui_tables.cpp" />
     <ClCompile Include="libs\imgui\imgui_widgets.cpp" />
     <ClCompile Include="source\Camera.cpp" />
+    <ClCompile Include="source\DirectionalLight.cpp" />
     <ClCompile Include="source\glad.c" />
+    <ClCompile Include="source\Light.cpp" />
     <ClCompile Include="source\Main.cpp" />
+    <ClCompile Include="source\PointLight.cpp" />
     <ClCompile Include="source\Shader.cpp" />
+    <ClCompile Include="source\SpotLight.cpp" />
     <ClCompile Include="source\stb_image_wrap.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="source\Camera.h" />
+    <ClInclude Include="source\DirectionalLight.h" />
+    <ClInclude Include="source\Light.h" />
+    <ClInclude Include="source\PointLight.h" />
     <ClInclude Include="source\Shader.h" />
+    <ClInclude Include="source\SpotLight.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="content\shaders\Cube.frag" />

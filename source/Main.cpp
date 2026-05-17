@@ -12,11 +12,15 @@
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
 
-#include "Shader.h"
+#include "assimp/Importer.hpp"
+#include <assimp/scene.h>
+#include <assimp/postprocess.h>
+
+#include "Renderer/Shader.h"
 #include "Camera.h"
-#include "DirectionalLight.h"
-#include "PointLight.h"
-#include "SpotLight.h"
+#include "Light/DirectionalLight.h"
+#include "Light/PointLight.h"
+#include "Light/SpotLight.h"
 
 float screenWidth = 800.0f;
 float screenHeight = 600.0f;

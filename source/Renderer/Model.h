@@ -22,18 +22,15 @@ public:
 
 private:
     std::vector<Mesh> Meshes;
+    std::vector<std::unique_ptr<Material>> Materials;
     std::string Directory;
-    std::unordered_map<std::string, Texture> TexturesLoaded;
 
     void LoadModel(const std::string& path);
     void ProcessNode(aiNode* node, const aiScene* scene, glm::mat4 parentTransform, int depth);
     Mesh ProcessMesh(aiMesh* mesh, const aiScene* scene, glm::mat4 globalTransform);
-    std::vector<Texture> LoadMaterialTextures(aiMaterial* mat, const aiScene* scene, aiTextureType type,
-        const std::string& typeName);
 
-    unsigned int TextureFromFile(const char* path, const std::string& directory, bool gamma = false);
-    unsigned int TextureFromMemory(const char* path, const aiScene* scene);
-    unsigned int CreateGLTexture(int width, int height, int nrChannels, unsigned char* data);
+    void LoadMaterials(const aiScene* scene);
+    Texture2D* LoadTexture(aiMaterial* mat, aiTextureType type, const aiScene* scene);
 
     void PrintNode(aiNode* node, int depth = 0);
 

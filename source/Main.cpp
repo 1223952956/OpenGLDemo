@@ -15,6 +15,7 @@
 #include "Renderer/Shader.h"
 #include "Camera.h"
 #include "Renderer/Model.h"
+#include "Renderer/TextureManager.h"
 #include "Light/DirectionalLight.h"
 #include "Light/PointLight.h"
 #include "Light/SpotLight.h"
@@ -360,7 +361,7 @@ int main(void)
 		glfwPollEvents();
 	}
 
-
+	TextureManager::ShutDown();
 	glfwTerminate();
 	return 0;
 }

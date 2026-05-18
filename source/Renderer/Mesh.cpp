@@ -1,10 +1,11 @@
 #include "Mesh.h"
+
 #include <glad/glad.h>
 
-Mesh::Mesh(const std::vector<Vertex>& vertices, const std::vector<unsigned int>& indices, const std::vector<Texture>& textures, const std::string& name)
-	:Vertices(vertices)
-	,Indices(indices)
-	,Textures(textures)
+Mesh::Mesh(std::vector<Vertex>& vertices,std::vector<unsigned int>& indices, Material* material, const std::string& name)
+	:Vertices(std::move(vertices))
+	,Indices(std::move(indices))
+	,MaterialPtr(material)
 	,Name(name)
 	,VAO(0)
 	,VBO(0)
@@ -15,34 +16,7 @@ Mesh::Mesh(const std::vector<Vertex>& vertices, const std::vector<unsigned int>&
 
 void Mesh::Draw(Shader& shader)
 {
-	unsigned int diffuseN = 0;
-	unsigned int specularN = 0;
-
-	for (unsigned int i = 0; i < Textures.size(); ++i)
-	{
-		unsigned int number = 0;
-		std::string type = Textures[i].Type;
-
-		if (type == "texture_diffuse")
-		{
-			++diffuseN;
-			number = diffuseN;
-		}
-		else if (type == "texture_specular")
-		{
-			++specularN;
-			number = specularN;
-		}
-		else
-		{
-			std::cerr << "[Mesh] Undefined texture type: "<< type << std::endl;
-			return;
-		}
-			
-		shader.setInt(("material." + type + std::to_string(number)), i);
-		glActiveTexture(GL_TEXTURE0 + i);
-		glBindTexture(GL_TEXTURE_2D, Textures[i].Id);
-	}
+	MaterialPtr->Bind(shader);
 
 	glBindVertexArray(VAO);
 	glDrawElements(GL_TRIANGLES, (GLsizei)Indices.size(), GL_UNSIGNED_INT, 0);

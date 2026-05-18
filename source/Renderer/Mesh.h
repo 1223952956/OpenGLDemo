@@ -5,6 +5,7 @@
 #include <glm/glm.hpp>
 
 #include "Shader.h"
+#include "Material.h"
 
 
 struct Vertex
@@ -14,16 +15,11 @@ struct Vertex
     glm::vec2 TexCoords;
 };
 
-struct Texture
-{
-    unsigned int Id;
-    std::string Type;
-};
 
 class Mesh
 {
 public:
-    Mesh(const std::vector<Vertex>& vertices, const std::vector<unsigned int>& indices, const std::vector<Texture>& textures, const std::string& name = "");
+    Mesh(std::vector<Vertex>& vertices, std::vector<unsigned int>& indices, Material* material, const std::string& name = "");
     
     // Needs a destructor to free VAO blabla, but I'm kinda lazy...
     
@@ -36,7 +32,8 @@ private:
     /*  Mesh Data  */
     std::vector<Vertex> Vertices;
     std::vector<unsigned int> Indices;
-    std::vector<Texture> Textures;
+
+    Material* MaterialPtr;
 
     /*  Rendering Data  */
     unsigned int VAO, VBO, EBO;

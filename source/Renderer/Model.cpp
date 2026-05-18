@@ -1,6 +1,8 @@
 #include "Model.h"
 #include <stb_image.h>
 
+#include "TextureManager.h"
+
 void Model::Draw(Shader shader)
 {
 	for (unsigned int i = 0; i < Meshes.size(); i++)
@@ -34,6 +36,8 @@ void Model::LoadModel(const std::string& path)
 	Directory = path.substr(0, path.find_last_of('/'));
 
 	glm::mat4 rootTransform = glm::mat4(1.f);
+
+	LoadMaterials(scene);
 
 	ProcessNode(scene->mRootNode, scene, rootTransform, 0);
 }
@@ -71,7 +75,9 @@ Mesh Model::ProcessMesh(aiMesh* mesh, const aiScene* scene, glm::mat4 globalTran
 
 	std::vector<Vertex> vertices;
 	std::vector<unsigned int> indices;
-	std::vector<Texture> textures;
+
+	// Normal needs inverse and transpose
+	glm::mat3 normalMatrix = glm::transpose(glm::inverse(glm::mat3(globalTransform)));
 
 	// Vertex
 	vertices.reserve(mesh->mNumVertices);
@@ -80,11 +86,10 @@ Mesh Model::ProcessMesh(aiMesh* mesh, const aiScene* scene, glm::mat4 globalTran
 		Vertex vertex;
 		
 		// apply globalTransform from node
-		vertex.Position = globalTransform * glm::vec4(ToGlm(mesh->mVertices[i]), 1.f);
+		vertex.Position = glm::vec3(globalTransform * glm::vec4(ToGlm(mesh->mVertices[i]), 1.f));
 
-		// Normal needs inverse and transpose
-		glm::mat4 normalMatrix = glm::transpose(glm::inverse(glm::mat3(globalTransform)));
-		vertex.Normal = normalMatrix * glm::vec4(ToGlm(mesh->mNormals[i]), 1.f);
+		// apply normalMatrix
+		vertex.Normal = glm::normalize(normalMatrix * ToGlm(mesh->mNormals[i]));
 
 		if (mesh->mTextureCoords[0])
 			vertex.TexCoords = ToGlm(mesh->mTextureCoords[0][i]);
@@ -102,129 +107,73 @@ Mesh Model::ProcessMesh(aiMesh* mesh, const aiScene* scene, glm::mat4 globalTran
 			indices.emplace_back(face.mIndices[j]);
 		}
 	}
-	// Texture
-	if (mesh->mMaterialIndex >= 0)
-	{
-		aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
-		std::vector<Texture> diffuseMaps = LoadMaterialTextures(material, scene,
-			aiTextureType_DIFFUSE, "texture_diffuse");
-		std::vector<Texture> specularMaps = LoadMaterialTextures(material, scene,
-			aiTextureType_SPECULAR, "texture_specular");
+	// Material
+	Material* matPtr = Materials[mesh->mMaterialIndex].get();
 
-		textures.insert(textures.end(), diffuseMaps.begin(), diffuseMaps.end());
-		textures.insert(textures.end(), specularMaps.begin(), specularMaps.end());
-	}
-
-	return Mesh(vertices, indices, textures, mesh->mName.C_Str());
+	return Mesh(vertices, indices, matPtr, mesh->mName.C_Str());
 }
 
-std::vector<Texture> Model::LoadMaterialTextures(aiMaterial* mat, const aiScene* scene, aiTextureType type, const std::string& typeName)
+void Model::LoadMaterials(const aiScene* scene)
 {
-	std::vector<Texture> textures;
-	for (unsigned int i = 0; i < mat->GetTextureCount(type); i++)
-	{
-		aiString path;
-		mat->GetTexture(type, i, &path);
-		std::cout << "Texture: " << path.C_Str() << '\n';		
+	Materials.reserve(scene->mNumMaterials);
 
-		auto it = TexturesLoaded.find(path.C_Str());
-		if (it != TexturesLoaded.end())
-		{
-			textures.emplace_back(it->second);
-		}
-		else
-		{
-			Texture texture;
-			if (path.C_Str()[0] == '*')
-			{
-				texture.Id = TextureFromMemory(path.C_Str(), scene);
-			}
-			else
-			{
-				texture.Id = TextureFromFile(path.C_Str(), Directory);
-			}
-			texture.Type = typeName;
-			textures.emplace_back(texture);
-			TexturesLoaded[path.C_Str()] = texture;
-		}
+	for (unsigned int i = 0; i < scene->mNumMaterials; ++i)
+	{
+		aiMaterial* aiMat = scene->mMaterials[i];
+
+		auto material = std::make_unique<Material>();
+
+		// Base Color
+		material->BaseColorTexture =
+			LoadTexture(
+				aiMat,
+				aiTextureType_BASE_COLOR,
+				scene
+			);
+
+		// Normal
+		material->NormalTexture =
+			LoadTexture(
+				aiMat,
+				aiTextureType_NORMALS,
+				scene
+			);
+
+		// Emissive
+		material->EmissiveTexture =
+			LoadTexture(
+				aiMat,
+				aiTextureType_EMISSIVE,
+				scene
+			);
+
+		// TODO:
+		// MetallicRoughness
+		// AO
+
+		Materials.emplace_back(std::move(material));
 	}
-	return textures;
 }
 
-unsigned int Model::TextureFromFile(const char* path, const std::string& directory, bool gamma)
+Texture2D* Model::LoadTexture(aiMaterial* mat, aiTextureType type, const aiScene* scene)
 {
-	std::string filename = directory + '/' + path;
-	int width, height, nrChannels;
-
-	unsigned char* data = stbi_load(filename.c_str(), &width, &height, &nrChannels, 0);
-
-	if (!data)
+	if (mat->GetTextureCount(type) == 0)
 	{
-		std::cerr << "[Model] Failed to load texture:" << path << std::endl;
-		stbi_image_free(data);
-		return -1;
+		return nullptr;
 	}
 
-	unsigned int textureID = CreateGLTexture(width, height, nrChannels, data);
+	aiString str;
+	mat->GetTexture(type, 0, &str);
 
-	stbi_image_free(data);
-
-	return textureID;
-}
-
-unsigned int Model::TextureFromMemory(const char* path, const aiScene* scene)
-{
-	const aiTexture* texture = scene->GetEmbeddedTexture(path);
-	int width, height, channels;
-
-	unsigned char* data = stbi_load_from_memory(
-		reinterpret_cast<unsigned char*>(texture->pcData),
-		texture->mWidth,
-		&width,
-		&height,
-		&channels,
-		0
-		);
-
-	if (!data)
+	if (str.C_Str()[0] == '*')
 	{
-		std::cerr << "[Model] Failed to load texture:" << path << std::endl;
-		stbi_image_free(data);
-		return -1;
+		return TextureManager::Load(str.C_Str(), scene);
 	}
-
-	unsigned int textureId = CreateGLTexture(width, height, channels, data);
-
-	stbi_image_free(data);
-
-	return textureId;
-}
-
-unsigned int Model::CreateGLTexture(int width, int height, int nrChannels, unsigned char* data)
-{
-	GLenum format;
-	if (nrChannels == 1)
-		format = GL_RED;
-	else if (nrChannels == 3)
-		format = GL_RGB;
-	else if (nrChannels == 4)
-		format = GL_RGBA;
 	else
-		format = GL_RGB;
-
-	unsigned int textureID;
-	glGenTextures(1, &textureID);
-	glBindTexture(GL_TEXTURE_2D, textureID);
-
-	glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
-	glGenerateMipmap(GL_TEXTURE_2D);
-
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-	return textureID;
+	{
+		std::string path = Directory + "/" + str.C_Str();
+		return TextureManager::Load(path);
+	}
 }
 
 void Model::PrintNode(aiNode* node, int depth)

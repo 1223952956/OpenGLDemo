@@ -159,21 +159,25 @@
     <ClCompile Include="source\Light\PointLight.cpp" />
     <ClCompile Include="source\Light\SpotLight.cpp" />
     <ClCompile Include="source\Main.cpp" />
+    <ClCompile Include="source\Renderer\Material.cpp" />
     <ClCompile Include="source\Renderer\Mesh.cpp" />
     <ClCompile Include="source\Renderer\Model.cpp" />
     <ClCompile Include="source\Renderer\Shader.cpp" />
+    <ClCompile Include="source\Renderer\TextureManager.cpp" />
     <ClCompile Include="source\stb_image_wrap.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="resource.h" />
     <ClInclude Include="source\Camera.h" />
     <ClInclude Include="source\Light\DirectionalLight.h" />
     <ClInclude Include="source\Light\Light.h" />
     <ClInclude Include="source\Light\PointLight.h" />
     <ClInclude Include="source\Light\SpotLight.h" />
+    <ClInclude Include="source\Renderer\Material.h" />
     <ClInclude Include="source\Renderer\Mesh.h" />
     <ClInclude Include="source\Renderer\Model.h" />
     <ClInclude Include="source\Renderer\Shader.h" />
+    <ClInclude Include="source\Renderer\Texture.h" />
+    <ClInclude Include="source\Renderer\TextureManager.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="content\models\ChessBoard.glb" />

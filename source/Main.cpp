@@ -338,7 +338,10 @@ int main(void)
 		pieceProgram.setMat4("view", 1, GL_FALSE, glm::value_ptr(view));
 		pieceProgram.setMat4("projection", 1, GL_FALSE, glm::value_ptr(projection));
 
-		chessBoard.Draw(pieceProgram, "Cube.001");
+		//chessBoard.Draw(pieceProgram, "Cube.001");
+		//chessBoard.Draw(pieceProgram, "Cube.002");
+
+		chessBoard.Draw(pieceProgram);
 
 		//cubeProgram.setFloat("material.shininess", 0.5 * 128);
 

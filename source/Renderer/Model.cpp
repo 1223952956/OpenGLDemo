@@ -33,16 +33,21 @@ void Model::LoadModel(const std::string& path)
 	}
 	Directory = path.substr(0, path.find_last_of('/'));
 
-	ProcessNode(scene->mRootNode, scene, 0);
+	glm::mat4 rootTransform = glm::mat4(1.f);
+
+	ProcessNode(scene->mRootNode, scene, rootTransform, 0);
 }
 
-void Model::ProcessNode(aiNode* node, const aiScene* scene, int depth)
+void Model::ProcessNode(aiNode* node, const aiScene* scene, glm::mat4 parentTransform, int depth)
 {
 	for (int i = 0; i < depth; ++i)
 	{
 		std::cout << "    ";
 	}
 	std::cout << node->mName.C_Str() << '\n';
+
+	glm::mat4 nodeTransform = ConvertMatrix(node->mTransformation);
+	glm::mat4 globalTransform = parentTransform * nodeTransform;
 
 	for (unsigned int i = 0; i < node->mNumMeshes; ++i)
 	{
@@ -51,16 +56,16 @@ void Model::ProcessNode(aiNode* node, const aiScene* scene, int depth)
 			std::cout << "    ";
 		}
 		aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
-		Meshes.emplace_back(ProcessMesh(mesh, scene));
+		Meshes.emplace_back(ProcessMesh(mesh, scene, globalTransform));
 	}
 
 	for (unsigned int i = 0; i < node->mNumChildren; ++i)
 	{
-		ProcessNode(node->mChildren[i], scene, depth + 1);
+		ProcessNode(node->mChildren[i], scene, globalTransform, depth + 1);
 	}
 }
 
-Mesh Model::ProcessMesh(aiMesh* mesh, const aiScene* scene)
+Mesh Model::ProcessMesh(aiMesh* mesh, const aiScene* scene, glm::mat4 globalTransform)
 {
 	std::cout << "Mesh: " << mesh->mName.C_Str() << '\n';
 
@@ -74,8 +79,13 @@ Mesh Model::ProcessMesh(aiMesh* mesh, const aiScene* scene)
 	{
 		Vertex vertex;
 		
-		vertex.Position = ToGlm(mesh->mVertices[i]);
-		vertex.Normal = ToGlm(mesh->mNormals[i]);
+		// apply globalTransform from node
+		vertex.Position = globalTransform * glm::vec4(ToGlm(mesh->mVertices[i]), 1.f);
+
+		// Normal needs inverse and transpose
+		glm::mat4 normalMatrix = glm::transpose(glm::inverse(glm::mat3(globalTransform)));
+		vertex.Normal = normalMatrix * glm::vec4(ToGlm(mesh->mNormals[i]), 1.f);
+
 		if (mesh->mTextureCoords[0])
 			vertex.TexCoords = ToGlm(mesh->mTextureCoords[0][i]);
 		else

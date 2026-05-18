@@ -119,13 +119,13 @@
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
-      <AdditionalIncludeDirectories>$(ProjectDir)\libs\imgui;$(ProjectDir)\libs\imgui\backends;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)\libs\imgui;$(ProjectDir)\libs\imgui\backends;$(ProjectDir)\source;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>glfw3.lib;opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>glfw3.lib;opengl32.lib;assimp-vc142-mtd.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -153,27 +153,35 @@
     <ClCompile Include="libs\imgui\imgui_tables.cpp" />
     <ClCompile Include="libs\imgui\imgui_widgets.cpp" />
     <ClCompile Include="source\Camera.cpp" />
-    <ClCompile Include="source\DirectionalLight.cpp" />
     <ClCompile Include="source\glad.c" />
-    <ClCompile Include="source\Light.cpp" />
+    <ClCompile Include="source\Light\DirectionalLight.cpp" />
+    <ClCompile Include="source\Light\Light.cpp" />
+    <ClCompile Include="source\Light\PointLight.cpp" />
+    <ClCompile Include="source\Light\SpotLight.cpp" />
     <ClCompile Include="source\Main.cpp" />
-    <ClCompile Include="source\PointLight.cpp" />
-    <ClCompile Include="source\Shader.cpp" />
-    <ClCompile Include="source\SpotLight.cpp" />
+    <ClCompile Include="source\Renderer\Mesh.cpp" />
+    <ClCompile Include="source\Renderer\Model.cpp" />
+    <ClCompile Include="source\Renderer\Shader.cpp" />
     <ClCompile Include="source\stb_image_wrap.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="resource.h" />
     <ClInclude Include="source\Camera.h" />
-    <ClInclude Include="source\DirectionalLight.h" />
-    <ClInclude Include="source\Light.h" />
-    <ClInclude Include="source\PointLight.h" />
-    <ClInclude Include="source\Shader.h" />
-    <ClInclude Include="source\SpotLight.h" />
+    <ClInclude Include="source\Light\DirectionalLight.h" />
+    <ClInclude Include="source\Light\Light.h" />
+    <ClInclude Include="source\Light\PointLight.h" />
+    <ClInclude Include="source\Light\SpotLight.h" />
+    <ClInclude Include="source\Renderer\Mesh.h" />
+    <ClInclude Include="source\Renderer\Model.h" />
+    <ClInclude Include="source\Renderer\Shader.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="content\models\ChessBoard.glb" />
     <None Include="content\shaders\Cube.frag" />
     <None Include="content\shaders\Cube.vert" />
     <None Include="content\shaders\Light.frag" />
+    <None Include="content\shaders\Piece.frag" />
+    <None Include="content\shaders\Piece.vert" />
     <None Include="content\shaders\Shader.frag" />
     <None Include="content\shaders\Shader.vert" />
   </ItemGroup>

@@ -30,6 +30,7 @@ public:
 	void setFloat(const std::string& name, float value) const;
 	void setVec3(const std::string& name, float x, float y, float z);
 	void setVec3(const std::string& name, const glm::vec3& value);
+	// Change parameter order later
 	void setMat4(const std::string& name, GLsizei count, GLboolean transpose, const GLfloat* value);
 };
 

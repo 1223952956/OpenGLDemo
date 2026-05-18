@@ -16,11 +16,26 @@
     <Filter Include="Source Files\imgui">
       <UniqueIdentifier>{be3a8cdd-568a-4209-b2fa-8090d2cb4843}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Resource Files\Shader">
-      <UniqueIdentifier>{6da5a245-d9eb-44b4-9101-62faf912425e}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Resource Files\Images">
       <UniqueIdentifier>{bdc7de73-4303-49f9-be83-9353a8b6d888}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Light">
+      <UniqueIdentifier>{a199123b-5f72-4110-8eae-fc55c77ad897}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\LIght">
+      <UniqueIdentifier>{cdd9837d-943d-4fdb-8a12-4055f99e5f58}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Renderer">
+      <UniqueIdentifier>{787823ab-3ad9-49f2-9dde-11f242d17c3e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Renderer">
+      <UniqueIdentifier>{a0e5673e-3cdd-49c8-8861-04b3b55f29ff}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files\Models">
+      <UniqueIdentifier>{cac7a65d-4da7-474c-8108-48d0f986d0a8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files\Shaders">
+      <UniqueIdentifier>{6da5a245-d9eb-44b4-9101-62faf912425e}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -31,9 +46,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="source\Main.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="source\Shader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="source\stb_image_wrap.cpp">
@@ -60,54 +72,81 @@
     <ClCompile Include="libs\imgui\imgui_impl_opengl3.cpp">
       <Filter>Source Files\imgui</Filter>
     </ClCompile>
-    <ClCompile Include="source\Light.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="source\Light\Light.cpp">
+      <Filter>Source Files\LIght</Filter>
     </ClCompile>
-    <ClCompile Include="source\DirectionalLight.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="source\Light\PointLight.cpp">
+      <Filter>Source Files\LIght</Filter>
     </ClCompile>
-    <ClCompile Include="source\PointLight.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="source\Light\SpotLight.cpp">
+      <Filter>Source Files\LIght</Filter>
     </ClCompile>
-    <ClCompile Include="source\SpotLight.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="source\Light\DirectionalLight.cpp">
+      <Filter>Source Files\LIght</Filter>
+    </ClCompile>
+    <ClCompile Include="source\Renderer\Shader.cpp">
+      <Filter>Source Files\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="source\Renderer\Mesh.cpp">
+      <Filter>Source Files\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="source\Renderer\Model.cpp">
+      <Filter>Source Files\Renderer</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="source\Camera.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="source\Shader.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="source\Light\Light.h">
+      <Filter>Header Files\Light</Filter>
     </ClInclude>
-    <ClInclude Include="source\Light.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="source\Light\PointLight.h">
+      <Filter>Header Files\Light</Filter>
     </ClInclude>
-    <ClInclude Include="source\DirectionalLight.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="source\Light\SpotLight.h">
+      <Filter>Header Files\Light</Filter>
     </ClInclude>
-    <ClInclude Include="source\PointLight.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="source\Light\DirectionalLight.h">
+      <Filter>Header Files\Light</Filter>
     </ClInclude>
-    <ClInclude Include="source\SpotLight.h">
+    <ClInclude Include="source\Renderer\Shader.h">
+      <Filter>Header Files\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="source\Renderer\Mesh.h">
+      <Filter>Header Files\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="source\Renderer\Model.h">
+      <Filter>Header Files\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="resource.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="content\shaders\Cube.frag">
-      <Filter>Resource Files\Shader</Filter>
+      <Filter>Resource Files\Shaders</Filter>
     </None>
     <None Include="content\shaders\Cube.vert">
-      <Filter>Resource Files\Shader</Filter>
+      <Filter>Resource Files\Shaders</Filter>
     </None>
     <None Include="content\shaders\Light.frag">
-      <Filter>Resource Files\Shader</Filter>
+      <Filter>Resource Files\Shaders</Filter>
     </None>
     <None Include="content\shaders\Shader.frag">
-      <Filter>Resource Files\Shader</Filter>
+      <Filter>Resource Files\Shaders</Filter>
     </None>
     <None Include="content\shaders\Shader.vert">
-      <Filter>Resource Files\Shader</Filter>
+      <Filter>Resource Files\Shaders</Filter>
+    </None>
+    <None Include="content\shaders\Piece.vert">
+      <Filter>Resource Files\Shaders</Filter>
+    </None>
+    <None Include="content\shaders\Piece.frag">
+      <Filter>Resource Files\Shaders</Filter>
+    </None>
+    <None Include="content\models\ChessBoard.glb">
+      <Filter>Resource Files\Models</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>

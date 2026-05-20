@@ -9,7 +9,16 @@ void Material::Bind(Shader& shader)
 		glActiveTexture(GL_TEXTURE0 + slot);
 		glBindTexture(GL_TEXTURE_2D, BaseColorTexture->Id);
 
-		shader.setInt("material.base_color_texture", slot);
+		shader.setInt("material.texture_base_color", slot);
+
+		slot++;
+	}
+	if (EmissiveTexture)
+	{
+		glActiveTexture(GL_TEXTURE0 + slot);
+		glBindTexture(GL_TEXTURE_2D, EmissiveTexture->Id);
+
+		shader.setInt("material.texture_emissive", slot);
 
 		slot++;
 	}

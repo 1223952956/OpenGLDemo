@@ -1,6 +1,8 @@
 #version 330 core
 
 in vec2 TexCoords;
+in vec3 WorldPos;
+in vec3 Normal;
 
 out vec4 FragColor;
 
@@ -14,7 +16,14 @@ struct Material {
 
 uniform Material material;
 
+uniform vec3 camPos;
+
 void main()
 {
-    FragColor = texture(material.texture_base_color, TexCoords);
+    vec3 norm = normalize(Normal);
+    vec3 view = normalize(camPos - WorldPos);
+
+    vec4 baseColor = texture(material.texture_base_color, TexCoords);
+    vec4 emissionColor = texture(material.texture_emissive, TexCoords);
+    FragColor = baseColor + emissionColor;
 }

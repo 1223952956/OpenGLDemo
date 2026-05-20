@@ -175,6 +175,8 @@ int main(void)
 
 	glEnable(GL_DEPTH_TEST);
 
+	glEnable(GL_FRAMEBUFFER_SRGB);
+
 	float vertices[] = {
 		//  ---- 位置 ----    - 纹理坐标 -
 		-0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
@@ -329,6 +331,7 @@ int main(void)
 		glm::mat4 model = glm::mat4(1.0f);
 		model = glm::translate(model, glm::vec3(0.f, 0.f, 0.f));
 		model = glm::scale(model, glm::vec3(1.f, 1.f, 1.f));
+		glm::mat4 model_normal = glm::transpose(glm::inverse(model));
 
 		glm::mat4 view = MainCamera.GetViewMatrix();
 		glm::mat4 projection;
@@ -336,8 +339,10 @@ int main(void)
 
 		pieceProgram.use();
 		pieceProgram.setMat4("model", 1, GL_FALSE, glm::value_ptr(model));
+		pieceProgram.setMat4("model_normal", 1, GL_FALSE, glm::value_ptr(model_normal));
 		pieceProgram.setMat4("view", 1, GL_FALSE, glm::value_ptr(view));
 		pieceProgram.setMat4("projection", 1, GL_FALSE, glm::value_ptr(projection));
+		pieceProgram.setMat4("camePos", 1, GL_FALSE, glm::value_ptr(MainCamera.Pos));
 
 		//chessBoard.Draw(pieceProgram, "Cube.001");
 		//chessBoard.Draw(pieceProgram, "Cube.002");
@@ -361,6 +366,7 @@ int main(void)
 		glfwPollEvents();
 	}
 
+	// Release textures
 	TextureManager::ShutDown();
 	glfwTerminate();
 	return 0;

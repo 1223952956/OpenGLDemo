@@ -160,6 +160,9 @@
     <None Include="content\models\ChessBoard.glb">
       <Filter>Resource Files\Models</Filter>
     </None>
+    <None Include="content\models\BlackQueen.glb">
+      <Filter>Resource Files\Models</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Image Include="content\images\awesomeface.png">

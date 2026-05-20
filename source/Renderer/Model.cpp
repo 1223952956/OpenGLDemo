@@ -23,10 +23,7 @@ void Model::Draw(Shader shader, const std::string& name)
 void Model::LoadModel(const std::string& path)
 {
 	Assimp::Importer importer;
-	const aiScene* scene = importer.ReadFile(path, aiProcess_Triangulate |
-		aiProcess_GenSmoothNormals |
-		aiProcess_CalcTangentSpace |
-		aiProcess_JoinIdenticalVertices);
+	const aiScene* scene = importer.ReadFile(path, aiProcess_Triangulate |aiProcess_FlipUVs);
 	
 	if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
 	{
@@ -167,12 +164,12 @@ Texture2D* Model::LoadTexture(aiMaterial* mat, aiTextureType type, const aiScene
 
 	if (str.C_Str()[0] == '*')
 	{
-		return TextureManager::Load(str.C_Str(), scene);
+		return TextureManager::Load(str.C_Str(), scene, type);
 	}
 	else
 	{
 		std::string path = Directory + "/" + str.C_Str();
-		return TextureManager::Load(path);
+		return TextureManager::Load(path, type);
 	}
 }
 

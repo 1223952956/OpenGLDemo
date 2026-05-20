@@ -180,6 +180,7 @@
     <ClInclude Include="source\Renderer\TextureManager.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="content\models\BlackQueen.glb" />
     <None Include="content\models\ChessBoard.glb" />
     <None Include="content\shaders\Cube.frag" />
     <None Include="content\shaders\Cube.vert" />

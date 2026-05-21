@@ -3,9 +3,20 @@
 #include <iostream>
 
 #include <glad/glad.h>
+#include <glm/glm.hpp>
 #include <stb_image.h>
 
 std::unordered_map<std::string, std::unique_ptr<Texture2D>>TextureManager::Texture2DMap;
+GLuint TextureManager::WhiteTexture;
+GLuint TextureManager::BlackTexture;
+GLuint TextureManager::NormalTexture;
+
+void TextureManager::Init()
+{
+	WhiteTexture = CreateSolidTexture(1.f, 1.f, 1.f, 1.f);
+	BlackTexture = CreateSolidTexture(0.f, 0.f, 0.f, 1.f);
+	NormalTexture = CreateSolidTexture(0.5f, 0.5f, 1.f, 1.f);
+}
 
 Texture2D* TextureManager::Load(const std::string& path, aiTextureType type)
 {
@@ -26,6 +37,8 @@ Texture2D* TextureManager::Load(const std::string& path, aiTextureType type)
 		stbi_image_free(data);
 		return nullptr;
 	}
+
+	std::cout << "Texture: " << path << std::endl;
 
 	auto texture = std::make_unique<Texture2D>();
 
@@ -67,6 +80,8 @@ Texture2D* TextureManager::Load(const std::string& path, const aiScene* scene, a
 		stbi_image_free(data);
 		return nullptr;
 	}
+
+	std::cout << "Texture: " << tex->mFilename.C_Str() << std::endl;
 
 	auto texture = std::make_unique<Texture2D>();
 
@@ -128,9 +143,32 @@ unsigned int TextureManager::CreateGLTexture(int width, int height, int nrChanne
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-	//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-
 	glGenerateMipmap(GL_TEXTURE_2D);
 
 	return textureID;
+}
+
+GLuint TextureManager::CreateSolidTexture(float r, float g, float b, float a)
+{
+	unsigned char pixel[4];
+	pixel[0] = static_cast<unsigned char>(glm::clamp(r, 0.0f, 1.0f) * 255.0f);
+	pixel[1] = static_cast<unsigned char>(glm::clamp(g, 0.0f, 1.0f) * 255.0f);
+	pixel[2] = static_cast<unsigned char>(glm::clamp(b, 0.0f, 1.0f) * 255.0f);
+	pixel[3] = static_cast<unsigned char>(glm::clamp(a, 0.0f, 1.0f) * 255.0f);
+
+	GLuint texId;
+	glGenTextures(1, &texId);
+	glBindTexture(GL_TEXTURE_2D, texId);
+
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 1, 1, 0, GL_RGBA, GL_UNSIGNED_BYTE, pixel);
+
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+
+	glBindTexture(GL_TEXTURE_2D, 0);
+
+	return texId;
 }

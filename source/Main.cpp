@@ -177,6 +177,8 @@ int main(void)
 
 	glEnable(GL_FRAMEBUFFER_SRGB);
 
+	TextureManager::Init();
+
 	float vertices[] = {
 		//  ---- 位置 ----    - 纹理坐标 -
 		-0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
@@ -297,17 +299,17 @@ int main(void)
 	pieceProgram.use();
 
 	// Model Initialize
-	Model chessBoard("content/models/ChessBoard.glb");
+	Model chessBoard("content/models/WhiteKnight.glb");
 
 
 	// Light Initialize
-	DirectionalLight dirLight(glm::vec3(-0.2f, -1.0f, -0.3f), glm::vec3(0.2f, 0.2f, 0.2f), glm::vec3(0.5f, 0.5f, 0.5f), glm::vec3(1.0f, 1.0f, 1.0f));
+	DirectionalLight dirLight(glm::vec3(-0.2f, -1.0f, -0.3f), glm::vec3(0.2f));
 	std::vector<PointLight> pointLights;
 	for (int i = 0; i < 4; ++i)
 	{
-		pointLights.emplace_back(PointLight(pointLightPositions[i], glm::vec3(0.2f, 0.2f, 0.2f), glm::vec3(0.5f, 0.5f, 0.5f), glm::vec3(1.0f, 1.0f, 1.0f), 1.f, 0.09f, 0.032f));
+		pointLights.emplace_back(PointLight(pointLightPositions[i], glm::vec3(0.2f), 1.f, 0.09f, 0.032f));
 	}
-	SpotLight spotLight(MainCamera.Pos, MainCamera.GetFront(), glm::vec3(0.2f, 0.2f, 0.2f), glm::vec3(0.5f, 0.5f, 0.5f), glm::vec3(1.0f, 1.0f, 1.0f), glm::cos(glm::radians(12.5f)), glm::cos(glm::radians(17.5f)));
+	SpotLight spotLight(MainCamera.Pos, MainCamera.GetFront(), glm::vec3(1.f), glm::cos(glm::radians(12.5f)), glm::cos(glm::radians(17.5f)));
 
 	float deltaTime = 0.0f;
 	float lastFrameTime = 0.0f;
@@ -349,18 +351,26 @@ int main(void)
 
 		chessBoard.Draw(pieceProgram);
 
-		//cubeProgram.setFloat("material.shininess", 0.5 * 128);
 
 		// Upload Light Data
-		//dirLight.Upload(cubeProgram, "dirLight");
-		//for (int i = 0; i < 4; ++i)
-		//{
-		//	std::string name = "pointLights[" + std::to_string(i) + "]";
-		//	pointLights[i].Upload(cubeProgram, name);
-		//}
-		//spotLight.SetPosition(MainCamera.Pos);
-		//spotLight.SetDirection(MainCamera.GetFront());
-		//spotLight.Upload(cubeProgram, "spotlight");
+		std::string name;
+		int i = 0;
+		for (; i < 4; ++i)
+		{
+			name = "lights[" + std::to_string(i) + "]";
+			pointLights[i].Upload(pieceProgram, name);
+		}
+
+		name = "lights[" + std::to_string(i) + "]";
+		dirLight.Upload(pieceProgram, name);
+		++i;
+
+		spotLight.SetPosition(MainCamera.Pos);
+		spotLight.SetDirection(MainCamera.GetFront());
+		name = "lights[" + std::to_string(i) + "]";
+		spotLight.Upload(pieceProgram, name);
+
+		pieceProgram.setInt("num_lights", 6);
 
 		glfwSwapBuffers(window);
 		glfwPollEvents();

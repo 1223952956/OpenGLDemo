@@ -118,35 +118,41 @@ void Model::LoadMaterials(const aiScene* scene)
 	{
 		aiMaterial* aiMat = scene->mMaterials[i];
 
+		aiString name;
+		scene->mMaterials[i]->Get(AI_MATKEY_NAME, name);
+		printf("Material[%d]: '%s'\n", i, name.C_Str());
+
 		auto material = std::make_unique<Material>();
 
 		// Base Color
 		material->BaseColorTexture =
-			LoadTexture(
-				aiMat,
-				aiTextureType_BASE_COLOR,
-				scene
-			);
-
+			LoadTexture(aiMat, aiTextureType_BASE_COLOR, scene);
 		// Normal
 		material->NormalTexture =
-			LoadTexture(
-				aiMat,
-				aiTextureType_NORMALS,
-				scene
-			);
+			LoadTexture(aiMat, aiTextureType_NORMALS, scene);
+
+		// Metallic Roughness
+		material->MetallicRoughnessTexture =
+			LoadTexture(aiMat, aiTextureType_GLTF_METALLIC_ROUGHNESS, scene);
+		float metallic = 1.0f;
+		if (aiMat->Get(AI_MATKEY_METALLIC_FACTOR, metallic) == AI_SUCCESS)
+		{
+			printf("metallicFactor: %f\n", metallic);
+			material->MetallicFactor = metallic;
+		}
+		float roughness = 1.0f;
+		if (aiMat->Get(AI_MATKEY_ROUGHNESS_FACTOR, roughness) == AI_SUCCESS)
+		{
+			printf("roughnessFactor: %f\n", roughness);
+			material->RoughnessFactor = roughness;
+		}
 
 		// Emissive
 		material->EmissiveTexture =
-			LoadTexture(
-				aiMat,
-				aiTextureType_EMISSIVE,
-				scene
-			);
-
-		// TODO:
-		// MetallicRoughness
-		// AO
+			LoadTexture(aiMat, aiTextureType_EMISSIVE, scene);
+		// Ambient Occlusion
+		material->OcclusionTexture =
+			LoadTexture(aiMat, aiTextureType_LIGHTMAP, scene);
 
 		Materials.emplace_back(std::move(material));
 	}

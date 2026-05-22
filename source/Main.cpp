@@ -287,10 +287,10 @@ int main(void)
 	glm::vec3 lightPos = glm::vec3(1.2f, 1.0f, 2.0f);
 
 	glm::vec3 pointLightPositions[] = {
-		glm::vec3(0.7f,  0.2f,  2.0f),
-		glm::vec3(2.3f, -3.3f, -4.0f),
-		glm::vec3(-4.0f,  2.0f, -12.0f),
-		glm::vec3(0.0f,  0.0f, -3.0f)
+		glm::vec3(2.5f,  3.0f,  2.0f),
+		glm::vec3(-3.0f,  1.0f,  2.0f),
+		glm::vec3(-2.0f,  2.0f, -3.0f),
+		glm::vec3(0.0f,  5.0f, 0.0f)
 	};
 	
 
@@ -299,18 +299,19 @@ int main(void)
 	pieceProgram.use();
 
 	// Model Initialize
-	Model Piece("content/models/WhiteRook.glb");
-	Model Piece2("content/models/BlackQueen.glb");
+	Model ChessBoard("content/models/ChessBoard.glb");
+	Model WhiteRook("content/models/WhiteRook.glb");
+	Model BlackQueen("content/models/BlackQueen.glb");
 
 
 	// Light Initialize
-	DirectionalLight dirLight(glm::vec3(-0.2f, -1.0f, -0.3f), glm::vec3(0.2f));
+	DirectionalLight dirLight(glm::vec3(-0.5f, -1.0f, -0.3f), glm::vec3(1.0f, 0.95f, 0.90f), 4.0f);
 	std::vector<PointLight> pointLights;
 	for (int i = 0; i < 4; ++i)
 	{
-		pointLights.emplace_back(PointLight(pointLightPositions[i], glm::vec3(0.2f), 1.f, 0.09f, 0.032f, 1000.f));
+		pointLights.emplace_back(PointLight(pointLightPositions[i], glm::vec3(1.0f, 0.97f, 0.92f), 1.f, 0.09f, 0.032f, 10.f, 80.0f));
 	}
-	SpotLight spotLight(MainCamera.Pos, MainCamera.GetFront(), glm::vec3(0.f), glm::cos(glm::radians(12.5f)), glm::cos(glm::radians(17.5f)), 10.f);
+	SpotLight spotLight(MainCamera.Pos, MainCamera.GetFront(), glm::vec3(0.f), glm::cos(glm::radians(12.5f)), glm::cos(glm::radians(17.5f)), 10.f, 1.f);
 
 	float deltaTime = 0.0f;
 	float lastFrameTime = 0.0f;
@@ -348,8 +349,9 @@ int main(void)
 		pieceProgram.setMat4("camePos", 1, GL_FALSE, glm::value_ptr(MainCamera.Pos));
 
 
-		Piece.Draw(pieceProgram);
-		Piece2.Draw(pieceProgram);
+		ChessBoard.Draw(pieceProgram);
+		WhiteRook.Draw(pieceProgram);
+		BlackQueen.Draw(pieceProgram);
 
 		// Upload Light Data
 		std::string name;

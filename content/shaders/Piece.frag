@@ -31,11 +31,15 @@ uniform float occlusion_strength;
 uniform bool is_opaque;
 uniform float alpha_cutoff;
 
+
+// TODO 
+// sperate light to Point/Directional/Spot 
 struct Light {
     vec3 position;   
     vec3 color;      
     int type;     // Use int may have memory alignment issue  
-    float range;      
+    float range;
+    float intensity;
 
     vec3 direction;
 
@@ -87,8 +91,8 @@ vec3 CalcLightRadiance(Light light, vec3 fragPos, vec3 N, vec3 V,
         vec3  delta = light.position - fragPos;
         float dist  = length(delta);
         L = normalize(delta);
-        attenuation = 1.0 / (light.constant + light.linear * dist + light.quadratic * dist * dist);
-        float rangeFactor = clamp(1.0 - dist / light.range, 0.0, 1.0);
+        attenuation = 1.0 / (dist * dist);
+        float rangeFactor = clamp(1.0 - pow(dist / light.range, 4.0), 0.0, 1.0);
         attenuation *= rangeFactor * rangeFactor;
 
     } else if (light.type == LIGHT_DIRECTIONAL) {
@@ -105,7 +109,7 @@ vec3 CalcLightRadiance(Light light, vec3 fragPos, vec3 N, vec3 V,
         float spotFade = clamp((cosTheta - light.outerCos) / epsilon, 0.0, 1.0);
         float diff = max(dot(normalize(Normal), normalize(L)), 0.0);
         attenuation = spotFade / (1.0 + dist * dist);
-        float rangeFactor = clamp(1.0 - dist / light.range, 0.0, 1.0);
+        float rangeFactor = clamp(1.0 - pow(dist / light.range, 4.0), 0.0, 1.0);
         attenuation *= rangeFactor * rangeFactor;
     }
 
@@ -129,9 +133,20 @@ vec3 CalcLightRadiance(Light light, vec3 fragPos, vec3 N, vec3 V,
     vec3  diffuse   = kD * albedo / PI;
 
     // 4. merge
-    vec3 radiance = light.color * attenuation;
+    vec3 radiance = light.intensity * light.color * attenuation;
     return (diffuse + specular) * radiance * NdL;
 }
+
+// ACES Film Tone Mapping
+vec3 ACESFilm(vec3 x) {
+    float a = 2.51;
+    float b = 0.03;
+    float c = 2.43;
+    float d = 0.59;
+    float e = 0.14;
+    return clamp((x * (a * x + b)) / (x * (c * x + d) + e), 0.0, 1.0);
+}
+
 
 void main()
 {
@@ -154,9 +169,10 @@ void main()
 
     vec3 color = emissive + ambient + Lo;
 
-    // Tone mapping + Gamma
-    color = color / (color + vec3(1.0));   // Reinhard
-    color = pow(color, vec3(1.0 / 2.2));
+    // ACE
+    color = ACESFilm(color);  
+    // No need for double gamma correction for gltf texure are RGBA
+    // color = pow(color, vec3(1.0 / 2.2));
 
     FragColor = vec4(color, 1.0);
 }

@@ -1,7 +1,7 @@
 #include "SpotLight.h"
 
-SpotLight::SpotLight(glm::vec3 position, glm::vec3 direction, glm::vec3 color, float cutOff, float outerCutOff, float range)
-	:Light(position, color)
+SpotLight::SpotLight(glm::vec3 position, glm::vec3 direction, glm::vec3 color, float cutOff, float outerCutOff, float range, float intensity)
+	:Light(position, color, intensity)
 	,Direction(direction)
 	,InnerCos(cutOff)
 	,OuterCos(outerCutOff)

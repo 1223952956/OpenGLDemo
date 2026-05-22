@@ -1,7 +1,7 @@
 #include "PointLight.h"
 
-PointLight::PointLight(glm::vec3 position, glm::vec3 color, float constant, float linear, float quadratic, float range)
-	: Light(position, color)
+PointLight::PointLight(glm::vec3 position, glm::vec3 color, float constant, float linear, float quadratic, float range, float intensity)
+	: Light(position, color, intensity)
 	, Constant(constant)
 	, Linear(linear)
 	, Quadratic(quadratic)

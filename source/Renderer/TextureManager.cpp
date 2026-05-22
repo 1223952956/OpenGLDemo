@@ -127,7 +127,8 @@ unsigned int TextureManager::CreateGLTexture(int width, int height, int nrChanne
 		dataFormat = GL_RGBA;
 	}
 
-	if (type == aiTextureType::aiTextureType_BASE_COLOR)
+	if (type == aiTextureType::aiTextureType_BASE_COLOR ||
+		type == aiTextureType::aiTextureType_EMISSIVE)
 	{
 		internalFormat = (nrChannels == 4) ? GL_SRGB8_ALPHA8 : GL_SRGB8;
 	}

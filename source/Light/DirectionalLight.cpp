@@ -1,7 +1,7 @@
 #include "DirectionalLight.h"
 
-DirectionalLight::DirectionalLight(glm::vec3 direction, glm::vec3 color)
-	:Light(glm::vec3(0.f), color)
+DirectionalLight::DirectionalLight(glm::vec3 direction, glm::vec3 color, float intensity)
+	:Light(glm::vec3(0.f), color, intensity)
 	,Direction(direction)
 {
 }

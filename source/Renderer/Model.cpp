@@ -170,7 +170,7 @@ Texture2D* Model::LoadTexture(aiMaterial* mat, aiTextureType type, const aiScene
 
 	if (str.C_Str()[0] == '*')
 	{
-		return TextureManager::Load(str.C_Str(), scene, type);
+		return TextureManager::Load(str.C_Str(), Directory, scene, type);
 	}
 	else
 	{

@@ -38,8 +38,15 @@ struct Light {
     float range;      
 
     vec3 direction;
+
+    //spot
     float innerCos;
     float outerCos;
+
+    // point
+    float constant;
+    float linear;
+    float quadratic;
 };
 
 uniform int num_lights;
@@ -70,23 +77,26 @@ vec3 FresnelSchlick(float cosTheta, vec3 F0) {
 
 vec3 CalcLightRadiance(Light light, vec3 fragPos, vec3 N, vec3 V,
                        vec3 albedo, float metallic, float roughness) {
-    // 1. 求 L 和衰减
+    // 1. calc L and attenuation
     vec3  L;
     float attenuation = 1.0;
 
+    // "If" may be slow on GPU
     if (light.type == LIGHT_POINT) {
-        // 点光源
+        // point
         vec3  delta = light.position - fragPos;
         float dist  = length(delta);
         L = normalize(delta);
-        attenuation = 1.0 / (1.0 + (dist / light.range) * (dist / light.range));
+        attenuation = 1.0 / (light.constant + light.linear * dist + light.quadratic * dist * dist);
+        float rangeFactor = clamp(1.0 - dist / light.range, 0.0, 1.0);
+        attenuation *= rangeFactor * rangeFactor;
 
     } else if (light.type == LIGHT_DIRECTIONAL) {
-        // 方向光
+        // directional
         L = normalize(-light.direction);
 
     } else if (light.type == LIGHT_SPOT) {
-        // 聚光灯
+        // spot
         vec3  delta    = light.position - fragPos;
         float dist     = length(delta);
         L = normalize(delta);
@@ -94,16 +104,18 @@ vec3 CalcLightRadiance(Light light, vec3 fragPos, vec3 N, vec3 V,
         float epsilon  = light.innerCos - light.outerCos;
         float spotFade = clamp((cosTheta - light.outerCos) / epsilon, 0.0, 1.0);
         float diff = max(dot(normalize(Normal), normalize(L)), 0.0);
-        attenuation    = spotFade / (1.0 + (dist / light.range) * (dist / light.range));
+        attenuation = spotFade / (1.0 + dist * dist);
+        float rangeFactor = clamp(1.0 - dist / light.range, 0.0, 1.0);
+        attenuation *= rangeFactor * rangeFactor;
     }
 
-    // 2. 共享量
+    // 2. shared
     vec3  H   = normalize(V + L);
     float NdL = max(dot(N, L), 0.0);
     float NdV = max(dot(N, V), 0.0);
     float HdV = max(dot(H, V), 0.0);
 
-    if (NdL < 1e-4) return vec3(0.0); // 背面直接跳过
+    if (NdL < 1e-4) return vec3(0.0); // Ignore back
 
     // 3. PBR BRDF
     vec3 F0 = mix(vec3(0.04), albedo, metallic);
@@ -116,7 +128,7 @@ vec3 CalcLightRadiance(Light light, vec3 fragPos, vec3 N, vec3 V,
     vec3  kD        = (1.0 - F) * (1.0 - metallic);
     vec3  diffuse   = kD * albedo / PI;
 
-    // 4. 合并
+    // 4. merge
     vec3 radiance = light.color * attenuation;
     return (diffuse + specular) * radiance * NdL;
 }
@@ -131,13 +143,13 @@ void main()
     float ao = texture(texture_occlusion, TexCoords).r * occlusion_strength;
     vec3 emissive = texture(texture_emissive, TexCoords).rgb * emissive_factor;
 
-    // 逐光源累加 ← 只需改这里添加/删除光源
+    // Add per light
     vec3 Lo = vec3(0.0);
     for (int i = 0; i < num_lights; i++) {
         Lo += CalcLightRadiance(lights[i], WorldPos, norm, view, albedo, metallic, roughness);
     }
 
-    // IBL 环境光
+    // Simple ambient
     vec3 ambient = vec3(0.03) * albedo * ao;
 
     vec3 color = emissive + ambient + Lo;

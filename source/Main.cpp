@@ -299,7 +299,8 @@ int main(void)
 	pieceProgram.use();
 
 	// Model Initialize
-	Model chessBoard("content/models/WhiteKnight.glb");
+	Model Piece("content/models/WhiteRook.glb");
+	Model Piece2("content/models/BlackQueen.glb");
 
 
 	// Light Initialize
@@ -307,9 +308,9 @@ int main(void)
 	std::vector<PointLight> pointLights;
 	for (int i = 0; i < 4; ++i)
 	{
-		pointLights.emplace_back(PointLight(pointLightPositions[i], glm::vec3(0.2f), 1.f, 0.09f, 0.032f));
+		pointLights.emplace_back(PointLight(pointLightPositions[i], glm::vec3(0.2f), 1.f, 0.09f, 0.032f, 1000.f));
 	}
-	SpotLight spotLight(MainCamera.Pos, MainCamera.GetFront(), glm::vec3(1.f), glm::cos(glm::radians(12.5f)), glm::cos(glm::radians(17.5f)));
+	SpotLight spotLight(MainCamera.Pos, MainCamera.GetFront(), glm::vec3(0.f), glm::cos(glm::radians(12.5f)), glm::cos(glm::radians(17.5f)), 10.f);
 
 	float deltaTime = 0.0f;
 	float lastFrameTime = 0.0f;
@@ -346,11 +347,9 @@ int main(void)
 		pieceProgram.setMat4("projection", 1, GL_FALSE, glm::value_ptr(projection));
 		pieceProgram.setMat4("camePos", 1, GL_FALSE, glm::value_ptr(MainCamera.Pos));
 
-		//chessBoard.Draw(pieceProgram, "Cube.001");
-		//chessBoard.Draw(pieceProgram, "Cube.002");
 
-		chessBoard.Draw(pieceProgram);
-
+		Piece.Draw(pieceProgram);
+		Piece2.Draw(pieceProgram);
 
 		// Upload Light Data
 		std::string name;

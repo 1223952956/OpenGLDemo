@@ -12,7 +12,7 @@ public:
 	static void Init();
 
 	static Texture2D* Load(const std::string& path, aiTextureType type);
-	static Texture2D* Load(const std::string& path, const aiScene* scene, aiTextureType type);
+	static Texture2D* Load(const std::string& texNum, const std::string& dictionary, const aiScene* scene, aiTextureType type);
 
 	static GLuint GetWhiteTexture() { return WhiteTexture; };
 	static GLuint GetBlackTexture() { return BlackTexture; };

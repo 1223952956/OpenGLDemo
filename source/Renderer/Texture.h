@@ -1,4 +1,5 @@
 #pragma once
+#include <iostream>
 #include <string>
 #include <glad/glad.h>
 
@@ -14,6 +15,23 @@ public:
     {
         if (Id != 0)
         {
+            glDeleteTextures(1, &Id);
+        }
+    }
+};
+
+// !!! Never construct data structures directly using Texture2D !!!
+class Cubemap
+{
+public:
+    unsigned int Id;
+
+    // !!! Delete GPU resource !!!
+    ~Cubemap()
+    {
+        if (Id != 0)
+        {
+            std::cout << "Delete cubemap: " << Id << std::endl;
             glDeleteTextures(1, &Id);
         }
     }

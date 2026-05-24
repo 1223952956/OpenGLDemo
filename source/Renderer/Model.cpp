@@ -3,13 +3,13 @@
 
 #include "TextureManager.h"
 
-void Model::Draw(Shader shader)
+void Model::Draw(Shader& shader)
 {
 	for (unsigned int i = 0; i < Meshes.size(); i++)
 		Meshes[i].Draw(shader);
 }
 
-void Model::Draw(Shader shader, const std::string& name)
+void Model::Draw(Shader& shader, const std::string& name)
 {
 	for (unsigned int i = 0; i < Meshes.size(); i++)
 	{

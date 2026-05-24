@@ -18,6 +18,40 @@ void TextureManager::Init()
 	NormalTexture = CreateSolidTexture(0.5f, 0.5f, 1.f, 1.f);
 }
 
+Texture2D* TextureManager::Load(const std::string& path)
+{
+	auto it = Texture2DMap.find(path);
+
+	if (it != Texture2DMap.end())
+	{
+		return it->second.get();
+	}
+
+	stbi_set_flip_vertically_on_load(true);
+	int width, height, channels;
+	float* data = stbi_loadf(path.c_str(), &width, &height, &channels, 0);
+	if (!data)
+	{
+		std::cerr << "[TextureManager] Failed to load texture: " << path << std::endl;
+		stbi_image_free(data);
+		return nullptr;
+	}
+
+	std::cout << "Load texture: " << path << std::endl;
+
+	auto texture = std::make_unique<Texture2D>();
+
+	texture->Id = CreateGLTexture(width, height, channels, data);
+	texture->Path = path;
+
+	stbi_image_free(data);
+
+	Texture2D* ptr = texture.get();
+	Texture2DMap[texture->Path] = std::move(texture);
+
+	return ptr;
+}
+
 Texture2D* TextureManager::Load(const std::string& path, aiTextureType type)
 {
 	auto it = Texture2DMap.find(path);
@@ -33,12 +67,12 @@ Texture2D* TextureManager::Load(const std::string& path, aiTextureType type)
 
 	if (!data)
 	{
-		std::cerr << "[Model] Failed to load texture:" << path << std::endl;
+		std::cerr << "[TextureManager] Failed to load texture: " << path << std::endl;
 		stbi_image_free(data);
 		return nullptr;
 	}
 
-	std::cout << "Texture: " << path << std::endl;
+	std::cout << "Load texture: " << path << std::endl;
 
 	auto texture = std::make_unique<Texture2D>();
 
@@ -76,12 +110,12 @@ Texture2D* TextureManager::Load(const std::string& texNum, const std::string& di
 
 	if (!data)
 	{
-		std::cerr << "[Model] Failed to load texture:" << texNum << std::endl;
+		std::cerr << "[TextureManager] Failed to load texture: " << texNum << std::endl;
 		stbi_image_free(data);
 		return nullptr;
 	}
 
-	std::cout << "Texture: " << tex->mFilename.C_Str() << std::endl;
+	std::cout << "Load texture: " << tex->mFilename.C_Str() << std::endl;
 
 	auto texture = std::make_unique<Texture2D>();
 
@@ -145,6 +179,21 @@ unsigned int TextureManager::CreateGLTexture(int width, int height, int nrChanne
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
 	glGenerateMipmap(GL_TEXTURE_2D);
+
+	return textureID;
+}
+
+unsigned int TextureManager::CreateGLTexture(int width, int height, int nrChannels, float* data)
+{
+	unsigned int textureID;
+	glGenTextures(1, &textureID);
+	glBindTexture(GL_TEXTURE_2D, textureID);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F, width, height, 0, GL_RGB, GL_FLOAT, data);
+
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
 	return textureID;
 }

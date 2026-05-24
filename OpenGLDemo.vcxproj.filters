@@ -16,9 +16,6 @@
     <Filter Include="Source Files\imgui">
       <UniqueIdentifier>{be3a8cdd-568a-4209-b2fa-8090d2cb4843}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Resource Files\Images">
-      <UniqueIdentifier>{bdc7de73-4303-49f9-be83-9353a8b6d888}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Header Files\Light">
       <UniqueIdentifier>{a199123b-5f72-4110-8eae-fc55c77ad897}</UniqueIdentifier>
     </Filter>
@@ -31,10 +28,13 @@
     <Filter Include="Source Files\Renderer">
       <UniqueIdentifier>{a0e5673e-3cdd-49c8-8861-04b3b55f29ff}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Resource Files\Models">
+    <Filter Include="Resource Files\images">
+      <UniqueIdentifier>{bdc7de73-4303-49f9-be83-9353a8b6d888}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files\models">
       <UniqueIdentifier>{cac7a65d-4da7-474c-8108-48d0f986d0a8}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Resource Files\Shaders">
+    <Filter Include="Resource Files\shaders">
       <UniqueIdentifier>{6da5a245-d9eb-44b4-9101-62faf912425e}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
@@ -99,6 +99,12 @@
     <ClCompile Include="source\Renderer\TextureManager.cpp">
       <Filter>Source Files\Renderer</Filter>
     </ClCompile>
+    <ClCompile Include="source\Renderer\IBLMaterial.cpp">
+      <Filter>Source Files\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="source\Renderer\IBLBaker.cpp">
+      <Filter>Source Files\Renderer</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="source\Camera.h">
@@ -134,54 +140,75 @@
     <ClInclude Include="source\Renderer\TextureManager.h">
       <Filter>Header Files\Renderer</Filter>
     </ClInclude>
+    <ClInclude Include="source\Renderer\IBLMaterial.h">
+      <Filter>Header Files\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="source\Renderer\IBLBaker.h">
+      <Filter>Header Files\Renderer</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="content\shaders\Cube.frag">
-      <Filter>Resource Files\Shaders</Filter>
+      <Filter>Resource Files\shaders</Filter>
     </None>
     <None Include="content\shaders\Cube.vert">
-      <Filter>Resource Files\Shaders</Filter>
+      <Filter>Resource Files\shaders</Filter>
     </None>
     <None Include="content\shaders\Light.frag">
-      <Filter>Resource Files\Shaders</Filter>
+      <Filter>Resource Files\shaders</Filter>
     </None>
     <None Include="content\shaders\Shader.frag">
-      <Filter>Resource Files\Shaders</Filter>
+      <Filter>Resource Files\shaders</Filter>
     </None>
     <None Include="content\shaders\Shader.vert">
-      <Filter>Resource Files\Shaders</Filter>
+      <Filter>Resource Files\shaders</Filter>
     </None>
     <None Include="content\shaders\Piece.vert">
-      <Filter>Resource Files\Shaders</Filter>
+      <Filter>Resource Files\shaders</Filter>
     </None>
     <None Include="content\shaders\Piece.frag">
-      <Filter>Resource Files\Shaders</Filter>
+      <Filter>Resource Files\shaders</Filter>
     </None>
     <None Include="content\models\ChessBoard.glb">
-      <Filter>Resource Files\Models</Filter>
+      <Filter>Resource Files\models</Filter>
     </None>
     <None Include="content\models\BlackQueen.glb">
-      <Filter>Resource Files\Models</Filter>
+      <Filter>Resource Files\models</Filter>
+    </None>
+    <None Include="content\shaders\EquirectangularToCubemap.frag">
+      <Filter>Resource Files\shaders</Filter>
+    </None>
+    <None Include="content\shaders\Cubemap.vert">
+      <Filter>Resource Files\shaders</Filter>
+    </None>
+    <None Include="content\shaders\SkyBox.frag">
+      <Filter>Resource Files\shaders</Filter>
+    </None>
+    <None Include="content\shaders\SkyBox.vert">
+      <Filter>Resource Files\shaders</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>
     <Image Include="content\images\awesomeface.png">
-      <Filter>Resource Files\Images</Filter>
+      <Filter>Resource Files\images</Filter>
     </Image>
     <Image Include="content\images\container.jpg">
-      <Filter>Resource Files\Images</Filter>
+      <Filter>Resource Files\images</Filter>
     </Image>
     <Image Include="content\images\container2.png">
-      <Filter>Resource Files\Images</Filter>
+      <Filter>Resource Files\images</Filter>
     </Image>
     <Image Include="content\images\container2_specular.png">
-      <Filter>Resource Files\Images</Filter>
+      <Filter>Resource Files\images</Filter>
     </Image>
     <Image Include="content\images\lighting_maps_specular_color.png">
-      <Filter>Resource Files\Images</Filter>
+      <Filter>Resource Files\images</Filter>
     </Image>
     <Image Include="content\images\matrix.jpg">
-      <Filter>Resource Files\Images</Filter>
+      <Filter>Resource Files\images</Filter>
+    </Image>
+    <Image Include="content\images\ibl_hdr_radiance.png">
+      <Filter>Resource Files\images</Filter>
     </Image>
   </ItemGroup>
 </Project>

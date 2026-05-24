@@ -17,8 +17,8 @@ public:
     {
         LoadModel(path);
     }
-    void Draw(Shader shader);
-    void Draw(Shader shader, const std::string& name);
+    void Draw(Shader& shader);
+    void Draw(Shader& shader, const std::string& name);
 
 private:
     std::vector<Mesh> Meshes;

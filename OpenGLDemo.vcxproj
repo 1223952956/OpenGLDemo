@@ -159,6 +159,8 @@
     <ClCompile Include="source\Light\PointLight.cpp" />
     <ClCompile Include="source\Light\SpotLight.cpp" />
     <ClCompile Include="source\Main.cpp" />
+    <ClCompile Include="source\Renderer\IBLBaker.cpp" />
+    <ClCompile Include="source\Renderer\IBLMaterial.cpp" />
     <ClCompile Include="source\Renderer\Material.cpp" />
     <ClCompile Include="source\Renderer\Mesh.cpp" />
     <ClCompile Include="source\Renderer\Model.cpp" />
@@ -172,6 +174,8 @@
     <ClInclude Include="source\Light\Light.h" />
     <ClInclude Include="source\Light\PointLight.h" />
     <ClInclude Include="source\Light\SpotLight.h" />
+    <ClInclude Include="source\Renderer\IBLBaker.h" />
+    <ClInclude Include="source\Renderer\IBLMaterial.h" />
     <ClInclude Include="source\Renderer\Material.h" />
     <ClInclude Include="source\Renderer\Mesh.h" />
     <ClInclude Include="source\Renderer\Model.h" />
@@ -184,17 +188,22 @@
     <None Include="content\models\ChessBoard.glb" />
     <None Include="content\shaders\Cube.frag" />
     <None Include="content\shaders\Cube.vert" />
+    <None Include="content\shaders\EquirectangularToCubemap.frag" />
+    <None Include="content\shaders\Cubemap.vert" />
     <None Include="content\shaders\Light.frag" />
     <None Include="content\shaders\Piece.frag" />
     <None Include="content\shaders\Piece.vert" />
     <None Include="content\shaders\Shader.frag" />
     <None Include="content\shaders\Shader.vert" />
+    <None Include="content\shaders\SkyBox.frag" />
+    <None Include="content\shaders\SkyBox.vert" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="content\images\awesomeface.png" />
     <Image Include="content\images\container.jpg" />
     <Image Include="content\images\container2.png" />
     <Image Include="content\images\container2_specular.png" />
+    <Image Include="content\images\ibl_hdr_radiance.png" />
     <Image Include="content\images\lighting_maps_specular_color.png" />
     <Image Include="content\images\matrix.jpg" />
   </ItemGroup>

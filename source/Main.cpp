@@ -21,18 +21,6 @@
 #include "Light/SpotLight.h"
 #include "Renderer/IBLBaker.h"
 
-#define GL_CHECK(x) \
-    do { \
-        x; \
-        GLenum err; \
-        while ((err = glGetError()) != GL_NO_ERROR) { \
-            std::cout << "[OpenGL Error] (" << err << ") in " \
-                      << __FILE__ << " at line " << __LINE__ \
-                      << "\nExpr: " << #x << std::endl; \
-        } \
-    } while(0)
-
-
 float screenWidth = 800.0f;
 float screenHeight = 600.0f;
 float blend = 0.2f;
@@ -327,6 +315,8 @@ int main(void)
 	// Shader program
 	Shader pieceProgram("content/shaders/Piece.vert", "content/shaders/Piece.frag");
 	Shader cubemapProgram("content/shaders/Cubemap.vert", "content/shaders/EquirectangularToCubemap.frag");
+	Shader irradianceMapProgram("content/shaders/Cubemap.vert", "content/shaders/IrradianceMap.frag");
+	Shader prefilterMapProgram("content/shaders/Cubemap.vert", "content/shaders/PrefilterMap.frag");
 	Shader skyboxProgram("content/shaders/SkyBox.vert", "content/shaders/SkyBox.frag");
 
 	// Model Initialize
@@ -344,12 +334,13 @@ int main(void)
 	SpotLight spotLight(MainCamera.Pos, MainCamera.GetFront(), glm::vec3(1.f), glm::cos(glm::radians(12.5f)), glm::cos(glm::radians(17.5f)), 10.f, 1.f);
 
 	// IBL Bake
-	auto iblMat = IBLBaker::Bake("content/images/ibl_hdr_radiance.png", cubemapProgram);
+	auto iblMat = IBLBaker::Bake("content/images/ibl_hdr_radiance.png", cubemapProgram, irradianceMapProgram, prefilterMapProgram);
 
 	// Initialize static shader uniforms before rendering
 	glm::mat4 projection = glm::perspective(MainCamera.GetFoV(), screenWidth / screenHeight, 0.1f, 100.0f);
 	pieceProgram.use();
 	pieceProgram.setMat4("projection", 1, GL_FALSE, glm::value_ptr(projection));
+	pieceProgram.setInt("irradianceMap", 10);
 	skyboxProgram.use();
 	skyboxProgram.setMat4("projection", 1, GL_FALSE, glm::value_ptr(projection));
 	skyboxProgram.setInt("environmentMap", 0);
@@ -373,9 +364,9 @@ int main(void)
 		glClearColor(0.45f, 0.55f, 0.60f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		// IBL
-		//cubemapProgram.use();
-		//iblMat.Bind(cubemapProgram);
+		// bind pre-computed IBL data
+		glActiveTexture(GL_TEXTURE10);
+		glBindTexture(GL_TEXTURE_CUBE_MAP, iblMat->IrradianceMap.Id);
 
 		// PBR
 		glm::mat4 model = glm::mat4(1.0f);

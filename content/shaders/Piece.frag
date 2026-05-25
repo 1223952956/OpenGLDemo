@@ -31,6 +31,9 @@ uniform float occlusion_strength;
 uniform bool is_opaque;
 uniform float alpha_cutoff;
 
+// IBL
+uniform samplerCube irradianceMap;
+
 
 // TODO 
 // sperate light to Point/Directional/Spot 
@@ -75,8 +78,8 @@ float GeometrySmith(float NdV, float NdL, float roughness) {
     return g1 * g2;
 }
 
-vec3 FresnelSchlick(float cosTheta, vec3 F0) {
-    return F0 + (1.0 - F0) * pow(clamp(1.0 - cosTheta, 0.0, 1.0), 5.0);
+vec3 FresnelSchlick(float cosTheta, vec3 F0, float roughness) {
+    return F0 + (max(vec3(1.0 - roughness), F0) - F0) * pow(1.0 - cosTheta, 5.0);
 }
 
 vec3 CalcLightRadiance(Light light, vec3 fragPos, vec3 N, vec3 V,
@@ -126,13 +129,13 @@ vec3 CalcLightRadiance(Light light, vec3 fragPos, vec3 N, vec3 V,
 
     float D = DistributionGGX(N, H, roughness);
     float G = GeometrySmith(NdV, NdL, roughness);
-    vec3  F = FresnelSchlick(HdV, F0);
+    vec3  F = FresnelSchlick(HdV, F0, roughness);
 
     vec3  specular  = (D * G * F) / max(4.0 * NdV * NdL, 1e-4);
     vec3  kD        = (1.0 - F) * (1.0 - metallic);
     vec3  diffuse   = kD * albedo / PI;
 
-    // 4. merge
+    // 5. merge
     vec3 radiance = light.intensity * light.color * attenuation;
     return (diffuse + specular) * radiance * NdL;
 }
@@ -164,10 +167,14 @@ void main()
         Lo += CalcLightRadiance(lights[i], WorldPos, norm, view, albedo, metallic, roughness);
     }
 
-    // Simple ambient
-    vec3 ambient = vec3(0.03) * albedo * ao;
+    // IBL
+    vec3 F0 = mix(vec3(0.04), albedo, metallic);
+    vec3 F = FresnelSchlick(max(dot(norm, view), 0.0), F0, roughness);
+    vec3 kD = (1.0 - F) * (1.0 - metallic);
+    vec3 irradiance = texture(irradianceMap, norm).rgb;
+    vec3 ambient = irradiance * albedo * ao;
 
-    vec3 color = emissive + ambient + Lo;
+    vec3 color = emissive + Lo + kD * ambient;
 
     // ACE
     color = ACESFilm(color);  

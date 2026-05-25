@@ -190,9 +190,11 @@
     <None Include="content\shaders\Cube.vert" />
     <None Include="content\shaders\EquirectangularToCubemap.frag" />
     <None Include="content\shaders\Cubemap.vert" />
+    <None Include="content\shaders\IrradianceMap.frag" />
     <None Include="content\shaders\Light.frag" />
     <None Include="content\shaders\Piece.frag" />
     <None Include="content\shaders\Piece.vert" />
+    <None Include="content\shaders\PrefilterMap.frag" />
     <None Include="content\shaders\Shader.frag" />
     <None Include="content\shaders\Shader.vert" />
     <None Include="content\shaders\SkyBox.frag" />

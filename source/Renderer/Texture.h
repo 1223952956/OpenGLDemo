@@ -15,6 +15,7 @@ public:
     {
         if (Id != 0)
         {
+            std::cout << "Delete Texture2D: " << Id << std::endl;
             glDeleteTextures(1, &Id);
         }
     }
@@ -31,7 +32,7 @@ public:
     {
         if (Id != 0)
         {
-            std::cout << "Delete cubemap: " << Id << std::endl;
+            std::cout << "Delete Cubemap: " << Id << std::endl;
             glDeleteTextures(1, &Id);
         }
     }

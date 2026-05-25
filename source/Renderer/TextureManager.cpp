@@ -89,14 +89,15 @@ Texture2D* TextureManager::Load(const std::string& path, aiTextureType type)
 
 Texture2D* TextureManager::Load(const std::string& texNum, const std::string& dictionary, const aiScene* scene, aiTextureType type)
 {
-	auto it = Texture2DMap.find(texNum);
+	const aiTexture* tex = scene->GetEmbeddedTexture(texNum.c_str());
 
+	std::string key = dictionary + "/" + tex->mFilename.C_Str();
+	auto it = Texture2DMap.find(key);
 	if (it != Texture2DMap.end())
 	{
 		return it->second.get();
 	}
 
-	const aiTexture* tex = scene->GetEmbeddedTexture(texNum.c_str());
 	int width, height, channels;
 
 	unsigned char* data = stbi_load_from_memory(

@@ -187,6 +187,12 @@
     <None Include="content\shaders\SkyBox.vert">
       <Filter>Resource Files\shaders</Filter>
     </None>
+    <None Include="content\shaders\IrradianceMap.frag">
+      <Filter>Resource Files\shaders</Filter>
+    </None>
+    <None Include="content\shaders\PrefilterMap.frag">
+      <Filter>Resource Files\shaders</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Image Include="content\images\awesomeface.png">

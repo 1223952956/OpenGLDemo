@@ -80,7 +80,12 @@ float GeometrySmith(float NdV, float NdL, float roughness) {
     return g1 * g2;
 }
 
-vec3 FresnelSchlick(float cosTheta, vec3 F0, float roughness) {
+vec3 fresnelSchlick(float cosTheta, vec3 F0)
+{
+    return F0 + (1.0 - F0) * pow(clamp(1.0 - cosTheta, 0.0, 1.0), 5.0);
+}
+
+vec3 FresnelSchlickRoughness(float cosTheta, vec3 F0, float roughness) {
     return F0 + (max(vec3(1.0 - roughness), F0) - F0) * pow(1.0 - cosTheta, 5.0);
 }
 
@@ -131,7 +136,7 @@ vec3 CalcLightRadiance(Light light, vec3 fragPos, vec3 N, vec3 V,
 
     float D = DistributionGGX(N, H, roughness);
     float G = GeometrySmith(NdV, NdL, roughness);
-    vec3  F = FresnelSchlick(HdV, F0, roughness);
+    vec3  F = fresnelSchlick(HdV, F0);
 
     vec3  specular  = (D * G * F) / max(4.0 * NdV * NdL, 1e-4);
     vec3  kD        = (1.0 - F) * (1.0 - metallic);
@@ -173,7 +178,7 @@ void main()
 
     // IBL
     vec3 F0 = mix(vec3(0.04), albedo, metallic);
-    vec3 F = FresnelSchlick(max(dot(norm, view), 0.0), F0, roughness);
+    vec3 F = FresnelSchlickRoughness(max(dot(norm, view), 0.0), F0, roughness);
     vec3 kD = (1.0 - F) * (1.0 - metallic);
     
     vec3 irradiance = texture(irradianceMap, norm).rgb;

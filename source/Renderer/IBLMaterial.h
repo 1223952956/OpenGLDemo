@@ -12,6 +12,7 @@ public:
 	Cubemap PrefilterMap;
 	Texture2D BRDFLUT;
 
-	void Bind(Shader& shader);
+	void Upload(Shader& shader);
+	void Bind();
 };
 

@@ -2,6 +2,16 @@
 
 #include "TextureManager.h"
 
+void Material::Upload(Shader& shader)
+{
+	shader.use();
+	shader.setInt("texture_base_color", 0);
+	shader.setInt("texture_normal", 1);
+	shader.setInt("texture_metallic_roughness", 2);
+	shader.setInt("texture_emissive", 3);
+	shader.setInt("texture_occlusion", 4);
+}
+
 void Material::Bind(Shader& shader)
 {
 	int slot = 0;

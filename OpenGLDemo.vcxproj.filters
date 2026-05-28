@@ -193,6 +193,12 @@
     <None Include="content\shaders\PrefilterMap.frag">
       <Filter>Resource Files\shaders</Filter>
     </None>
+    <None Include="content\shaders\BRDFLUT.frag">
+      <Filter>Resource Files\shaders</Filter>
+    </None>
+    <None Include="content\shaders\BRDFLUT.vert">
+      <Filter>Resource Files\shaders</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Image Include="content\images\awesomeface.png">

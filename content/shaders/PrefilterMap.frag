@@ -48,6 +48,14 @@ vec3 ImportanceSampleGGX(vec2 Xi, vec3 N, float roughness)
     return normalize(sampleVec);
 }
 
+float DistributionGGX(vec3 N, vec3 H, float roughness) {
+    float a  = roughness * roughness;
+    float a2 = a * a;
+    float NdH = max(dot(N, H), 0.0);
+    float d = NdH * NdH * (a2 - 1.0) + 1.0;
+    return a2 / (PI * d * d);
+}
+
 float GeometrySmith(float NdV, float NdL, float roughness) {
     float r = roughness + 1.0;
     float k = (r * r) / 8.0;
@@ -75,12 +83,23 @@ void main()
     {
         vec2 Xi = Hammersley(i, SAMPLE_COUNT);   
         vec3 H = ImportanceSampleGGX(Xi, normal, roughness);
-        vec3 L  = reflect(-view, H);
+        vec3 L = normalize(reflect(-view, H));
 
         float NdL = max(dot(normal, L), 0.0);
         if(NdL > 0.0)
         {
-            prefilteredColor += texture(environmentMap, L).rgb * NdL;
+            float D   = DistributionGGX(normal, H, roughness);
+            float NdH = max(dot(normal, H), 0.0);
+            float HdV = max(dot(H, view), 0.0);
+            float pdf = (D * NdH / (4.0 * HdV)) + 0.0001; 
+
+            float resolution = 512.0; // resolution of source cubemap (per face)
+            float saTexel  = 4.0 * PI / (6.0 * resolution * resolution);
+            float saSample = 1.0 / (float(SAMPLE_COUNT) * pdf + 0.0001);
+
+            float mipLevel = roughness == 0.0 ? 0.0 : 0.5 * log2(saSample / saTexel); 
+
+            prefilteredColor += textureLod(environmentMap, L, mipLevel).rgb * NdL;
             totalWeight      += NdL;
         }
     }

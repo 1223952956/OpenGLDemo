@@ -11,15 +11,20 @@
 class IBLBaker
 {
 public:
-    static std::unique_ptr<IBLMaterial> Bake(const std::string& path, Shader& envMapShader, Shader& irradianceMapShader, Shader& prefilterMapShader);
+    static std::unique_ptr<IBLMaterial> Bake(const std::string& path, 
+        Shader& envMapShader, 
+        Shader& irradianceMapShader, 
+        Shader& prefilterMapShader,
+        Shader& brdfLUTShader);
 
-    static void renderCube();
+    static void RenderCube();
+    static void RenderQuad();
 
 private:
     static GLuint CreateEnvCubemap(GLuint hdrTex, Shader& shader);
     static GLuint CreateIrradianceMap(GLuint envMap, Shader& shader);
     static GLuint CreatePrefilterMap(GLuint envMap, Shader& shader);
-    static GLuint CreateBRDFLUT();
+    static GLuint CreateBRDFLUT(Shader& shader);
 
     inline static const glm::mat4 CaptureProjection = glm::perspective(glm::radians(90.0f), 1.0f, 0.1f, 10.0f);
 	inline static const glm::mat4 CaptureViews[6] =
@@ -75,6 +80,15 @@ private:
          1.0f,  1.0f,  1.0f,  0.0f,  1.0f,  0.0f, 1.0f, 0.0f, // bottom-right
         -1.0f,  1.0f, -1.0f,  0.0f,  1.0f,  0.0f, 0.0f, 1.0f, // top-left
         -1.0f,  1.0f,  1.0f,  0.0f,  1.0f,  0.0f, 0.0f, 0.0f  // bottom-left 
+    };
+
+    inline static const float QuadVertices[] = 
+    {
+        // positions        // texture Coords
+        -1.0f,  1.0f, 0.0f, 0.0f, 1.0f,
+        -1.0f, -1.0f, 0.0f, 0.0f, 0.0f,
+         1.0f,  1.0f, 0.0f, 1.0f, 1.0f,
+         1.0f, -1.0f, 0.0f, 1.0f, 0.0f,
     };
 };
 

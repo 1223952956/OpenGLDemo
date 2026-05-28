@@ -33,6 +33,8 @@ uniform float alpha_cutoff;
 
 // IBL
 uniform samplerCube irradianceMap;
+uniform samplerCube prefilterMap;
+uniform sampler2D   brdfLUT;  
 
 
 // TODO 
@@ -155,6 +157,8 @@ void main()
 {
     vec3 norm = normalize(Normal);
     vec3 view = normalize(camPos - WorldPos);
+    vec3 R = reflect(-view, norm);   
+
     vec3 albedo = texture(texture_base_color, TexCoords).rgb;
     float roughness  = texture(texture_metallic_roughness, TexCoords).g * roughness_factor;
     float metallic  = texture(texture_metallic_roughness, TexCoords).b * metallic_factor;
@@ -171,8 +175,16 @@ void main()
     vec3 F0 = mix(vec3(0.04), albedo, metallic);
     vec3 F = FresnelSchlick(max(dot(norm, view), 0.0), F0, roughness);
     vec3 kD = (1.0 - F) * (1.0 - metallic);
+    
     vec3 irradiance = texture(irradianceMap, norm).rgb;
-    vec3 ambient = irradiance * albedo * ao;
+    vec3 diffuse = irradiance * albedo;
+
+    const float MAX_REFLECTION_LOD = 4.0;
+    vec3 prefilteredColor = textureLod(prefilterMap, R,  roughness * MAX_REFLECTION_LOD).rgb;   
+    vec2 envBRDF  = texture(brdfLUT, vec2(max(dot(norm, view), 0.0), roughness)).rg;
+    vec3 specular = prefilteredColor * (F * envBRDF.x + envBRDF.y);
+
+    vec3 ambient = (kD * diffuse + specular) * ao;
 
     vec3 color = emissive + Lo + kD * ambient;
 

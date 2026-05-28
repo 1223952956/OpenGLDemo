@@ -141,7 +141,6 @@ unsigned int loadTexture(unsigned int unitNum, bool flip, const char* filename)
 	return texture;
 }
 
-
 void APIENTRY MessageCallback(GLenum source, GLenum type, GLuint id, GLenum severity,
 	GLsizei length, const GLchar* message, const void* userParam)
 {
@@ -149,6 +148,7 @@ void APIENTRY MessageCallback(GLenum source, GLenum type, GLuint id, GLenum seve
 		<< " type = " << type << ", severity = " << severity
 		<< ", message = " << message << std::endl;
 }
+
 
 int main(void)
 {
@@ -186,6 +186,8 @@ int main(void)
 	glEnable(GL_DEPTH_TEST);
 
 	glEnable(GL_FRAMEBUFFER_SRGB);
+
+	glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
 
 	glEnable(GL_DEBUG_OUTPUT);
 	glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
@@ -318,6 +320,7 @@ int main(void)
 	Shader irradianceMapProgram("content/shaders/Cubemap.vert", "content/shaders/IrradianceMap.frag");
 	Shader prefilterMapProgram("content/shaders/Cubemap.vert", "content/shaders/PrefilterMap.frag");
 	Shader skyboxProgram("content/shaders/SkyBox.vert", "content/shaders/SkyBox.frag");
+	Shader brdfLUTProgram("content/shaders/BRDFLUT.vert", "content/shaders/BRDFLUT.frag");
 
 	// Model Initialize
 	Model ChessBoard("content/models/ChessBoard.glb");
@@ -331,16 +334,17 @@ int main(void)
 	{
 		pointLights.emplace_back(PointLight(pointLightPositions[i], glm::vec3(1.0f, 0.97f, 0.92f), 10.f, 80.0f));
 	}
-	SpotLight spotLight(MainCamera.Pos, MainCamera.GetFront(), glm::vec3(1.f), glm::cos(glm::radians(12.5f)), glm::cos(glm::radians(17.5f)), 10.f, 1.f);
+	SpotLight spotLight(MainCamera.Pos, MainCamera.GetFront(), glm::vec3(0.f), glm::cos(glm::radians(12.5f)), glm::cos(glm::radians(17.5f)), 10.f, 1.f);
 
 	// IBL Bake
-	auto iblMat = IBLBaker::Bake("content/images/ibl_hdr_radiance.png", cubemapProgram, irradianceMapProgram, prefilterMapProgram);
+	auto iblMat = IBLBaker::Bake("content/images/ferndale_studio_12_4k.hdr", cubemapProgram, irradianceMapProgram, prefilterMapProgram, brdfLUTProgram);
+	iblMat->Upload(pieceProgram);
 
 	// Initialize static shader uniforms before rendering
 	glm::mat4 projection = glm::perspective(MainCamera.GetFoV(), screenWidth / screenHeight, 0.1f, 100.0f);
 	pieceProgram.use();
 	pieceProgram.setMat4("projection", 1, GL_FALSE, glm::value_ptr(projection));
-	pieceProgram.setInt("irradianceMap", 10);
+
 	skyboxProgram.use();
 	skyboxProgram.setMat4("projection", 1, GL_FALSE, glm::value_ptr(projection));
 	skyboxProgram.setInt("environmentMap", 0);
@@ -365,8 +369,7 @@ int main(void)
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		// bind pre-computed IBL data
-		glActiveTexture(GL_TEXTURE10);
-		glBindTexture(GL_TEXTURE_CUBE_MAP, iblMat->IrradianceMap.Id);
+		iblMat->Bind();
 
 		// PBR
 		glm::mat4 model = glm::mat4(1.0f);
@@ -382,7 +385,7 @@ int main(void)
 		pieceProgram.setMat4("model", 1, GL_FALSE, glm::value_ptr(model));
 		pieceProgram.setMat4("model_normal", 1, GL_FALSE, glm::value_ptr(model_normal));
 		pieceProgram.setMat4("view", 1, GL_FALSE, glm::value_ptr(view));
-		pieceProgram.setMat4("camePos", 1, GL_FALSE, glm::value_ptr(MainCamera.Pos));
+		pieceProgram.setVec3("camPos", MainCamera.Pos);
 
 		ChessBoard.Draw(pieceProgram);
 		WhiteRook.Draw(pieceProgram);
@@ -415,7 +418,7 @@ int main(void)
 		skyboxProgram.setMat4("view", 1, GL_FALSE, glm::value_ptr(view));
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_CUBE_MAP, iblMat->EnvCubeMap.Id);
-		IBLBaker::renderCube();
+		IBLBaker::RenderCube();
 
 		glDepthFunc(GL_LESS);
 
@@ -429,4 +432,6 @@ int main(void)
 	glfwTerminate();
 	return 0;
 }
+
+
 

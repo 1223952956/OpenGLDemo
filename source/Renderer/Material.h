@@ -32,6 +32,10 @@ public:
     bool IsOpaque = true;
     float AlphaCutoff = 0.5f;
 
+    // TODO
+    // Upload some const value here
+    void Upload(Shader& shader);
+
     void Bind(Shader& shader);
 };
 

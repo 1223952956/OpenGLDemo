@@ -105,6 +105,24 @@
     <ClCompile Include="source\Renderer\IBLBaker.cpp">
       <Filter>Source Files\Renderer</Filter>
     </ClCompile>
+    <ClCompile Include="source\Renderer\ShadowMapBaker.cpp">
+      <Filter>Source Files\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="source\Renderer\ShadowMap.cpp">
+      <Filter>Source Files\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="source\Scene.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="source\Renderer\Renderer.cpp">
+      <Filter>Source Files\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="source\Piece.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="source\Renderer\RenderPrimitives.cpp">
+      <Filter>Source Files\Renderer</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="source\Camera.h">
@@ -144,6 +162,24 @@
       <Filter>Header Files\Renderer</Filter>
     </ClInclude>
     <ClInclude Include="source\Renderer\IBLBaker.h">
+      <Filter>Header Files\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="source\Renderer\ShadowMapBaker.h">
+      <Filter>Header Files\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="source\Renderer\ShadowMap.h">
+      <Filter>Header Files\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="source\Scene.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="source\Renderer\Renderer.h">
+      <Filter>Header Files\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="source\Piece.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="source\Renderer\RenderPrimitives.h">
       <Filter>Header Files\Renderer</Filter>
     </ClInclude>
   </ItemGroup>
@@ -197,6 +233,18 @@
       <Filter>Resource Files\shaders</Filter>
     </None>
     <None Include="content\shaders\BRDFLUT.vert">
+      <Filter>Resource Files\shaders</Filter>
+    </None>
+    <None Include="content\models\WhiteRook.glb">
+      <Filter>Resource Files\models</Filter>
+    </None>
+    <None Include="content\shaders\Light.vert">
+      <Filter>Resource Files\shaders</Filter>
+    </None>
+    <None Include="content\shaders\SimpleDepth.frag">
+      <Filter>Resource Files\shaders</Filter>
+    </None>
+    <None Include="content\shaders\SimpleDepth.vert">
       <Filter>Resource Files\shaders</Filter>
     </None>
   </ItemGroup>

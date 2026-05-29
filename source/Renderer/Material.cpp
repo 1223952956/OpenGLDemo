@@ -19,7 +19,7 @@ void Material::Bind(Shader& shader)
 	// base color
 	glActiveTexture(GL_TEXTURE0 + slot);
 	glBindTexture(GL_TEXTURE_2D, 
-		BaseColorTexture? BaseColorTexture->Id : TextureManager::GetWhiteTexture());
+		BaseColorTexture? BaseColorTexture->ID : TextureManager::GetWhiteTexture());
 	shader.setInt("texture_base_color", slot);
 	shader.setVec4("base_color_factor", BaseColorFactor);
 	slot++;
@@ -27,7 +27,7 @@ void Material::Bind(Shader& shader)
 	// normal
 	glActiveTexture(GL_TEXTURE0 + slot);
 	glBindTexture(GL_TEXTURE_2D, 
-		NormalTexture ? NormalTexture->Id : TextureManager::GetNormalTexture());
+		NormalTexture ? NormalTexture->ID : TextureManager::GetNormalTexture());
 	shader.setInt("texture_normal", slot);
 	shader.setFloat("normal_scale", NormalScale);
 	slot++;
@@ -35,7 +35,7 @@ void Material::Bind(Shader& shader)
 	// metallic and roughness
 	glActiveTexture(GL_TEXTURE0 + slot);
 	glBindTexture(GL_TEXTURE_2D, 
-		MetallicRoughnessTexture ? MetallicRoughnessTexture->Id : TextureManager::GetWhiteTexture());
+		MetallicRoughnessTexture ? MetallicRoughnessTexture->ID : TextureManager::GetWhiteTexture());
 	shader.setInt("texture_metallic_roughness", slot);
 	shader.setFloat("metallic_factor", MetallicFactor);
 	shader.setFloat("roughness_factor", RoughnessFactor);
@@ -44,7 +44,7 @@ void Material::Bind(Shader& shader)
 	// emissive
 	glActiveTexture(GL_TEXTURE0 + slot);
 	glBindTexture(GL_TEXTURE_2D, 
-		EmissiveTexture ? EmissiveTexture->Id : TextureManager::GetBlackTexture());
+		EmissiveTexture ? EmissiveTexture->ID : TextureManager::GetBlackTexture());
 	shader.setInt("texture_emissive", slot);
 	shader.setVec3("emissive_factor", EmissiveFactor);
 	slot++;
@@ -52,7 +52,7 @@ void Material::Bind(Shader& shader)
 	// occlusion
 	glActiveTexture(GL_TEXTURE0 + slot);
 	glBindTexture(GL_TEXTURE_2D, 
-		OcclusionTexture ? OcclusionTexture->Id : TextureManager::GetWhiteTexture());
+		OcclusionTexture ? OcclusionTexture->ID : TextureManager::GetWhiteTexture());
 	shader.setInt("texture_occlusion", slot);
 	shader.setFloat("occlusion_strength", OcclusionStrength);
 	slot++;

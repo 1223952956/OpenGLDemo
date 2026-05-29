@@ -41,7 +41,7 @@ Texture2D* TextureManager::Load(const std::string& path)
 
 	auto texture = std::make_unique<Texture2D>();
 
-	texture->Id = CreateGLTexture(width, height, channels, data);
+	texture->ID = CreateGLTexture(width, height, channels, data);
 	texture->Path = path;
 
 	stbi_image_free(data);
@@ -76,7 +76,7 @@ Texture2D* TextureManager::Load(const std::string& path, aiTextureType type)
 
 	auto texture = std::make_unique<Texture2D>();
 
-	texture->Id = CreateGLTexture(width, height, channels, data, type);
+	texture->ID = CreateGLTexture(width, height, channels, data, type);
 	texture->Path = path;
 
 	stbi_image_free(data);
@@ -120,7 +120,7 @@ Texture2D* TextureManager::Load(const std::string& texNum, const std::string& di
 
 	auto texture = std::make_unique<Texture2D>();
 
-	texture->Id = CreateGLTexture(width, height, channels, data, type);
+	texture->ID = CreateGLTexture(width, height, channels, data, type);
 	texture->Path = dictionary + "/" + tex->mFilename.C_Str();
 
 	stbi_image_free(data);

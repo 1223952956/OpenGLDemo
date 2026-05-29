@@ -12,6 +12,8 @@
 //#include "imgui_impl_glfw.h"
 //#include "imgui_impl_opengl3.h"
 
+#include "Scene.h"
+#include "Renderer/Renderer.h"
 #include "Renderer/Shader.h"
 #include "Camera.h"
 #include "Renderer/Model.h"
@@ -100,47 +102,6 @@ void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
 	MainCamera.Zoom(yoffset);
 }
 
-unsigned int loadTexture(unsigned int unitNum, bool flip, const char* filename)
-{
-	unsigned int texture;
-	int width, height, nrChannels;
-
-	stbi_set_flip_vertically_on_load(flip);
-	unsigned char* data = stbi_load(filename, &width, &height, &nrChannels, 0);
-
-	if (!data)
-	{
-		std::cout << "Failed to load texture" << std::endl;
-		return -1;
-	}
-
-	GLenum format;
-	if (nrChannels == 1)
-		format = GL_RED;
-	else if (nrChannels == 3)
-		format = GL_RGB;
-	else if (nrChannels == 4)
-		format = GL_RGBA;
-	else
-		format = GL_RGB;
-
-	glGenTextures(1, &texture);
-	glBindTexture(GL_TEXTURE_2D, texture);
-
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_MIRRORED_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT);
-
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-
-	glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
-	glGenerateMipmap(GL_TEXTURE_2D);
-
-	stbi_image_free(data);
-
-	return texture;
-}
-
 void APIENTRY MessageCallback(GLenum source, GLenum type, GLuint id, GLenum severity,
 	GLsizei length, const GLchar* message, const void* userParam)
 {
@@ -198,112 +159,11 @@ int main(void)
 
 	TextureManager::Init();
 
-	float vertices[] = {
-		//  ---- 位置 ----    - 纹理坐标 -
-		-0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
-		 0.5f, -0.5f, -0.5f,  1.0f, 0.0f,
-		 0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-		 0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-		-0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
-		-0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
+	Scene scene;
+	Renderer renderer;
+	IBLBaker iblBaker;
 
-		-0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-		 0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-		 0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
-		 0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
-		-0.5f,  0.5f,  0.5f,  0.0f, 1.0f,
-		-0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-
-		-0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-		-0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-		-0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-		-0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-		-0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-		-0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-
-		 0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-		 0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-		 0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-		 0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-		 0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-		 0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-
-		-0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-		 0.5f, -0.5f, -0.5f,  1.0f, 1.0f,
-		 0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-		 0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-		-0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-		-0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-
-		-0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
-		 0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-		 0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-		 0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-		-0.5f,  0.5f,  0.5f,  0.0f, 0.0f,
-		-0.5f,  0.5f, -0.5f,  0.0f, 1.0f
-	};
-
-	float cubeVertices[] = {
-		//  ---- 位置 ----    // --- 法向量 ---    - 纹理坐标 -
-		-0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  0.0f,  0.0f,
-		 0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  1.0f,  0.0f,
-		 0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  1.0f,  1.0f,
-		 0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  1.0f,  1.0f,
-		-0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  0.0f,  1.0f,
-		-0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  0.0f,  0.0f,
-
-		-0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  0.0f,  0.0f,
-		 0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  1.0f,  0.0f,
-		 0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  1.0f,  1.0f,
-		 0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  1.0f,  1.0f,
-		-0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  0.0f,  1.0f,
-		-0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  0.0f,  0.0f,
-
-		-0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,  1.0f,  0.0f,
-		-0.5f,  0.5f, -0.5f, -1.0f,  0.0f,  0.0f,  1.0f,  1.0f,
-		-0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,  0.0f,  1.0f,
-		-0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,  0.0f,  1.0f,
-		-0.5f, -0.5f,  0.5f, -1.0f,  0.0f,  0.0f,  0.0f,  0.0f,
-		-0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,  1.0f,  0.0f,
-
-		 0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  1.0f,  0.0f,
-		 0.5f,  0.5f, -0.5f,  1.0f,  0.0f,  0.0f,  1.0f,  1.0f,
-		 0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,  0.0f,  1.0f,
-		 0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,  0.0f,  1.0f,
-		 0.5f, -0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  0.0f,  0.0f,
-		 0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  1.0f,  0.0f,
-
-		-0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,  0.0f,  1.0f,
-		 0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,  1.0f,  1.0f,
-		 0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,  1.0f,  0.0f,
-		 0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,  1.0f,  0.0f,
-		-0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,  0.0f,  0.0f,
-		-0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,  0.0f,  1.0f,
-
-		-0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  0.0f,  1.0f,
-		 0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  1.0f,  1.0f,
-		 0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  1.0f,  0.0f,
-		 0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  1.0f,  0.0f,
-		-0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  0.0f,  0.0f,
-		-0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  0.0f,  1.0f
-	};
-
-	glm::vec3 cubePositions[] = {
-		glm::vec3(0.0f,  0.0f,  0.0f),
-		glm::vec3(2.0f,  5.0f, -15.0f),
-		glm::vec3(-1.5f, -2.2f, -2.5f),
-		glm::vec3(-3.8f, -2.0f, -12.3f),
-		glm::vec3(2.4f, -0.4f, -3.5f),
-		glm::vec3(-1.7f,  3.0f, -7.5f),
-		glm::vec3(1.3f, -2.0f, -2.5f),
-		glm::vec3(1.5f,  2.0f, -2.5f),
-		glm::vec3(1.5f,  0.2f, -1.5f),
-		glm::vec3(-1.3f,  1.0f, -1.5f)
-	};
-
-	glm::vec3 cubePos = glm::vec3(0.0f, 0.0f, 0.0f);
-
-	glm::vec3 lightPos = glm::vec3(1.2f, 1.0f, 2.0f);
+	scene.MainCamera = &MainCamera;
 
 	glm::vec3 pointLightPositions[] = {
 		glm::vec3(2.5f,  3.0f,  2.0f),
@@ -311,116 +171,65 @@ int main(void)
 		glm::vec3(-2.0f,  2.0f, -3.0f),
 		glm::vec3(0.0f,  5.0f, 0.0f)
 	};
-	
-
-
-	// Shader program
-	Shader pieceProgram("content/shaders/Piece.vert", "content/shaders/Piece.frag");
-	Shader cubemapProgram("content/shaders/Cubemap.vert", "content/shaders/EquirectangularToCubemap.frag");
-	Shader irradianceMapProgram("content/shaders/Cubemap.vert", "content/shaders/IrradianceMap.frag");
-	Shader prefilterMapProgram("content/shaders/Cubemap.vert", "content/shaders/PrefilterMap.frag");
-	Shader skyboxProgram("content/shaders/SkyBox.vert", "content/shaders/SkyBox.frag");
-	Shader brdfLUTProgram("content/shaders/BRDFLUT.vert", "content/shaders/BRDFLUT.frag");
 
 	// Model Initialize
-	Model ChessBoard("content/models/ChessBoard.glb");
-	Model WhiteRook("content/models/WhiteRook.glb");
-	Model BlackQueen("content/models/BlackQueen.glb");
+	auto& ChessBoard = scene.CreatePiece();
+	ChessBoard.ModelPtr = std::make_shared<Model>("content/models/ChessBoard.glb");
+	auto& BlackQueen = scene.CreatePiece();
+	BlackQueen.ModelPtr = std::make_shared<Model>("content/models/BlackQueen.glb");
+	auto& WhiteRook = scene.CreatePiece();
+	WhiteRook.ModelPtr = std::make_shared<Model>("content/models/WhiteRook.glb");
+
+	glm::mat4 model = glm::mat4(1.0f);
+	model = glm::translate(model, glm::vec3(0.f, 0.f, 0.f));
+	model = glm::scale(model, glm::vec3(1.f, 1.f, 1.f));
+	glm::mat4 model_normal = glm::transpose(glm::inverse(model));
+	for (int i = 0; i < scene.Pieces.size(); ++i)
+	{
+		scene.Pieces[i]->Transform = model;
+	}
 
 	// Light Initialize
-	DirectionalLight dirLight(glm::vec3(-0.5f, -1.0f, -0.3f), glm::vec3(1.0f, 0.95f, 0.90f), 4.0f);
-	std::vector<PointLight> pointLights;
+	scene.DirectionalLights.emplace_back(DirectionalLight(glm::vec3(-0.5f, -1.0f, -0.3f), glm::vec3(1.0f, 0.95f, 0.90f), 4.0f));
 	for (int i = 0; i < 4; ++i)
 	{
-		pointLights.emplace_back(PointLight(pointLightPositions[i], glm::vec3(1.0f, 0.97f, 0.92f), 10.f, 80.0f));
+		scene.PointLights.emplace_back(PointLight(pointLightPositions[i], glm::vec3(1.0f, 0.97f, 0.92f), 10.f, 80.0f));
 	}
-	SpotLight spotLight(MainCamera.Pos, MainCamera.GetFront(), glm::vec3(0.f), glm::cos(glm::radians(12.5f)), glm::cos(glm::radians(17.5f)), 10.f, 1.f);
+	scene.SpotLights.emplace_back(SpotLight(MainCamera.Pos, MainCamera.GetFront(), glm::vec3(0.f), glm::cos(glm::radians(12.5f)), glm::cos(glm::radians(17.5f)), 10.f, 1.f));
+
 
 	// IBL Bake
-	auto iblMat = IBLBaker::Bake("content/images/ferndale_studio_12_4k.hdr", cubemapProgram, irradianceMapProgram, prefilterMapProgram, brdfLUTProgram);
-	iblMat->Upload(pieceProgram);
-
-	// Initialize static shader uniforms before rendering
-	glm::mat4 projection = glm::perspective(MainCamera.GetFoV(), screenWidth / screenHeight, 0.1f, 100.0f);
-	pieceProgram.use();
-	pieceProgram.setMat4("projection", 1, GL_FALSE, glm::value_ptr(projection));
-
-	skyboxProgram.use();
-	skyboxProgram.setMat4("projection", 1, GL_FALSE, glm::value_ptr(projection));
-	skyboxProgram.setInt("environmentMap", 0);
+	scene.Enviroment = std::move(iblBaker.Bake("content/images/ferndale_studio_12_4k.hdr"));
 
 	float deltaTime = 0.0f;
 	float lastFrameTime = 0.0f;
-	
-	int count = 0;
 
 	// render loop
 	while (!glfwWindowShouldClose(window))
 	{
-		count++;
-
 		deltaTime = glfwGetTime() - lastFrameTime;
 		lastFrameTime = glfwGetTime();
 
 		processInput(window, deltaTime);
 
-		// render
-		glClearColor(0.45f, 0.55f, 0.60f, 1.0f);
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		renderer.Render(scene, screenWidth, screenHeight);
 
-		// bind pre-computed IBL data
-		iblMat->Bind();
 
-		// PBR
-		glm::mat4 model = glm::mat4(1.0f);
-		model = glm::translate(model, glm::vec3(0.f, 0.f, 0.f));
-		model = glm::scale(model, glm::vec3(1.f, 1.f, 1.f));
-		glm::mat4 model_normal = glm::transpose(glm::inverse(model));
+		// Draw light position
+		//glm::mat4 view = MainCamera.GetViewMatrix();
+		//for (int j = 0; j < 4; ++j)
+		//{
+		//	glm::mat4 model = glm::mat4(1.0f);
+		//	model = glm::translate(model, pointLightPositions[j]);
+		//	model = glm::scale(model, glm::vec3(0.2f));
 
-		glm::mat4 view = MainCamera.GetViewMatrix();
+		//	lightProgram.use();
+		//	lightProgram.setMat4("projection", 1, GL_FALSE, glm::value_ptr(projection));
+		//	lightProgram.setMat4("model", 1, GL_FALSE, glm::value_ptr(model));
+		//	lightProgram.setMat4("view", 1, GL_FALSE, glm::value_ptr(view));
+		//	renderSphere();
+		//}
 
-		//std::cout << "Before PBR use, ID = " << pieceProgram.ID << std::endl;
-
-		pieceProgram.use();
-		pieceProgram.setMat4("model", 1, GL_FALSE, glm::value_ptr(model));
-		pieceProgram.setMat4("model_normal", 1, GL_FALSE, glm::value_ptr(model_normal));
-		pieceProgram.setMat4("view", 1, GL_FALSE, glm::value_ptr(view));
-		pieceProgram.setVec3("camPos", MainCamera.Pos);
-
-		ChessBoard.Draw(pieceProgram);
-		WhiteRook.Draw(pieceProgram);
-		BlackQueen.Draw(pieceProgram);
-
-		// Upload Light Data
-		std::string name;
-		int i = 0;
-		for (; i < 4; ++i)
-		{
-			name = "lights[" + std::to_string(i) + "]";
-			pointLights[i].Upload(pieceProgram, name);
-		}
-
-		name = "lights[" + std::to_string(i) + "]";
-		dirLight.Upload(pieceProgram, name);
-		++i;
-
-		spotLight.SetPosition(MainCamera.Pos);
-		spotLight.SetDirection(MainCamera.GetFront());
-		name = "lights[" + std::to_string(i) + "]";
-		spotLight.Upload(pieceProgram, name);
-
-		pieceProgram.setInt("num_lights", 6);
-
-		// Sky box
-		glDepthFunc(GL_LEQUAL);
-
-		skyboxProgram.use();
-		skyboxProgram.setMat4("view", 1, GL_FALSE, glm::value_ptr(view));
-		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_CUBE_MAP, iblMat->EnvCubeMap.Id);
-		IBLBaker::RenderCube();
-
-		glDepthFunc(GL_LESS);
 
 
 		glfwSwapBuffers(window);
@@ -429,9 +238,8 @@ int main(void)
 
 	// Release textures
 	TextureManager::ShutDown();
+
 	glfwTerminate();
 	return 0;
 }
-
-
 

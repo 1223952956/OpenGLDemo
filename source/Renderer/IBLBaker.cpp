@@ -3,22 +3,38 @@
 #include <glm/gtc/type_ptr.hpp>
 
 #include "TextureManager.h"
+#include "RenderPrimitives.h"
 
-std::unique_ptr<IBLMaterial> IBLBaker::Bake(const std::string& path, Shader& envMapShader, Shader& irradianceMapShader, Shader& prefilterMapShader, Shader& brdfLUTShader)
+IBLBaker::IBLBaker()
+	:EquirectToCubemapShader("content/shaders/Cubemap.vert", "content/shaders/EquirectangularToCubemap.frag"),
+	IrradianceShader("content/shaders/Cubemap.vert", "content/shaders/IrradianceMap.frag"),
+	PrefilterShader("content/shaders/Cubemap.vert", "content/shaders/PrefilterMap.frag"),
+	BRDFLUTShader("content/shaders/BRDFLUT.vert", "content/shaders/BRDFLUT.frag")
+{
+}
+
+std::unique_ptr<IBLMaterial> IBLBaker::Bake(const std::string& path)
 {
     Texture2D* hdrTex = TextureManager::Load(path);
 
     auto iblMat = std::make_unique<IBLMaterial>();
 
-    iblMat->EnvCubeMap.Id = CreateEnvCubemap(hdrTex->Id, envMapShader);
-    iblMat->IrradianceMap.Id = CreateIrradianceMap(iblMat->EnvCubeMap.Id, irradianceMapShader);
-    iblMat->PrefilterMap.Id = CreatePrefilterMap(iblMat->EnvCubeMap.Id, prefilterMapShader);
-    iblMat->BRDFLUT.Id = CreateBRDFLUT(brdfLUTShader);
+    iblMat->EnvCubeMap.ID = CreateEnvCubemap(hdrTex->ID);
+    iblMat->EnvCubeMap.Name = hdrTex->Path + "::" + "EnvCubeMap";
+
+    iblMat->IrradianceMap.ID = CreateIrradianceMap(iblMat->EnvCubeMap.ID);
+    iblMat->IrradianceMap.Name = hdrTex->Path + "::" + "IrradianceMap";
+
+    iblMat->PrefilterMap.ID = CreatePrefilterMap(iblMat->EnvCubeMap.ID);
+    iblMat->PrefilterMap.Name = hdrTex->Path + "::" + "PrefilterMap";
+
+    iblMat->BRDFLUT.ID = CreateBRDFLUT();
+    iblMat->BRDFLUT.Path = hdrTex->Path + "::" + "BRDFLUT";
 
     return iblMat;
 }
 
-GLuint IBLBaker::CreateEnvCubemap(GLuint hdrTex, Shader& shader)
+GLuint IBLBaker::CreateEnvCubemap(GLuint hdrTex)
 {
     // Frame/Render Buffer
     unsigned int captureFBO, captureRBO;
@@ -48,9 +64,9 @@ GLuint IBLBaker::CreateEnvCubemap(GLuint hdrTex, Shader& shader)
 
 
     // convert HDR equirectangular environment map to cubemap equivalent
-    shader.use();
-    shader.setInt("equirectangularMap", 0);
-    shader.setMat4("projection", 1, GL_FALSE, glm::value_ptr(IBLBaker::CaptureProjection));
+    EquirectToCubemapShader.use();
+    EquirectToCubemapShader.setInt("equirectangularMap", 0);
+    EquirectToCubemapShader.setMat4("projection", 1, GL_FALSE, glm::value_ptr(IBLBaker::CaptureProjection));
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, hdrTex);
 
@@ -66,12 +82,12 @@ GLuint IBLBaker::CreateEnvCubemap(GLuint hdrTex, Shader& shader)
     glBindFramebuffer(GL_FRAMEBUFFER, captureFBO);
     for (unsigned int i = 0; i < 6; ++i)
     {
-        shader.setMat4("view", 1, GL_FALSE, glm::value_ptr(IBLBaker::CaptureViews[i]));
+        EquirectToCubemapShader.setMat4("view", 1, GL_FALSE, glm::value_ptr(IBLBaker::CaptureViews[i]));
         glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
             GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, envCubemap, 0);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        RenderCube(); // renders a 1x1 cube
+        RenderPrimitives::RenderCube(); // renders a 1x1 cube
     }
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
@@ -81,7 +97,7 @@ GLuint IBLBaker::CreateEnvCubemap(GLuint hdrTex, Shader& shader)
     return envCubemap;
 }
 
-GLuint IBLBaker::CreateIrradianceMap(GLuint envMap, Shader& shader)
+GLuint IBLBaker::CreateIrradianceMap(GLuint envMap)
 {
     unsigned int captureFBO, captureRBO;
     glGenFramebuffers(1, &captureFBO);
@@ -105,9 +121,9 @@ GLuint IBLBaker::CreateIrradianceMap(GLuint envMap, Shader& shader)
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-    shader.use();
-    shader.setInt("environmentMap", 0);
-    shader.setMat4("projection", 1, GL_FALSE, glm::value_ptr(IBLBaker::CaptureProjection));
+    IrradianceShader.use();
+    IrradianceShader.setInt("environmentMap", 0);
+    IrradianceShader.setMat4("projection", 1, GL_FALSE, glm::value_ptr(IBLBaker::CaptureProjection));
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_CUBE_MAP, envMap);
     glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
@@ -124,12 +140,12 @@ GLuint IBLBaker::CreateIrradianceMap(GLuint envMap, Shader& shader)
     glBindFramebuffer(GL_FRAMEBUFFER, captureFBO);
     for (unsigned int i = 0; i < 6; ++i)
     {
-        shader.setMat4("view", 1, GL_FALSE, glm::value_ptr(IBLBaker::CaptureViews[i]));
+        IrradianceShader.setMat4("view", 1, GL_FALSE, glm::value_ptr(IBLBaker::CaptureViews[i]));
         glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
             GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, irradianceMap, 0);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        RenderCube(); // renders a 1x1 cube
+        RenderPrimitives::RenderCube(); // renders a 1x1 cube
     }
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
@@ -139,7 +155,7 @@ GLuint IBLBaker::CreateIrradianceMap(GLuint envMap, Shader& shader)
     return irradianceMap;
 }
 
-GLuint IBLBaker::CreatePrefilterMap(GLuint envMap, Shader& shader)
+GLuint IBLBaker::CreatePrefilterMap(GLuint envMap)
 {
     unsigned int captureFBO, captureRBO;
     glGenFramebuffers(1, &captureFBO);
@@ -164,9 +180,9 @@ GLuint IBLBaker::CreatePrefilterMap(GLuint envMap, Shader& shader)
 
     glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
 
-    shader.use();
-    shader.setInt("environmentMap", 0);
-    shader.setMat4("projection", 1, GL_FALSE, glm::value_ptr(IBLBaker::CaptureProjection));
+    PrefilterShader.use();
+    PrefilterShader.setInt("environmentMap", 0);
+    PrefilterShader.setMat4("projection", 1, GL_FALSE, glm::value_ptr(IBLBaker::CaptureProjection));
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_CUBE_MAP, envMap);
 
@@ -189,15 +205,15 @@ GLuint IBLBaker::CreatePrefilterMap(GLuint envMap, Shader& shader)
         glViewport(0, 0, mipWidth, mipHeight);
 
         float roughness = (float)mip / (float)(maxMipLevels - 1);
-        shader.setFloat("roughness", roughness);
+        PrefilterShader.setFloat("roughness", roughness);
         for (unsigned int i = 0; i < 6; ++i)
         {
-            shader.setMat4("view", 1, GL_FALSE, glm::value_ptr(IBLBaker::CaptureViews[i]));
+            PrefilterShader.setMat4("view", 1, GL_FALSE, glm::value_ptr(IBLBaker::CaptureViews[i]));
             glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
                 GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, prefilterMap, mip);
 
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-            RenderCube();
+            RenderPrimitives::RenderCube();
         }
     }
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -208,7 +224,7 @@ GLuint IBLBaker::CreatePrefilterMap(GLuint envMap, Shader& shader)
     return prefilterMap;
 }
 
-GLuint IBLBaker::CreateBRDFLUT(Shader& shader)
+GLuint IBLBaker::CreateBRDFLUT()
 {
     unsigned int brdfLUTTexture;
     glGenTextures(1, &brdfLUTTexture);
@@ -237,9 +253,9 @@ GLuint IBLBaker::CreateBRDFLUT(Shader& shader)
     int scrHeight = viewport[3];
 
     glViewport(0, 0, 512, 512);
-    shader.use();
+    BRDFLUTShader.use();
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    RenderQuad();
+    RenderPrimitives::RenderQuad();
 
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
@@ -247,56 +263,4 @@ GLuint IBLBaker::CreateBRDFLUT(Shader& shader)
     glViewport(0, 0, scrWidth, scrHeight);
 
     return brdfLUTTexture;
-}
-
-void IBLBaker::RenderCube()
-{
-    unsigned int cubeVAO = 0;
-    unsigned int cubeVBO = 0;
-    // initialize (if necessary)
-    if (cubeVAO == 0)
-    {
-        glGenVertexArrays(1, &cubeVAO);
-        glGenBuffers(1, &cubeVBO);
-        // fill buffer
-        glBindBuffer(GL_ARRAY_BUFFER, cubeVBO);
-        glBufferData(GL_ARRAY_BUFFER, sizeof(IBLBaker::CubeVertices), IBLBaker::CubeVertices, GL_STATIC_DRAW);
-        // link vertex attributes
-        glBindVertexArray(cubeVAO);
-        glEnableVertexAttribArray(0);
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
-        glEnableVertexAttribArray(1);
-        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
-        glEnableVertexAttribArray(2);
-        glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
-        glBindBuffer(GL_ARRAY_BUFFER, 0);
-        glBindVertexArray(0);
-    }
-    // render Cube
-    glBindVertexArray(cubeVAO);
-    glDrawArrays(GL_TRIANGLES, 0, 36);
-    glBindVertexArray(0);
-}
-
-void IBLBaker::RenderQuad()
-{
-    unsigned int quadVAO = 0;
-    unsigned int quadVBO;
-
-    if (quadVAO == 0)
-    {
-        // setup plane VAO
-        glGenVertexArrays(1, &quadVAO);
-        glGenBuffers(1, &quadVBO);
-        glBindVertexArray(quadVAO);
-        glBindBuffer(GL_ARRAY_BUFFER, quadVBO);
-        glBufferData(GL_ARRAY_BUFFER, sizeof(IBLBaker::QuadVertices), &IBLBaker::QuadVertices, GL_STATIC_DRAW);
-        glEnableVertexAttribArray(0);
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
-        glEnableVertexAttribArray(1);
-        glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
-    }
-    glBindVertexArray(quadVAO);
-    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-    glBindVertexArray(0);
 }

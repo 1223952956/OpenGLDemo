@@ -3,38 +3,60 @@
 #include <string>
 #include <glad/glad.h>
 
-// !!! Never construct data structures directly using Texture2D !!!
-class Texture2D
+class Texture
 {
 public:
-	unsigned int Id;
-	std::string Path;
+    GLuint ID = 0;
 
-    // !!! Delete GPU resource !!!
-    ~Texture2D()
+    virtual ~Texture()
     {
-        if (Id != 0)
+        if (ID)
         {
-            std::cout << "Delete Texture2D: " << Id << std::endl;
-            glDeleteTextures(1, &Id);
+            std::cout << "~Texture() Delete Texture: " << ID << std::endl;
+            glDeleteTextures(1, &ID);
         }
+    }
+
+    Texture() = default;
+
+    Texture(const Texture&) = delete;
+    Texture& operator=(const Texture&) = delete;
+
+    Texture(Texture&& other) noexcept
+    {
+        ID = other.ID;
+        other.ID = 0;
+    }
+
+    Texture& operator=(Texture&& other) noexcept
+    {
+        if (this != &other)
+        {
+            if (ID)
+            {
+                std::cout << "Move assignment Delete Texture: " << ID << std::endl;
+                glDeleteTextures(1, &ID);
+            }
+
+            ID = other.ID;
+            other.ID = 0;
+        }
+
+        return *this;
     }
 };
 
 // !!! Never construct data structures directly using Texture2D !!!
-class Cubemap
+class Texture2D : public Texture
 {
 public:
-    unsigned int Id;
+	std::string Path;
+};
 
-    // !!! Delete GPU resource !!!
-    ~Cubemap()
-    {
-        if (Id != 0)
-        {
-            std::cout << "Delete Cubemap: " << Id << std::endl;
-            glDeleteTextures(1, &Id);
-        }
-    }
+// !!! Never construct data structures directly using Cubemap !!!
+class Cubemap : public Texture
+{
+public:
+    std::string Name;
 };
 

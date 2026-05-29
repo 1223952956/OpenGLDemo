@@ -3,6 +3,7 @@
 in vec2 TexCoords;
 in vec3 WorldPos;
 in vec3 Normal;
+in vec4 FragPosLightSpace;
 
 out vec4 FragColor;
 
@@ -89,6 +90,11 @@ vec3 FresnelSchlickRoughness(float cosTheta, vec3 F0, float roughness) {
     return F0 + (max(vec3(1.0 - roughness), F0) - F0) * pow(1.0 - cosTheta, 5.0);
 }
 
+float CalcShadow(vec4 fragPosLightSpace)
+{
+    return 0.f;
+}
+
 vec3 CalcLightRadiance(Light light, vec3 fragPos, vec3 N, vec3 V,
                        vec3 albedo, float metallic, float roughness) {
     // 1. calc L and attenuation
@@ -142,10 +148,15 @@ vec3 CalcLightRadiance(Light light, vec3 fragPos, vec3 N, vec3 V,
     vec3  kD        = (1.0 - F) * (1.0 - metallic);
     vec3  diffuse   = kD * albedo / PI;
 
+    // 4. shadow
+    float shadow = CalcShadow(FragPosLightSpace);
+
     // 5. merge
     vec3 radiance = light.intensity * light.color * attenuation;
-    return (diffuse + specular) * radiance * NdL;
+    return (1.0 - shadow) * (diffuse + specular) * radiance * NdL;
 }
+
+
 
 // ACES Film Tone Mapping
 vec3 ACESFilm(vec3 x) {
@@ -195,7 +206,7 @@ void main()
 
     // ACE
     color = ACESFilm(color);  
-    // No need for double gamma correction for gltf texure are RGBA
+    // No need for double gamma correction for that gltf texure are RGBA
     // color = pow(color, vec3(1.0 / 2.2));
 
     FragColor = vec4(color, 1.0);

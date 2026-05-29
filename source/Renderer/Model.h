@@ -17,6 +17,11 @@ public:
     {
         LoadModel(path);
     }
+    Model(const Model&) = delete;
+    Model& operator=(const Model&) = delete;
+    Model(Model&&) noexcept = default;
+    Model& operator=(Model&&) noexcept = default;
+
     void Draw(Shader& shader);
     void Draw(Shader& shader, const std::string& name);
 

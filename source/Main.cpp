@@ -201,7 +201,7 @@ int main(void)
 	renderer.Init(scene);
 
 	// IBL Bake
-	scene.Enviroment = std::move(iblBaker.Bake("content/images/brown_photostudio_02_4k.hdr"));
+	scene.Enviroment = std::move(iblBaker.Bake("content/images/brown_photostudio_02_2k.hdr"));
 
 	float deltaTime = 0.0f;
 	float lastFrameTime = 0.0f;

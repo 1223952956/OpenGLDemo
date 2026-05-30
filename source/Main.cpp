@@ -194,7 +194,7 @@ int main(void)
 	scene.DirectionalLights.emplace_back(DirectionalLight(glm::vec3(-2.0f, -2.0f, -1.0f), glm::vec3(1.0f, 0.95f, 0.90f), 20.0f));
 	for (int i = 0; i < 4; ++i)
 	{
-		scene.PointLights.emplace_back(PointLight(pointLightPositions[i], glm::vec3(1.0f, 0.97f, 0.92f), 10.f, 8.0f));
+		scene.PointLights.emplace_back(PointLight(pointLightPositions[i], glm::vec3(1.0f, 0.97f, 0.92f), 10.f, 16.0f));
 	}
 	// scene.SpotLights.emplace_back(SpotLight(MainCamera.Pos, MainCamera.GetFront(), glm::vec3(1.f), glm::cos(glm::radians(12.5f)), glm::cos(glm::radians(17.5f)), 10.f, 1.f));
 

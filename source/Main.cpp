@@ -23,8 +23,8 @@
 #include "Light/SpotLight.h"
 #include "Renderer/IBLBaker.h"
 
-float screenWidth = 800.0f;
-float screenHeight = 600.0f;
+float screenWidth = 1920.0f;
+float screenHeight = 1080.0f;
 float blend = 0.2f;
 
 float lastMouseX = screenWidth / 2.0f;
@@ -134,7 +134,7 @@ int main(void)
 		return -1;
 	}
 
-	glViewport(0, 0, 800, 600);
+	glViewport(0, 0, screenWidth, screenHeight);
 
 	MainCamera.Pos = glm::vec3(0.0f, 0.0f, 3.0f);
 

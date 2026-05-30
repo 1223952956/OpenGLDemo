@@ -6,15 +6,29 @@
 
 Renderer::Renderer()
 	: PBRShader("content/shaders/Piece.vert", "content/shaders/Piece.frag"),
-	ShadowShader("content/shaders/SimpleDepth", "content/shaders/SimpleDepth"),
-	SkyboxShader("content/shaders/SkyBox.vert", "content/shaders/SkyBox.frag")
+	SkyboxShader("content/shaders/SkyBox.vert", "content/shaders/SkyBox.frag"),
+	DebugQuadShader("content/shaders/DebugQuad.vert", "content/shaders/DebugQuad.frag")
 {
 	PBRShader.use();
 	PBRShader.setInt("irradianceMap", 10);
 	PBRShader.setInt("prefilterMap", 11);
 	PBRShader.setInt("brdfLUT", 12);
 
+	for (int i = 0; i < 4; ++i)
+	{
+		std::string dirLightName = "dirLightDepthMaps[" + std::to_string(i) + "]";
+		PBRShader.setInt(dirLightName, 13 + i);
+	}
+	SkyboxShader.use();
 	SkyboxShader.setInt("environmentMap", 0);
+
+	DebugQuadShader.use();
+	DebugQuadShader.setInt("depthMap", 0);
+}
+
+void Renderer::Init(Scene& scene)
+{
+	ShadowBaker.Init(scene);
 }
 
 void Renderer::Render(Scene& scene, float screenWidth, float screenHeight)
@@ -25,10 +39,15 @@ void Renderer::Render(Scene& scene, float screenWidth, float screenHeight)
 	UploadCamera(scene, screenWidth, screenHeight);
 	UploadLights(scene);
 
+	ShadowBaker.Bake(scene);
+
 	scene.Enviroment->Bind();
 
+	DrawShadow(scene);
 	DrawPieces(scene);
 	DrawSkyBox(scene);
+
+	// DrawDebugQuad(scene);
 }
 
 void Renderer::UploadCamera(Scene& scene, float screenWidth, float screenHeight)
@@ -68,6 +87,20 @@ void Renderer::UploadLights(Scene& scene)
 	PBRShader.setInt("num_lights", i);
 }
 
+void Renderer::DrawShadow(Scene& scene)
+{
+	PBRShader.use();
+
+	for (int i = 0; i < scene.DirectionalLights.size(); ++i)
+	{
+		DirectionalLight& dirLight = scene.DirectionalLights[i];
+		std::string dirLightName = "dirLightSpaceMatrices[" + std::to_string(i) + "]";
+		PBRShader.setMat4(dirLightName, 1, GL_FALSE, glm::value_ptr(dirLight.Shadow.LightSpaceMatrix));
+		glActiveTexture(GL_TEXTURE13 + i);
+		glBindTexture(GL_TEXTURE_2D, dirLight.Shadow.DepthMap);
+	}
+}
+
 void Renderer::DrawPieces(Scene& scene)
 {
 	PBRShader.use();
@@ -102,4 +135,14 @@ void Renderer::DrawSkyBox(Scene& scene)
 	RenderPrimitives::RenderCube();
 
 	glDepthFunc(GL_LESS);
+}
+
+void Renderer::DrawDebugQuad(Scene& scene)
+{
+	DebugQuadShader.use();
+	DebugQuadShader.setFloat("near_plane", 1.0f);
+	DebugQuadShader.setFloat("far_plane", 7.5f);
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, scene.DirectionalLights[0].Shadow.DepthMap);
+	RenderPrimitives::RenderQuad();
 }

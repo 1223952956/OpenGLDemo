@@ -162,6 +162,7 @@ int main(void)
 	Scene scene;
 	Renderer renderer;
 	IBLBaker iblBaker;
+	
 
 	scene.MainCamera = &MainCamera;
 
@@ -178,7 +179,7 @@ int main(void)
 	auto& BlackQueen = scene.CreatePiece();
 	BlackQueen.ModelPtr = std::make_shared<Model>("content/models/BlackQueen.glb");
 	auto& WhiteRook = scene.CreatePiece();
-	WhiteRook.ModelPtr = std::make_shared<Model>("content/models/WhiteRook.glb");
+	WhiteRook.ModelPtr = std::make_shared<Model>("content/models/WhiteKnight.glb");
 
 	glm::mat4 model = glm::mat4(1.0f);
 	model = glm::translate(model, glm::vec3(0.f, 0.f, 0.f));
@@ -190,16 +191,17 @@ int main(void)
 	}
 
 	// Light Initialize
-	scene.DirectionalLights.emplace_back(DirectionalLight(glm::vec3(-0.5f, -1.0f, -0.3f), glm::vec3(1.0f, 0.95f, 0.90f), 4.0f));
+	scene.DirectionalLights.emplace_back(DirectionalLight(glm::vec3(2.0f, -2.0f, 1.0f), glm::vec3(1.0f, 0.95f, 0.90f), 40.0f));
 	for (int i = 0; i < 4; ++i)
 	{
-		scene.PointLights.emplace_back(PointLight(pointLightPositions[i], glm::vec3(1.0f, 0.97f, 0.92f), 10.f, 80.0f));
+		scene.PointLights.emplace_back(PointLight(pointLightPositions[i], glm::vec3(1.0f, 0.97f, 0.92f), 10.f, 8.0f));
 	}
-	scene.SpotLights.emplace_back(SpotLight(MainCamera.Pos, MainCamera.GetFront(), glm::vec3(0.f), glm::cos(glm::radians(12.5f)), glm::cos(glm::radians(17.5f)), 10.f, 1.f));
+	// scene.SpotLights.emplace_back(SpotLight(MainCamera.Pos, MainCamera.GetFront(), glm::vec3(1.f), glm::cos(glm::radians(12.5f)), glm::cos(glm::radians(17.5f)), 10.f, 1.f));
 
+	renderer.Init(scene);
 
 	// IBL Bake
-	scene.Enviroment = std::move(iblBaker.Bake("content/images/ferndale_studio_12_4k.hdr"));
+	scene.Enviroment = std::move(iblBaker.Bake("content/images/fireplace_4k.hdr"));
 
 	float deltaTime = 0.0f;
 	float lastFrameTime = 0.0f;

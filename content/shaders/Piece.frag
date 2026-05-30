@@ -1,17 +1,18 @@
 #version 330 core
 
-in vec2 TexCoords;
-in vec3 WorldPos;
-in vec3 Normal;
-in vec4 FragPosLightSpace;
-
-out vec4 FragColor;
-
 #define PI 3.14159265358979323846
 #define MAX_LIGHTS 16
+#define MAX_DIR_LIGHTS 4
 #define LIGHT_POINT 0
 #define LIGHT_DIRECTIONAL 1
 #define LIGHT_SPOT 2
+
+in vec2 TexCoords;
+in vec3 WorldPos;
+in vec3 Normal;
+in vec4 FragPosLightSpace[MAX_DIR_LIGHTS];
+
+out vec4 FragColor;
 
 uniform sampler2D texture_base_color;
 uniform vec4 base_color_factor;
@@ -37,6 +38,9 @@ uniform samplerCube irradianceMap;
 uniform samplerCube prefilterMap;
 uniform sampler2D   brdfLUT;  
 
+// Shadow
+
+uniform sampler2D dirLightDepthMaps[MAX_DIR_LIGHTS];
 
 // TODO 
 // sperate light to Point/Directional/Spot 
@@ -90,9 +94,37 @@ vec3 FresnelSchlickRoughness(float cosTheta, vec3 F0, float roughness) {
     return F0 + (max(vec3(1.0 - roughness), F0) - F0) * pow(1.0 - cosTheta, 5.0);
 }
 
-float CalcShadow(vec4 fragPosLightSpace)
+float CalcShadow(int lightIndex, vec3 lightDir)
 {
-    return 0.f;
+    // 执行透视除法
+    vec3 projCoords = FragPosLightSpace[lightIndex].xyz / FragPosLightSpace[lightIndex].w;
+    // 变换到[0,1]的范围
+    projCoords = projCoords * 0.5 + 0.5;
+    // 取得最近点的深度(使用[0,1]范围下的fragPosLight当坐标)
+    float closestDepth = texture(dirLightDepthMaps[lightIndex], projCoords.xy).r; 
+    // 取得当前片段在光源视角下的深度
+    float currentDepth = projCoords.z;
+    // 检查当前片段是否在阴影中
+
+    vec3 normal = normalize(Normal);
+    float bias = max(0.05 * (1.0 - dot(normal, lightDir)), 0.005);
+    float shadow = 0.0;
+    vec2 texelSize = 1.0 / textureSize(dirLightDepthMaps[lightIndex], 0);
+    for(int x = -1; x <= 1; ++x)
+    {
+        for(int y = -1; y <= 1; ++y)
+        {
+            float pcfDepth = texture(dirLightDepthMaps[lightIndex], projCoords.xy + vec2(x, y) * texelSize).r; 
+            shadow += currentDepth - bias > pcfDepth  ? 1.0 : 0.0;        
+        }    
+    }
+    shadow /= 9.0;
+    
+    // keep the shadow at 0.0 when outside the far_plane region of the light's frustum.
+    if(projCoords.z > 1.0)
+        shadow = 0.0;
+        
+    return shadow;
 }
 
 vec3 CalcLightRadiance(Light light, vec3 fragPos, vec3 N, vec3 V,
@@ -100,6 +132,7 @@ vec3 CalcLightRadiance(Light light, vec3 fragPos, vec3 N, vec3 V,
     // 1. calc L and attenuation
     vec3  L;
     float attenuation = 1.0;
+    float shadow = 0.0;
 
     // "If" may be slow on GPU
     if (light.type == LIGHT_POINT) {
@@ -114,6 +147,9 @@ vec3 CalcLightRadiance(Light light, vec3 fragPos, vec3 N, vec3 V,
     } else if (light.type == LIGHT_DIRECTIONAL) {
         // directional
         L = normalize(-light.direction);
+
+        // !!!!!!!!!! TEMP !!!!!!!!!!!!!!!
+        shadow = CalcShadow(0, -light.direction);
 
     } else if (light.type == LIGHT_SPOT) {
         // spot
@@ -147,9 +183,6 @@ vec3 CalcLightRadiance(Light light, vec3 fragPos, vec3 N, vec3 V,
     vec3  specular  = (D * G * F) / max(4.0 * NdV * NdL, 1e-4);
     vec3  kD        = (1.0 - F) * (1.0 - metallic);
     vec3  diffuse   = kD * albedo / PI;
-
-    // 4. shadow
-    float shadow = CalcShadow(FragPosLightSpace);
 
     // 5. merge
     vec3 radiance = light.intensity * light.color * attenuation;
@@ -208,6 +241,7 @@ void main()
     color = ACESFilm(color);  
     // No need for double gamma correction for that gltf texure are RGBA
     // color = pow(color, vec3(1.0 / 2.2));
+
 
     FragColor = vec4(color, 1.0);
 }

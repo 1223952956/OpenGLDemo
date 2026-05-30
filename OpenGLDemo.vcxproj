@@ -203,6 +203,8 @@
     <None Include="content\shaders\BRDFLUT.vert" />
     <None Include="content\shaders\Cube.frag" />
     <None Include="content\shaders\Cube.vert" />
+    <None Include="content\shaders\DebugQuad.frag" />
+    <None Include="content\shaders\DebugQuad.vert" />
     <None Include="content\shaders\EquirectangularToCubemap.frag" />
     <None Include="content\shaders\Cubemap.vert" />
     <None Include="content\shaders\IrradianceMap.frag" />

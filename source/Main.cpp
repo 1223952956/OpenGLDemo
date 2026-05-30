@@ -191,7 +191,7 @@ int main(void)
 	}
 
 	// Light Initialize
-	scene.DirectionalLights.emplace_back(DirectionalLight(glm::vec3(2.0f, -2.0f, 1.0f), glm::vec3(1.0f, 0.95f, 0.90f), 40.0f));
+	scene.DirectionalLights.emplace_back(DirectionalLight(glm::vec3(-2.0f, -2.0f, -1.0f), glm::vec3(1.0f, 0.95f, 0.90f), 20.0f));
 	for (int i = 0; i < 4; ++i)
 	{
 		scene.PointLights.emplace_back(PointLight(pointLightPositions[i], glm::vec3(1.0f, 0.97f, 0.92f), 10.f, 8.0f));
@@ -201,7 +201,7 @@ int main(void)
 	renderer.Init(scene);
 
 	// IBL Bake
-	scene.Enviroment = std::move(iblBaker.Bake("content/images/fireplace_4k.hdr"));
+	scene.Enviroment = std::move(iblBaker.Bake("content/images/brown_photostudio_02_4k.hdr"));
 
 	float deltaTime = 0.0f;
 	float lastFrameTime = 0.0f;

@@ -4,17 +4,16 @@
 #include <glm/gtc/matrix_transform.hpp>
 
 
-
-ShadowMapBaker::ShadowMapBaker()
-	:SimpleDepthShader("content/shaders/SimpleDepth.vert", "content/shaders/SimpleDepth.frag")
+ShadowMapBaker::ShadowMapBaker(ShaderManager& shaderManager)
 {
+	SimpleDepthShader = shaderManager.Get("SimpleDepthShader");
 }
 
-void ShadowMapBaker::Init(Scene& scene)
+void ShadowMapBaker::Init(Scene* scene)
 {
-	for (int i = 0; i < scene.DirectionalLights.size(); ++i)
+	for (int i = 0; i < scene->DirectionalLights.size(); ++i)
 	{
-		DirectionalLight& dirLight = scene.DirectionalLights[i];
+		DirectionalLight& dirLight = scene->DirectionalLights[i];
 
 		glGenFramebuffers(1, &dirLight.Shadow.DepthMapFBO);
 
@@ -35,24 +34,24 @@ void ShadowMapBaker::Init(Scene& scene)
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
-void ShadowMapBaker::Bake(Scene& scene)
+void ShadowMapBaker::Bake(Scene* scene)
 {
-	SimpleDepthShader.use();
+	SimpleDepthShader->use();
 	// Save current viewport size
 	GLint viewport[4];
 	glGetIntegerv(GL_VIEWPORT, viewport);
 	int scrWidth = viewport[2];
 	int scrHeight = viewport[3];
 
-	for (int i = 0; i < scene.DirectionalLights.size(); ++i)
+	for (int i = 0; i < scene->DirectionalLights.size(); ++i)
 	{
-		DirectionalLight& dirLight = scene.DirectionalLights[i];
+		DirectionalLight& dirLight = scene->DirectionalLights[i];
 
 		glm::mat4 lightProjection, lightView;
 
-		dirLight.Shadow.LightSpaceMatrix = ComputeLightSpaceMatrix(-scene.DirectionalLights[i].GetDirection());
+		dirLight.Shadow.LightSpaceMatrix = ComputeLightSpaceMatrix(-scene->DirectionalLights[i].GetDirection());
 
-		SimpleDepthShader.setMat4("lightSpaceMatrix", 1, GL_FALSE, 
+		SimpleDepthShader->setMat4("lightSpaceMatrix", 1, GL_FALSE,
 			glm::value_ptr(dirLight.Shadow.LightSpaceMatrix));
 
 		// render scene from light's point of view
@@ -82,14 +81,14 @@ glm::mat4 ShadowMapBaker::ComputeLightSpaceMatrix(glm::vec3 lightPos)
 	return lightSpaceMatrix;
 }
 
-void ShadowMapBaker::DrawPieces(Scene& scene)
+void ShadowMapBaker::DrawPieces(Scene* scene)
 {
-	SimpleDepthShader.use();
+	SimpleDepthShader->use();
 
-	for (int i = 0; i < scene.Pieces.size(); ++i)
+	for (int i = 0; i < scene->Pieces.size(); ++i)
 	{
-		SimpleDepthShader.setMat4("model", 1, GL_FALSE, glm::value_ptr(scene.Pieces[i]->Transform));
-		scene.Pieces[i]->ModelPtr->Draw(SimpleDepthShader);
+		SimpleDepthShader->setMat4("model", 1, GL_FALSE, glm::value_ptr(scene->Pieces[i]->Transform));
+		scene->Pieces[i]->ModelPtr->Draw(SimpleDepthShader.get());
 	}
 }
 

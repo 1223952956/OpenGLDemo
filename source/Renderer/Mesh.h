@@ -23,7 +23,7 @@ public:
     
     // Needs a destructor to free VAO blabla, but I'm kinda lazy...
     
-    void Draw(Shader& shader);
+    void Draw(Shader* shader);
 
     const std::string& GetName() const { return Name; };
 private:

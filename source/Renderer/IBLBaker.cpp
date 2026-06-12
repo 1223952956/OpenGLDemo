@@ -5,11 +5,15 @@
 #include "TextureManager.h"
 #include "RenderPrimitives.h"
 
-IBLBaker::IBLBaker()
-	:EquirectToCubemapShader("content/shaders/Cubemap.vert", "content/shaders/EquirectangularToCubemap.frag"),
-	IrradianceShader("content/shaders/Cubemap.vert", "content/shaders/IrradianceMap.frag"),
-	PrefilterShader("content/shaders/Cubemap.vert", "content/shaders/PrefilterMap.frag"),
-	BRDFLUTShader("content/shaders/BRDFLUT.vert", "content/shaders/BRDFLUT.frag")
+IBLBaker::IBLBaker(ShaderManager& shaderManager)
+{
+    EquirectToCubemapShader = shaderManager.Get("EquirectToCubemapShader");
+    IrradianceShader = shaderManager.Get("IrradianceShader");
+    PrefilterShader = shaderManager.Get("PrefilterShader");
+    BRDFLUTShader = shaderManager.Get("BRDFLUTShader");
+}
+
+void IBLBaker::Init()
 {
 }
 
@@ -64,9 +68,9 @@ GLuint IBLBaker::CreateEnvCubemap(GLuint hdrTex)
 
 
     // convert HDR equirectangular environment map to cubemap equivalent
-    EquirectToCubemapShader.use();
-    EquirectToCubemapShader.setInt("equirectangularMap", 0);
-    EquirectToCubemapShader.setMat4("projection", 1, GL_FALSE, glm::value_ptr(IBLBaker::CaptureProjection));
+    EquirectToCubemapShader->use();
+    EquirectToCubemapShader->setInt("equirectangularMap", 0);
+    EquirectToCubemapShader->setMat4("projection", 1, GL_FALSE, glm::value_ptr(IBLBaker::CaptureProjection));
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, hdrTex);
 
@@ -82,7 +86,7 @@ GLuint IBLBaker::CreateEnvCubemap(GLuint hdrTex)
     glBindFramebuffer(GL_FRAMEBUFFER, captureFBO);
     for (unsigned int i = 0; i < 6; ++i)
     {
-        EquirectToCubemapShader.setMat4("view", 1, GL_FALSE, glm::value_ptr(IBLBaker::CaptureViews[i]));
+        EquirectToCubemapShader->setMat4("view", 1, GL_FALSE, glm::value_ptr(IBLBaker::CaptureViews[i]));
         glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
             GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, envCubemap, 0);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -121,9 +125,9 @@ GLuint IBLBaker::CreateIrradianceMap(GLuint envMap)
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-    IrradianceShader.use();
-    IrradianceShader.setInt("environmentMap", 0);
-    IrradianceShader.setMat4("projection", 1, GL_FALSE, glm::value_ptr(IBLBaker::CaptureProjection));
+    IrradianceShader->use();
+    IrradianceShader->setInt("environmentMap", 0);
+    IrradianceShader->setMat4("projection", 1, GL_FALSE, glm::value_ptr(IBLBaker::CaptureProjection));
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_CUBE_MAP, envMap);
     glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
@@ -140,7 +144,7 @@ GLuint IBLBaker::CreateIrradianceMap(GLuint envMap)
     glBindFramebuffer(GL_FRAMEBUFFER, captureFBO);
     for (unsigned int i = 0; i < 6; ++i)
     {
-        IrradianceShader.setMat4("view", 1, GL_FALSE, glm::value_ptr(IBLBaker::CaptureViews[i]));
+        IrradianceShader->setMat4("view", 1, GL_FALSE, glm::value_ptr(IBLBaker::CaptureViews[i]));
         glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
             GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, irradianceMap, 0);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -180,9 +184,9 @@ GLuint IBLBaker::CreatePrefilterMap(GLuint envMap)
 
     glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
 
-    PrefilterShader.use();
-    PrefilterShader.setInt("environmentMap", 0);
-    PrefilterShader.setMat4("projection", 1, GL_FALSE, glm::value_ptr(IBLBaker::CaptureProjection));
+    PrefilterShader->use();
+    PrefilterShader->setInt("environmentMap", 0);
+    PrefilterShader->setMat4("projection", 1, GL_FALSE, glm::value_ptr(IBLBaker::CaptureProjection));
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_CUBE_MAP, envMap);
 
@@ -205,10 +209,10 @@ GLuint IBLBaker::CreatePrefilterMap(GLuint envMap)
         glViewport(0, 0, mipWidth, mipHeight);
 
         float roughness = (float)mip / (float)(maxMipLevels - 1);
-        PrefilterShader.setFloat("roughness", roughness);
+        PrefilterShader->setFloat("roughness", roughness);
         for (unsigned int i = 0; i < 6; ++i)
         {
-            PrefilterShader.setMat4("view", 1, GL_FALSE, glm::value_ptr(IBLBaker::CaptureViews[i]));
+            PrefilterShader->setMat4("view", 1, GL_FALSE, glm::value_ptr(IBLBaker::CaptureViews[i]));
             glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
                 GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, prefilterMap, mip);
 
@@ -253,7 +257,7 @@ GLuint IBLBaker::CreateBRDFLUT()
     int scrHeight = viewport[3];
 
     glViewport(0, 0, 512, 512);
-    BRDFLUTShader.use();
+    BRDFLUTShader->use();
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     RenderPrimitives::RenderQuad();
 

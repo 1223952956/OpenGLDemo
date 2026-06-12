@@ -2,62 +2,64 @@
 
 #include "TextureManager.h"
 
-void Material::Upload(Shader& shader)
+void Material::Upload(Shader* shader)
 {
-	shader.use();
-	shader.setInt("texture_base_color", 0);
-	shader.setInt("texture_normal", 1);
-	shader.setInt("texture_metallic_roughness", 2);
-	shader.setInt("texture_emissive", 3);
-	shader.setInt("texture_occlusion", 4);
+	shader->use();
+	shader->setInt("texture_base_color", 0);
+	shader->setInt("texture_normal", 1);
+	shader->setInt("texture_metallic_roughness", 2);
+	shader->setInt("texture_emissive", 3);
+	shader->setInt("texture_occlusion", 4);
 }
 
-void Material::Bind(Shader& shader)
+void Material::Bind(Shader* shader)
 {
 	int slot = 0;
+
+	shader->use();
 
 	// base color
 	glActiveTexture(GL_TEXTURE0 + slot);
 	glBindTexture(GL_TEXTURE_2D, 
 		BaseColorTexture? BaseColorTexture->ID : TextureManager::GetWhiteTexture());
-	shader.setInt("texture_base_color", slot);
-	shader.setVec4("base_color_factor", BaseColorFactor);
+	shader->setInt("texture_base_color", slot);
+	shader->setVec4("base_color_factor", BaseColorFactor);
 	slot++;
 
 	// normal
 	glActiveTexture(GL_TEXTURE0 + slot);
 	glBindTexture(GL_TEXTURE_2D, 
 		NormalTexture ? NormalTexture->ID : TextureManager::GetNormalTexture());
-	shader.setInt("texture_normal", slot);
-	shader.setFloat("normal_scale", NormalScale);
+	shader->setInt("texture_normal", slot);
+	shader->setFloat("normal_scale", NormalScale);
 	slot++;
 
 	// metallic and roughness
 	glActiveTexture(GL_TEXTURE0 + slot);
 	glBindTexture(GL_TEXTURE_2D, 
 		MetallicRoughnessTexture ? MetallicRoughnessTexture->ID : TextureManager::GetWhiteTexture());
-	shader.setInt("texture_metallic_roughness", slot);
-	shader.setFloat("metallic_factor", MetallicFactor);
-	shader.setFloat("roughness_factor", RoughnessFactor);
+	shader->setInt("texture_metallic_roughness", slot);
+	shader->setFloat("metallic_factor", MetallicFactor);
+	shader->setFloat("roughness_factor", RoughnessFactor);
 	slot++;
 
 	// emissive
 	glActiveTexture(GL_TEXTURE0 + slot);
 	glBindTexture(GL_TEXTURE_2D, 
 		EmissiveTexture ? EmissiveTexture->ID : TextureManager::GetBlackTexture());
-	shader.setInt("texture_emissive", slot);
-	shader.setVec3("emissive_factor", EmissiveFactor);
+	shader->setInt("texture_emissive", slot);
+	shader->setVec3("emissive_factor", EmissiveFactor);
 	slot++;
 
 	// occlusion
 	glActiveTexture(GL_TEXTURE0 + slot);
 	glBindTexture(GL_TEXTURE_2D, 
 		OcclusionTexture ? OcclusionTexture->ID : TextureManager::GetWhiteTexture());
-	shader.setInt("texture_occlusion", slot);
-	shader.setFloat("occlusion_strength", OcclusionStrength);
+	shader->setInt("texture_occlusion", slot);
+	shader->setFloat("occlusion_strength", OcclusionStrength);
 	slot++;
 
 	// opaque
-	shader.setBool("is_opaque", IsOpaque);
-	shader.setFloat("alpha_cutoff", AlphaCutoff);
+	shader->setBool("is_opaque", IsOpaque);
+	shader->setFloat("alpha_cutoff", AlphaCutoff);
 }

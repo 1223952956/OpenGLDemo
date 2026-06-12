@@ -7,10 +7,10 @@ Light::Light(glm::vec3 position, glm::vec3 color, float intensity)
 {
 }
 
-void Light::Upload(Shader& shader, const std::string& name)
+void Light::Upload(Shader* shader, const std::string& name)
 {
-	shader.setVec3(name + ".color", Color);
-	shader.setFloat(name + ".intensity", Intensity);
+	shader->setVec3(name + ".color", Color);
+	shader->setFloat(name + ".intensity", Intensity);
 }
 
 void Light::SetPosition(glm::vec3 newPos)

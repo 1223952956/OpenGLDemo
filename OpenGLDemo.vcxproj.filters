@@ -37,12 +37,15 @@
     <Filter Include="Resource Files\shaders">
       <UniqueIdentifier>{6da5a245-d9eb-44b4-9101-62faf912425e}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Renderer\RenderPass">
+      <UniqueIdentifier>{74a94421-dedb-4c0d-8d36-d6f9e0bdd41f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Renderer\RenderPass">
+      <UniqueIdentifier>{e270c44d-7e1d-4472-b99d-90710ed35bfd}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="source\Camera.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="source\glad.c">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="source\Main.cpp">
@@ -123,6 +126,36 @@
     <ClCompile Include="source\Renderer\RenderPrimitives.cpp">
       <Filter>Source Files\Renderer</Filter>
     </ClCompile>
+    <ClCompile Include="source\glad.c">
+      <Filter>Source Files\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="source\Renderer\RenderPass\BloomPass.cpp">
+      <Filter>Source Files\Renderer\RenderPass</Filter>
+    </ClCompile>
+    <ClCompile Include="source\Renderer\RenderPass\GeometryPass.cpp">
+      <Filter>Source Files\Renderer\RenderPass</Filter>
+    </ClCompile>
+    <ClCompile Include="source\Renderer\RenderPass\LightingPass.cpp">
+      <Filter>Source Files\Renderer\RenderPass</Filter>
+    </ClCompile>
+    <ClCompile Include="source\Renderer\RenderPass\RenderContext.cpp">
+      <Filter>Source Files\Renderer\RenderPass</Filter>
+    </ClCompile>
+    <ClCompile Include="source\Renderer\RenderPass\RenderPass.cpp">
+      <Filter>Source Files\Renderer\RenderPass</Filter>
+    </ClCompile>
+    <ClCompile Include="source\Renderer\RenderPass\ShadowPass.cpp">
+      <Filter>Source Files\Renderer\RenderPass</Filter>
+    </ClCompile>
+    <ClCompile Include="source\Renderer\RenderPass\ToneMappingPass.cpp">
+      <Filter>Source Files\Renderer\RenderPass</Filter>
+    </ClCompile>
+    <ClCompile Include="source\Renderer\ShaderManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="source\Renderer\RenderPass\SkyboxPass.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="source\Camera.h">
@@ -181,6 +214,33 @@
     </ClInclude>
     <ClInclude Include="source\Renderer\RenderPrimitives.h">
       <Filter>Header Files\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="source\Renderer\RenderPass\BloomPass.h">
+      <Filter>Header Files\Renderer\RenderPass</Filter>
+    </ClInclude>
+    <ClInclude Include="source\Renderer\RenderPass\GeometryPass.h">
+      <Filter>Header Files\Renderer\RenderPass</Filter>
+    </ClInclude>
+    <ClInclude Include="source\Renderer\RenderPass\LightingPass.h">
+      <Filter>Header Files\Renderer\RenderPass</Filter>
+    </ClInclude>
+    <ClInclude Include="source\Renderer\RenderPass\RenderContext.h">
+      <Filter>Header Files\Renderer\RenderPass</Filter>
+    </ClInclude>
+    <ClInclude Include="source\Renderer\RenderPass\RenderPass.h">
+      <Filter>Header Files\Renderer\RenderPass</Filter>
+    </ClInclude>
+    <ClInclude Include="source\Renderer\RenderPass\ShadowPass.h">
+      <Filter>Header Files\Renderer\RenderPass</Filter>
+    </ClInclude>
+    <ClInclude Include="source\Renderer\RenderPass\ToneMappingPass.h">
+      <Filter>Header Files\Renderer\RenderPass</Filter>
+    </ClInclude>
+    <ClInclude Include="source\Renderer\ShaderManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="source\Renderer\RenderPass\SkyboxPass.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

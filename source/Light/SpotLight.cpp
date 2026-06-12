@@ -9,16 +9,16 @@ SpotLight::SpotLight(glm::vec3 position, glm::vec3 direction, glm::vec3 color, f
 {
 }
 
-void SpotLight::Upload(Shader& shader, const std::string& name)
+void SpotLight::Upload(Shader* shader, const std::string& name)
 {
 	Light::Upload(shader, name);
-	shader.setVec3(name + ".position", Position);
-	shader.setVec3(name + ".direction", Direction);
-	shader.setFloat(name + ".innerCos", InnerCos);
-	shader.setFloat(name + ".outerCos", OuterCos);
+	shader->setVec3(name + ".position", Position);
+	shader->setVec3(name + ".direction", Direction);
+	shader->setFloat(name + ".innerCos", InnerCos);
+	shader->setFloat(name + ".outerCos", OuterCos);
 
-	shader.setInt(name + ".type", 2);
-	shader.setFloat(name + ".range", Range);
+	shader->setInt(name + ".type", 2);
+	shader->setFloat(name + ".range", Range);
 }
 
 void SpotLight::SetDirection(glm::vec3 newDir)

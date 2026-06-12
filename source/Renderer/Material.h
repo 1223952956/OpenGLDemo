@@ -34,8 +34,8 @@ public:
 
     // TODO
     // Upload some const value here
-    void Upload(Shader& shader);
+    void Upload(Shader* shader);
 
-    void Bind(Shader& shader);
+    void Bind(Shader* shader);
 };
 

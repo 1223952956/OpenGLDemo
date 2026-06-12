@@ -6,9 +6,9 @@ DirectionalLight::DirectionalLight(glm::vec3 direction, glm::vec3 color, float i
 {
 }
 
-void DirectionalLight::Upload(Shader& shader, const std::string& name)
+void DirectionalLight::Upload(Shader* shader, const std::string& name)
 {
 	Light::Upload(shader, name);
-	shader.setVec3(name + ".direction", Direction);
-	shader.setInt(name + ".type", 1);
+	shader->setVec3(name + ".direction", Direction);
+	shader->setInt(name + ".type", 1);
 }

@@ -22,6 +22,7 @@
 #include "Light/PointLight.h"
 #include "Light/SpotLight.h"
 #include "Renderer/IBLBaker.h"
+#include "Renderer/ShaderManager.h"
 
 float screenWidth = 1920.0f;
 float screenHeight = 1080.0f;
@@ -159,10 +160,11 @@ int main(void)
 
 	TextureManager::Init();
 
+	ShaderManager shaderManager;
+	shaderManager.Init();
+
 	Scene scene;
-	Renderer renderer;
-	IBLBaker iblBaker;
-	
+	Renderer renderer(shaderManager);
 
 	scene.MainCamera = &MainCamera;
 
@@ -199,9 +201,6 @@ int main(void)
 	// scene.SpotLights.emplace_back(SpotLight(MainCamera.Pos, MainCamera.GetFront(), glm::vec3(1.f), glm::cos(glm::radians(12.5f)), glm::cos(glm::radians(17.5f)), 10.f, 1.f));
 
 	renderer.Init(scene);
-
-	// IBL Bake
-	scene.Enviroment = std::move(iblBaker.Bake("content/images/brown_photostudio_02_2k.hdr"));
 
 	float deltaTime = 0.0f;
 	float lastFrameTime = 0.0f;
@@ -240,6 +239,7 @@ int main(void)
 
 	// Release textures
 	TextureManager::ShutDown();
+	shaderManager.ShutDown();
 
 	glfwTerminate();
 	return 0;

@@ -14,7 +14,7 @@ Mesh::Mesh(std::vector<Vertex>& vertices,std::vector<unsigned int>& indices, Mat
 	SetupMesh();
 }
 
-void Mesh::Draw(Shader& shader)
+void Mesh::Draw(Shader* shader)
 {
 	MaterialPtr->Bind(shader);
 

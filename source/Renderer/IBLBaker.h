@@ -5,20 +5,22 @@
 
 #include "IBLMaterial.h"
 #include "Shader.h"
+#include "ShaderManager.h"
 
 
 // For now, makes it static
 class IBLBaker
 {
 public:
-    IBLBaker();
+    IBLBaker(ShaderManager& shaderManager);
+    void Init();
     std::unique_ptr<IBLMaterial> Bake(const std::string& path);
 
 private:
-    Shader EquirectToCubemapShader;
-    Shader IrradianceShader;
-    Shader PrefilterShader;
-    Shader BRDFLUTShader;
+    std::shared_ptr<Shader> EquirectToCubemapShader;
+    std::shared_ptr<Shader> IrradianceShader;
+    std::shared_ptr<Shader> PrefilterShader;
+    std::shared_ptr<Shader> BRDFLUTShader;
 
     GLuint CreateEnvCubemap(GLuint hdrTex);
     GLuint CreateIrradianceMap(GLuint envMap);

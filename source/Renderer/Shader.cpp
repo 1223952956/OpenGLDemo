@@ -1,7 +1,7 @@
 #include "Shader.h"
 #include <glm/gtc/type_ptr.hpp>
 
-Shader::Shader(const char* vertexPath, const char* fragmentPath)
+Shader::Shader(const std::string& vertexPath, const std::string& fragmentPath)
 {
 	// 从文件路径中获取顶点/片段着色器
 	std::string vertexCode;

@@ -7,10 +7,12 @@
 class IBLMaterial
 {
 public:
- 	Cubemap EnvCubeMap;
-	Cubemap IrradianceMap;
-	Cubemap PrefilterMap;
-	Texture2D BRDFLUT;
+	IBLMaterial();
+
+ 	std::unique_ptr<Cubemap> EnvCubeMap;
+	std::unique_ptr<Cubemap> IrradianceMap;
+	std::unique_ptr<Cubemap> PrefilterMap;
+	std::unique_ptr<Texture2D> BRDFLUT;
 
 	void Upload(Shader& shader);
 	void Bind();

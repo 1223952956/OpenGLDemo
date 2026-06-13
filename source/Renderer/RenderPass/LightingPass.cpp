@@ -32,6 +32,9 @@ void LightingPass::Resize(unsigned int width, unsigned int height)
 
 void LightingPass::Execute(RenderContext& context)
 {
+	context.SceneFramebuffer->Bind();
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
 	context.Scene->Enviroment->Bind();
 	PBRShader->use();
 
@@ -39,12 +42,16 @@ void LightingPass::Execute(RenderContext& context)
 	UploadLight(context);
 
 	DrawPieces(context);
+
+	context.SceneFramebuffer->UnBind();
 }
 
 
 void LightingPass::UploadCamera(RenderContext& context)
 {
-	glm::mat4 projection = glm::perspective(context.Scene->MainCamera->GetFoV(), context.ScreenWidth / context.ScreenHeight, 0.1f, 100.0f);
+	glm::mat4 projection = glm::perspective(context.Scene->MainCamera->GetFoV(), 
+		static_cast<float>(context.ScreenWidth) / static_cast<float>(context.ScreenHeight),
+		0.1f, 100.0f);
 
 	PBRShader->setMat4("projection", 1, GL_FALSE, glm::value_ptr(projection));
 }

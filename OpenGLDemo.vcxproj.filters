@@ -150,11 +150,14 @@
     <ClCompile Include="source\Renderer\RenderPass\ToneMappingPass.cpp">
       <Filter>Source Files\Renderer\RenderPass</Filter>
     </ClCompile>
-    <ClCompile Include="source\Renderer\ShaderManager.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="source\Renderer\Framebuffer.cpp">
+      <Filter>Source Files\Renderer</Filter>
     </ClCompile>
     <ClCompile Include="source\Renderer\RenderPass\SkyboxPass.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\Renderer\RenderPass</Filter>
+    </ClCompile>
+    <ClCompile Include="source\Renderer\ShaderManager.cpp">
+      <Filter>Source Files\Renderer</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -236,11 +239,14 @@
     <ClInclude Include="source\Renderer\RenderPass\ToneMappingPass.h">
       <Filter>Header Files\Renderer\RenderPass</Filter>
     </ClInclude>
-    <ClInclude Include="source\Renderer\ShaderManager.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="source\Renderer\Framebuffer.h">
+      <Filter>Header Files\Renderer</Filter>
     </ClInclude>
     <ClInclude Include="source\Renderer\RenderPass\SkyboxPass.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\Renderer\RenderPass</Filter>
+    </ClInclude>
+    <ClInclude Include="source\Renderer\ShaderManager.h">
+      <Filter>Header Files\Renderer</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -251,12 +257,6 @@
       <Filter>Resource Files\shaders</Filter>
     </None>
     <None Include="content\shaders\Light.frag">
-      <Filter>Resource Files\shaders</Filter>
-    </None>
-    <None Include="content\shaders\Shader.frag">
-      <Filter>Resource Files\shaders</Filter>
-    </None>
-    <None Include="content\shaders\Shader.vert">
       <Filter>Resource Files\shaders</Filter>
     </None>
     <None Include="content\shaders\Piece.vert">
@@ -311,6 +311,15 @@
       <Filter>Resource Files\shaders</Filter>
     </None>
     <None Include="content\shaders\DebugQuad.frag">
+      <Filter>Resource Files\shaders</Filter>
+    </None>
+    <None Include="content\shaders\GaussianBlur.frag">
+      <Filter>Resource Files\shaders</Filter>
+    </None>
+    <None Include="content\shaders\FullscreenQuad.vert">
+      <Filter>Resource Files\shaders</Filter>
+    </None>
+    <None Include="content\shaders\ToneMapping.frag">
       <Filter>Resource Files\shaders</Filter>
     </None>
   </ItemGroup>

@@ -14,6 +14,7 @@ void SkyboxPass::Init(RenderContext& context)
 {
 	SkyboxShader->use();
 	SkyboxShader->setInt("environmentMap", 0);
+	SkyboxShader->setFloat("intensity", 1.f);
 }
 
 void SkyboxPass::Resize(unsigned int width, unsigned int height)
@@ -22,16 +23,20 @@ void SkyboxPass::Resize(unsigned int width, unsigned int height)
 
 void SkyboxPass::Execute(RenderContext& context)
 {
+	context.SceneFramebuffer->Bind();
 	SkyboxShader->use();
 
 	UploadCamera(context);
 
 	DrawSkybox(context);
+	context.SceneFramebuffer->UnBind();
 }
 
 void SkyboxPass::UploadCamera(RenderContext& context)
 {
-	glm::mat4 projection = glm::perspective(context.Scene->MainCamera->GetFoV(), context.ScreenWidth / context.ScreenHeight, 0.1f, 100.0f);
+	glm::mat4 projection = glm::perspective(context.Scene->MainCamera->GetFoV(),
+		static_cast<float>(context.ScreenWidth) / static_cast<float>(context.ScreenHeight),
+		0.1f, 100.0f);
 	SkyboxShader->setMat4("projection", 1, GL_FALSE, glm::value_ptr(projection));
 }
 
@@ -43,7 +48,7 @@ void SkyboxPass::DrawSkybox(RenderContext& context)
 
 	SkyboxShader->setMat4("view", 1, GL_FALSE, glm::value_ptr(view));
 	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_CUBE_MAP, context.Scene->Enviroment->EnvCubeMap.ID);
+	glBindTexture(GL_TEXTURE_CUBE_MAP, context.Scene->Enviroment->EnvCubeMap->ID);
 	RenderPrimitives::RenderCube();
 
 	glDepthFunc(GL_LESS);

@@ -12,6 +12,9 @@ void ShaderManager::Init()
     Load("BRDFLUTShader", "content/shaders/BRDFLUT.vert", "content/shaders/BRDFLUT.frag");
 
     Load("SimpleDepthShader", "content/shaders/SimpleDepth.vert", "content/shaders/SimpleDepth.frag");
+
+    Load("GaussianBlurShader", "content/shaders/FullscreenQuad.vert", "content/shaders/GaussianBlur.frag");
+    Load("ToneMappingShader", "content/shaders/FullscreenQuad.vert", "content/shaders/ToneMapping.frag");
 }
 
 void ShaderManager::ShutDown()

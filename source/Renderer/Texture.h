@@ -6,7 +6,7 @@
 class Texture
 {
 public:
-    GLuint ID = 0;
+    unsigned int ID = 0;
 
     virtual ~Texture()
     {
@@ -16,44 +16,29 @@ public:
             glDeleteTextures(1, &ID);
         }
     }
-
     Texture() = default;
+    Texture(unsigned int id) 
+        :ID(id)
+    {
+    }
 
     Texture(const Texture&) = delete;
     Texture& operator=(const Texture&) = delete;
-
-    Texture(Texture&& other) noexcept
-    {
-        ID = other.ID;
-        other.ID = 0;
-    }
-
-    Texture& operator=(Texture&& other) noexcept
-    {
-        if (this != &other)
-        {
-            if (ID)
-            {
-                std::cout << "Move assignment Delete Texture: " << ID << std::endl;
-                glDeleteTextures(1, &ID);
-            }
-
-            ID = other.ID;
-            other.ID = 0;
-        }
-
-        return *this;
-    }
 };
 
-// !!! Never construct data structures directly using Texture2D !!!
 class Texture2D : public Texture
 {
 public:
+    Texture2D() = default;
+    Texture2D(const std::string& path, unsigned int id)
+        :Texture(id),
+        Path(path)
+    {
+    }
+
 	std::string Path;
 };
 
-// !!! Never construct data structures directly using Cubemap !!!
 class Cubemap : public Texture
 {
 public:

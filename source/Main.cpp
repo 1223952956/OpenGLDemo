@@ -24,12 +24,12 @@
 #include "Renderer/IBLBaker.h"
 #include "Renderer/ShaderManager.h"
 
-float screenWidth = 1920.0f;
-float screenHeight = 1080.0f;
+uint32_t screenWidth = 1920.0f;
+uint32_t screenHeight = 1080.0f;
 float blend = 0.2f;
 
-float lastMouseX = screenWidth / 2.0f;
-float lastMouseY = screenHeight / 2.0f;
+float lastMouseX = static_cast<float>(screenWidth) / 2.0f;
+float lastMouseY = static_cast<float>(screenHeight) / 2.0f;
 
 Camera MainCamera;
 
@@ -193,14 +193,14 @@ int main(void)
 	}
 
 	// Light Initialize
-	scene.DirectionalLights.emplace_back(DirectionalLight(glm::vec3(-2.0f, -2.0f, -1.0f), glm::vec3(1.0f, 0.95f, 0.90f), 20.0f));
+	scene.DirectionalLights.emplace_back(DirectionalLight(glm::vec3(-2.0f, -2.0f, -1.0f), glm::vec3(1.0f, 0.95f, 0.90f), 2.0f));
 	for (int i = 0; i < 4; ++i)
 	{
-		scene.PointLights.emplace_back(PointLight(pointLightPositions[i], glm::vec3(1.0f, 0.97f, 0.92f), 10.f, 16.0f));
+		scene.PointLights.emplace_back(PointLight(pointLightPositions[i], glm::vec3(1.0f, 0.97f, 0.92f), 10.f, 10.0f));
 	}
 	// scene.SpotLights.emplace_back(SpotLight(MainCamera.Pos, MainCamera.GetFront(), glm::vec3(1.f), glm::cos(glm::radians(12.5f)), glm::cos(glm::radians(17.5f)), 10.f, 1.f));
 
-	renderer.Init(scene);
+	renderer.Init(scene, screenWidth, screenHeight);
 
 	float deltaTime = 0.0f;
 	float lastFrameTime = 0.0f;

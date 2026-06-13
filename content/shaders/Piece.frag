@@ -12,7 +12,8 @@ in vec3 WorldPos;
 in vec3 Normal;
 in vec4 FragPosLightSpace[MAX_DIR_LIGHTS];
 
-out vec4 FragColor;
+layout (location = 0) out vec4 FragColor;
+layout (location = 1) out vec4 BrightColor;
 
 uniform sampler2D texture_base_color;
 uniform vec4 base_color_factor;
@@ -191,15 +192,7 @@ vec3 CalcLightRadiance(Light light, vec3 fragPos, vec3 N, vec3 V,
 
 
 
-// ACES Film Tone Mapping
-vec3 ACESFilm(vec3 x) {
-    float a = 2.51;
-    float b = 0.03;
-    float c = 2.43;
-    float d = 0.59;
-    float e = 0.14;
-    return clamp((x * (a * x + b)) / (x * (c * x + d) + e), 0.0, 1.0);
-}
+
 
 
 void main()
@@ -237,11 +230,10 @@ void main()
 
     vec3 color = emissive + Lo + kD * ambient;
 
-    // ACE
-    color = ACESFilm(color);  
-    // No need for double gamma correction for that gltf texure are RGBA
-    // color = pow(color, vec3(1.0 / 2.2));
-
-
     FragColor = vec4(color, 1.0);
+
+    float brightness = dot(color, vec3(0.2126, 0.7152, 0.0722));
+    if(brightness > 1.0){
+        BrightColor = vec4(color, 1.0);
+    }  
 }

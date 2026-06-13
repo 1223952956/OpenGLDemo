@@ -23,23 +23,25 @@ std::unique_ptr<IBLMaterial> IBLBaker::Bake(const std::string& path)
 
     auto iblMat = std::make_unique<IBLMaterial>();
 
-    iblMat->EnvCubeMap.ID = CreateEnvCubemap(hdrTex->ID);
-    iblMat->EnvCubeMap.Name = hdrTex->Path + "::" + "EnvCubeMap";
+    iblMat->EnvCubeMap->ID = CreateEnvCubemap(hdrTex->ID);
+    iblMat->EnvCubeMap->Name = hdrTex->Path + "::" + "EnvCubeMap";
 
-    iblMat->IrradianceMap.ID = CreateIrradianceMap(iblMat->EnvCubeMap.ID);
-    iblMat->IrradianceMap.Name = hdrTex->Path + "::" + "IrradianceMap";
+    iblMat->IrradianceMap->ID = CreateIrradianceMap(iblMat->EnvCubeMap->ID);
+    iblMat->IrradianceMap->Name = hdrTex->Path + "::" + "IrradianceMap";
 
-    iblMat->PrefilterMap.ID = CreatePrefilterMap(iblMat->EnvCubeMap.ID);
-    iblMat->PrefilterMap.Name = hdrTex->Path + "::" + "PrefilterMap";
+    iblMat->PrefilterMap->ID = CreatePrefilterMap(iblMat->EnvCubeMap->ID);
+    iblMat->PrefilterMap->Name = hdrTex->Path + "::" + "PrefilterMap";
 
-    iblMat->BRDFLUT.ID = CreateBRDFLUT();
-    iblMat->BRDFLUT.Path = hdrTex->Path + "::" + "BRDFLUT";
+    iblMat->BRDFLUT->ID = CreateBRDFLUT();
+    iblMat->BRDFLUT->Path = hdrTex->Path + "::" + "BRDFLUT";
 
     return iblMat;
 }
 
 GLuint IBLBaker::CreateEnvCubemap(GLuint hdrTex)
 {
+    // TODO 
+    // delete captureFBO when baking is done
     // Frame/Render Buffer
     unsigned int captureFBO, captureRBO;
     glGenFramebuffers(1, &captureFBO);

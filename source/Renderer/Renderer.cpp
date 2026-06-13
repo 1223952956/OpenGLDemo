@@ -39,13 +39,15 @@ void Renderer::Init(Scene& scene, uint32_t screenWidth, uint32_t screenHeight)
 	}
 }
 
-void Renderer::Render(Scene& scene, uint32_t screenWidth, uint32_t screenHeight)
+void Renderer::Render(Scene& scene, uint32_t screenWidth, uint32_t screenHeight, float currTime, float deltaTime)
 {
 	glClearColor(0.f, 0.f, 0.f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	RenderContext context;
 	context.Scene = &scene;
+	context.CurrTime = currTime;
+	context.DeltaTime = deltaTime;
 	context.ScreenWidth = screenWidth;
 	context.ScreenHeight = screenHeight;
 	context.SceneFramebuffer = SceneFramebuffer;

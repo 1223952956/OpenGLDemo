@@ -11,7 +11,7 @@ class Renderer
 public:
     Renderer(ShaderManager& shaderManager);
     void Init(Scene& scene, uint32_t screenWidth, uint32_t screenHeight);
-	void Render(Scene& scene, uint32_t screenWidth, uint32_t screenHeight);
+	void Render(Scene& scene, uint32_t screenWidth, uint32_t screenHeight, float currTime, float deltaTime);
 
 private:
     std::vector<std::unique_ptr<RenderPass>> RenderPasses;

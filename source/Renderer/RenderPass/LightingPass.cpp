@@ -37,6 +37,7 @@ void LightingPass::Execute(RenderContext& context)
 
 	context.Scene->Enviroment->Bind();
 	PBRShader->use();
+	PBRShader->setFloat("curr_time", context.CurrTime);
 
 	UploadCamera(context);
 	UploadLight(context);

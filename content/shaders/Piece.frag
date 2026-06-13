@@ -43,6 +43,9 @@ uniform sampler2D   brdfLUT;
 
 uniform sampler2D dirLightDepthMaps[MAX_DIR_LIGHTS];
 
+// Time
+uniform float curr_time;
+
 // TODO 
 // sperate light to Point/Directional/Spot 
 struct Light {
@@ -227,6 +230,9 @@ void main()
     vec3 specular = prefilteredColor * (F * envBRDF.x + envBRDF.y);
 
     vec3 ambient = (kD * diffuse + specular) * ao;
+
+    // Temp breathing light effect
+    emissive = (1.0 + (sin(curr_time * 2.0) * 0.5 + 0.5) * 15.0) * emissive;
 
     vec3 color = emissive + Lo + kD * ambient;
 

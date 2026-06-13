@@ -208,12 +208,13 @@ int main(void)
 	// render loop
 	while (!glfwWindowShouldClose(window))
 	{
-		deltaTime = glfwGetTime() - lastFrameTime;
-		lastFrameTime = glfwGetTime();
+		double currFrameTime = glfwGetTime();
+		deltaTime = static_cast<float>(currFrameTime - lastFrameTime);
+		lastFrameTime = currFrameTime;
 
 		processInput(window, deltaTime);
 
-		renderer.Render(scene, screenWidth, screenHeight);
+		renderer.Render(scene, screenWidth, screenHeight, lastFrameTime, deltaTime);
 
 
 		// Draw light position

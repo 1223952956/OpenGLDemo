@@ -11,6 +11,9 @@ public:
 	uint32_t ScreenWidth;
 	uint32_t ScreenHeight;
 
+	float CurrTime;
+	float DeltaTime;
+
 	Scene* Scene;
 
 	std::shared_ptr<Framebuffer> SceneFramebuffer;

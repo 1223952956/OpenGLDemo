@@ -19,26 +19,35 @@ void IBLBaker::Init()
 
 std::unique_ptr<IBLMaterial> IBLBaker::Bake(const std::string& path)
 {
-    Texture2D* hdrTex = TextureManager::Load(path);
+    Texture2D* hdrTex = TextureManager::LoadEquirectangularMap(path);
 
     auto iblMat = std::make_unique<IBLMaterial>();
 
-    iblMat->EnvCubeMap->ID = CreateEnvCubemap(hdrTex->ID);
-    iblMat->EnvCubeMap->Name = hdrTex->Path + "::" + "EnvCubeMap";
+	iblMat->EnvCubeMap = std::make_unique<Cubemap>();
+	iblMat->IrradianceMap = std::make_unique<Cubemap>();
+	iblMat->PrefilterMap = std::make_unique<Cubemap>();
+	iblMat->BRDFLUT = std::make_unique<Texture2D>();
 
-    iblMat->IrradianceMap->ID = CreateIrradianceMap(iblMat->EnvCubeMap->ID);
-    iblMat->IrradianceMap->Name = hdrTex->Path + "::" + "IrradianceMap";
+    iblMat->EnvCubeMap->Bind();
+    UploadEnvCubemap(hdrTex, iblMat->EnvCubeMap.get());
+    iblMat->EnvCubeMap->DebugName = hdrTex->DebugName + "::" + "EnvCubeMap";
 
-    iblMat->PrefilterMap->ID = CreatePrefilterMap(iblMat->EnvCubeMap->ID);
-    iblMat->PrefilterMap->Name = hdrTex->Path + "::" + "PrefilterMap";
+	iblMat->IrradianceMap->Bind();
+	UploadIrradianceMap(iblMat->EnvCubeMap.get(), iblMat->IrradianceMap.get());
+	iblMat->IrradianceMap->DebugName = hdrTex->DebugName + "::" + "IrradianceMap";
 
-    iblMat->BRDFLUT->ID = CreateBRDFLUT();
-    iblMat->BRDFLUT->Path = hdrTex->Path + "::" + "BRDFLUT";
+	iblMat->PrefilterMap->Bind();
+	UploadPrefilterMap(iblMat->EnvCubeMap.get(), iblMat->PrefilterMap.get());
+	iblMat->PrefilterMap->DebugName = hdrTex->DebugName + "::" + "PrefilterMap";
+
+	iblMat->BRDFLUT->Bind();
+	UploadBRDFLUT(iblMat->BRDFLUT.get());
+	iblMat->BRDFLUT->DebugName = hdrTex->DebugName + "::" + "BRDFLUT";
 
     return iblMat;
 }
 
-GLuint IBLBaker::CreateEnvCubemap(GLuint hdrTex)
+void IBLBaker::UploadEnvCubemap(Texture2D* hdrTex, Cubemap* envMap)
 {
     // TODO 
     // delete captureFBO when baking is done
@@ -53,9 +62,6 @@ GLuint IBLBaker::CreateEnvCubemap(GLuint hdrTex)
     glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, captureRBO);
 
     // Cubemap
-    unsigned int envCubemap;
-    glGenTextures(1, &envCubemap);
-    glBindTexture(GL_TEXTURE_CUBE_MAP, envCubemap);
     for (unsigned int i = 0; i < 6; ++i)
     {
         // note that we store each face with 16 bit floating point values
@@ -74,7 +80,7 @@ GLuint IBLBaker::CreateEnvCubemap(GLuint hdrTex)
     EquirectToCubemapShader->setInt("equirectangularMap", 0);
     EquirectToCubemapShader->setMat4("projection", 1, GL_FALSE, glm::value_ptr(IBLBaker::CaptureProjection));
     glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, hdrTex);
+	hdrTex->Bind();
 
     // Save current viewport size
     GLint viewport[4];
@@ -90,7 +96,7 @@ GLuint IBLBaker::CreateEnvCubemap(GLuint hdrTex)
     {
         EquirectToCubemapShader->setMat4("view", 1, GL_FALSE, glm::value_ptr(IBLBaker::CaptureViews[i]));
         glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
-            GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, envCubemap, 0);
+            GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, envMap->GetID(), 0);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         RenderPrimitives::RenderCube(); // renders a 1x1 cube
@@ -99,11 +105,9 @@ GLuint IBLBaker::CreateEnvCubemap(GLuint hdrTex)
 
     // configure the viewport to the original framebuffer's screen dimensions
     glViewport(0, 0, scrWidth, scrHeight);
-
-    return envCubemap;
 }
 
-GLuint IBLBaker::CreateIrradianceMap(GLuint envMap)
+void IBLBaker::UploadIrradianceMap(Cubemap* envMap, Cubemap* irradianceMap)
 {
     unsigned int captureFBO, captureRBO;
     glGenFramebuffers(1, &captureFBO);
@@ -113,9 +117,7 @@ GLuint IBLBaker::CreateIrradianceMap(GLuint envMap)
     glBindRenderbuffer(GL_RENDERBUFFER, captureRBO);
     glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, 32, 32);
 
-    unsigned int irradianceMap;
-    glGenTextures(1, &irradianceMap);
-    glBindTexture(GL_TEXTURE_CUBE_MAP, irradianceMap);
+
     for (unsigned int i = 0; i < 6; ++i)
     {
         glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB16F, 32, 32, 0,
@@ -131,7 +133,7 @@ GLuint IBLBaker::CreateIrradianceMap(GLuint envMap)
     IrradianceShader->setInt("environmentMap", 0);
     IrradianceShader->setMat4("projection", 1, GL_FALSE, glm::value_ptr(IBLBaker::CaptureProjection));
     glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_CUBE_MAP, envMap);
+    envMap->Bind();
     glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
 
     // Save current viewport size
@@ -148,7 +150,7 @@ GLuint IBLBaker::CreateIrradianceMap(GLuint envMap)
     {
         IrradianceShader->setMat4("view", 1, GL_FALSE, glm::value_ptr(IBLBaker::CaptureViews[i]));
         glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
-            GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, irradianceMap, 0);
+            GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, irradianceMap->GetID(), 0);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         RenderPrimitives::RenderCube(); // renders a 1x1 cube
@@ -157,11 +159,9 @@ GLuint IBLBaker::CreateIrradianceMap(GLuint envMap)
 
     // configure the viewport to the original framebuffer's screen dimensions
     glViewport(0, 0, scrWidth, scrHeight);
-
-    return irradianceMap;
 }
 
-GLuint IBLBaker::CreatePrefilterMap(GLuint envMap)
+void IBLBaker::UploadPrefilterMap(Cubemap* envMap, Cubemap* prefilterMap)
 {
     unsigned int captureFBO, captureRBO;
     glGenFramebuffers(1, &captureFBO);
@@ -171,9 +171,6 @@ GLuint IBLBaker::CreatePrefilterMap(GLuint envMap)
     glBindRenderbuffer(GL_RENDERBUFFER, captureRBO);
     glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, 32, 32);
 
-    unsigned int prefilterMap;
-    glGenTextures(1, &prefilterMap);
-    glBindTexture(GL_TEXTURE_CUBE_MAP, prefilterMap);
     for (unsigned int i = 0; i < 6; ++i)
     {
         glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB16F, 128, 128, 0, GL_RGB, GL_FLOAT, nullptr);
@@ -190,7 +187,7 @@ GLuint IBLBaker::CreatePrefilterMap(GLuint envMap)
     PrefilterShader->setInt("environmentMap", 0);
     PrefilterShader->setMat4("projection", 1, GL_FALSE, glm::value_ptr(IBLBaker::CaptureProjection));
     glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_CUBE_MAP, envMap);
+	envMap->Bind();
 
     glBindFramebuffer(GL_FRAMEBUFFER, captureFBO);
     unsigned int maxMipLevels = 5;
@@ -216,7 +213,7 @@ GLuint IBLBaker::CreatePrefilterMap(GLuint envMap)
         {
             PrefilterShader->setMat4("view", 1, GL_FALSE, glm::value_ptr(IBLBaker::CaptureViews[i]));
             glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
-                GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, prefilterMap, mip);
+                GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, prefilterMap->GetID(), mip);
 
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
             RenderPrimitives::RenderCube();
@@ -226,17 +223,12 @@ GLuint IBLBaker::CreatePrefilterMap(GLuint envMap)
 
     // configure the viewport to the original framebuffer's screen dimensions
     glViewport(0, 0, scrWidth, scrHeight);
-
-    return prefilterMap;
 }
 
-GLuint IBLBaker::CreateBRDFLUT()
+void IBLBaker::UploadBRDFLUT(Texture2D* brdfLUT)
 {
-    unsigned int brdfLUTTexture;
-    glGenTextures(1, &brdfLUTTexture);
-
     // pre-allocate enough memory for the LUT texture.
-    glBindTexture(GL_TEXTURE_2D, brdfLUTTexture);
+    brdfLUT->Bind();
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RG16F, 512, 512, 0, GL_RG, GL_FLOAT, 0);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
@@ -250,7 +242,7 @@ GLuint IBLBaker::CreateBRDFLUT()
     glBindFramebuffer(GL_FRAMEBUFFER, captureFBO);
     glBindRenderbuffer(GL_RENDERBUFFER, captureRBO);
     glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, 512, 512);
-    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, brdfLUTTexture, 0);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, brdfLUT->GetID(), 0);
 
     // Save current viewport size
     GLint viewport[4];
@@ -267,6 +259,4 @@ GLuint IBLBaker::CreateBRDFLUT()
 
     // configure the viewport to the original framebuffer's screen dimensions
     glViewport(0, 0, scrWidth, scrHeight);
-
-    return brdfLUTTexture;
 }

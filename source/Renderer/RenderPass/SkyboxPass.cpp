@@ -48,7 +48,7 @@ void SkyboxPass::DrawSkybox(RenderContext& context)
 
 	SkyboxShader->setMat4("view", 1, GL_FALSE, glm::value_ptr(view));
 	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_CUBE_MAP, context.Scene->Enviroment->EnvCubeMap->ID);
+	context.Scene->Enviroment->EnvCubeMap->Bind();
 	RenderPrimitives::RenderCube();
 
 	glDepthFunc(GL_LESS);

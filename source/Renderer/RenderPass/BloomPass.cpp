@@ -27,9 +27,15 @@ void BloomPass::Execute(RenderContext& context)
 void BloomPass::InitPingPongBuffer(uint32_t screenWidth, uint32_t screenHeight)
 {
     GLuint pingpongFBO[2];
-    GLuint pingpongBuffer[2];
     glGenFramebuffers(2, pingpongFBO);
-    glGenTextures(2, pingpongBuffer);
+
+    auto blurPing = std::make_shared<Texture2D>();
+    auto blurPong = std::make_shared<Texture2D>();
+    blurPing->SetDebugName("BloomPass::BlurPing");
+    blurPong->SetDebugName("BloomPass::BlurPong");
+
+    GLuint pingpongBuffer[2] = { blurPing->GetID(), blurPong->GetID() };
+
     for (GLuint i = 0; i < 2; i++)
     {
         glBindFramebuffer(GL_FRAMEBUFFER, pingpongFBO[i]);
@@ -53,9 +59,6 @@ void BloomPass::InitPingPongBuffer(uint32_t screenWidth, uint32_t screenHeight)
     BufferPing = std::make_shared<Framebuffer>("BloomPass::BufferPing", pingpongFBO[0]);
     BufferPong = std::make_shared<Framebuffer>("BloomPass::BufferPong", pingpongFBO[1]);
 
-    auto blurPing = std::make_shared<Texture2D>("BloomPass::BlurPing", pingpongBuffer[0]);
-    auto blurPong = std::make_shared<Texture2D>("BloomPass::BlurPong", pingpongBuffer[1]);
-
     BufferPing->ColorAttachments = { blurPing };
     BufferPong->ColorAttachments = { blurPong };
 
@@ -76,8 +79,14 @@ void BloomPass::Blur(RenderContext& context)
         target->Bind();
         GaussianBlurShader->setBool("is_horizontal", isHorizontal);
 
-        GLuint sourceTexture = (i == 0) ? context.SceneFramebuffer->ColorAttachments[1]->ID : source->ColorAttachments[0]->ID;
-        glBindTexture(GL_TEXTURE_2D, sourceTexture);
+		if (i == 0)
+		{
+			context.SceneFramebuffer->ColorAttachments[1]->Bind();
+		}
+		else
+		{
+			source->ColorAttachments[0]->Bind();
+		}
 
         RenderPrimitives::RenderQuad();
 

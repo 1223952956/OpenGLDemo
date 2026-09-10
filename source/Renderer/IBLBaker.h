@@ -22,10 +22,10 @@ private:
     std::shared_ptr<Shader> PrefilterShader;
     std::shared_ptr<Shader> BRDFLUTShader;
 
-    GLuint CreateEnvCubemap(GLuint hdrTex);
-    GLuint CreateIrradianceMap(GLuint envMap);
-    GLuint CreatePrefilterMap(GLuint envMap);
-    GLuint CreateBRDFLUT();
+    void UploadEnvCubemap(Texture2D* hdrTex, Cubemap* envMap);
+    void UploadIrradianceMap(Cubemap* envMap, Cubemap* irradianceMap);
+    void UploadPrefilterMap(Cubemap* envMap, Cubemap* prefilterMap);
+    void UploadBRDFLUT(Texture2D* brdfLUT);
 
     const glm::mat4 CaptureProjection = glm::perspective(glm::radians(90.0f), 1.0f, 0.1f, 10.0f);
     const glm::mat4 CaptureViews[6] =

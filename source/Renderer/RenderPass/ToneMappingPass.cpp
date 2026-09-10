@@ -24,10 +24,10 @@ void ToneMappingPass::Execute(RenderContext& context)
 	ToneMappingShader->use();
 
 	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, context.SceneFramebuffer->ColorAttachments[0]->ID);
+	context.SceneFramebuffer->ColorAttachments[0]->Bind();
 
 	glActiveTexture(GL_TEXTURE1);
-	glBindTexture(GL_TEXTURE_2D, context.BlurColor->ID);
+	context.BlurColor->Bind();
 
 	RenderPrimitives::RenderQuad();
 }

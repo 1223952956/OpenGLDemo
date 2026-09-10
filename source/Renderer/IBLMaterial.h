@@ -7,8 +7,6 @@
 class IBLMaterial
 {
 public:
-	IBLMaterial();
-
  	std::unique_ptr<Cubemap> EnvCubeMap;
 	std::unique_ptr<Cubemap> IrradianceMap;
 	std::unique_ptr<Cubemap> PrefilterMap;

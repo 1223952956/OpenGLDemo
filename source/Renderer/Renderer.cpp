@@ -67,11 +67,18 @@ void Renderer::InitColorBuffer(uint32_t screenWidth, uint32_t screenHeight)
 	GLuint sceneFBO;
 	glGenFramebuffers(1, &sceneFBO);
 	glBindFramebuffer(GL_FRAMEBUFFER, sceneFBO);
-	GLuint colorBuffers[2];
-	glGenTextures(2, colorBuffers);
+
+	auto sceneColor = std::make_shared<Texture2D>();
+	sceneColor->SetDebugName("Renderer::SceneColor");
+
+	auto brightColor = std::make_shared<Texture2D>();
+	brightColor->SetDebugName("Renderer::BrightColor");
+
+	std::shared_ptr<Texture2D> colorBuffers[] = { sceneColor, brightColor };
+
 	for (GLuint i = 0; i < 2; i++)
 	{
-		glBindTexture(GL_TEXTURE_2D, colorBuffers[i]);
+		colorBuffers[i]->Bind();
 		glTexImage2D(
 			GL_TEXTURE_2D, 0, GL_RGB16F, screenWidth, screenHeight, 0, GL_RGB, GL_FLOAT, NULL
 		);
@@ -81,7 +88,7 @@ void Renderer::InitColorBuffer(uint32_t screenWidth, uint32_t screenHeight)
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 		// attach texture to framebuffer
 		glFramebufferTexture2D(
-			GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + i, GL_TEXTURE_2D, colorBuffers[i], 0
+			GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + i, GL_TEXTURE_2D, colorBuffers[i]->GetID(), 0
 		);
 	}
 
@@ -100,11 +107,9 @@ void Renderer::InitColorBuffer(uint32_t screenWidth, uint32_t screenHeight)
 		std::cout << "Framebuffer not complete!" << std::endl;
 	}
 
-	auto sceneColor = std::make_shared<Texture2D>("Renderer::SceneColor", colorBuffers[0]);
-	auto brightColor = std::make_shared<Texture2D>("Renderer::BrightColor", colorBuffers[1]);
-
 	SceneFramebuffer = std::make_shared<Framebuffer>("Renderer::SceneFramebuffer", sceneFBO);
-	SceneFramebuffer->ColorAttachments = { sceneColor, brightColor};
+
+	SceneFramebuffer->ColorAttachments = { sceneColor, brightColor };
 
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }

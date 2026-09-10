@@ -180,6 +180,7 @@
     <ClCompile Include="source\Renderer\ShaderManager.cpp" />
     <ClCompile Include="source\Renderer\ShadowMap.cpp" />
     <ClCompile Include="source\Renderer\ShadowMapBaker.cpp" />
+    <ClCompile Include="source\Renderer\Texture.cpp" />
     <ClCompile Include="source\Renderer\TextureManager.cpp" />
     <ClCompile Include="source\Scene.cpp" />
     <ClCompile Include="source\stb_image_wrap.cpp" />

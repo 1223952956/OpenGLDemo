@@ -18,37 +18,6 @@ void TextureManager::Init()
 	NormalTexture = CreateSolidTexture(0.5f, 0.5f, 1.f, 1.f);
 }
 
-Texture2D* TextureManager::Load(const std::string& path)
-{
-	auto it = Texture2DMap.find(path);
-
-	if (it != Texture2DMap.end())
-	{
-		return it->second.get();
-	}
-
-	stbi_set_flip_vertically_on_load(true);
-	int width, height, channels;
-	float* data = stbi_loadf(path.c_str(), &width, &height, &channels, 0);
-	if (!data)
-	{
-		std::cerr << "[TextureManager] Failed to load texture: " << path << std::endl;
-		stbi_image_free(data);
-		return nullptr;
-	}
-
-	std::cout << "Load texture: " << path << std::endl;
-
-	auto texture = std::make_unique<Texture2D>(path, CreateGLTexture(width, height, channels, data));
-
-	stbi_image_free(data);
-
-	Texture2D* ptr = texture.get();
-	Texture2DMap[texture->Path] = std::move(texture);
-
-	return ptr;
-}
-
 Texture2D* TextureManager::Load(const std::string& path, aiTextureType type)
 {
 	auto it = Texture2DMap.find(path);
@@ -71,12 +40,15 @@ Texture2D* TextureManager::Load(const std::string& path, aiTextureType type)
 
 	std::cout << "Load texture: " << path << std::endl;
 
-	auto texture = std::make_unique<Texture2D>(path, CreateGLTexture(width, height, channels, data, type));
+	auto texture = std::make_unique<Texture2D>();
+	texture->DebugName = path;
+	texture->Bind();
+	UploadGLTextureData(width, height, channels, data, type);
 
 	stbi_image_free(data);
 
 	Texture2D* ptr = texture.get();
-	Texture2DMap[texture->Path] = std::move(texture);
+	Texture2DMap[texture->DebugName] = std::move(texture);
 
 	return ptr;
 }
@@ -112,13 +84,49 @@ Texture2D* TextureManager::Load(const std::string& texNum, const std::string& di
 
 	std::cout << "Load texture: " << tex->mFilename.C_Str() << std::endl;
 
-	auto texture = std::make_unique<Texture2D>(dictionary + "/" + tex->mFilename.C_Str(),
-		CreateGLTexture(width, height, channels, data, type));
+	auto texture = std::make_unique<Texture2D>();
+	texture->Bind();
+	texture->DebugName = dictionary + "/" + tex->mFilename.C_Str();
+	UploadGLTextureData(width, height, channels, data, type);
 
 	stbi_image_free(data);
 
 	Texture2D* ptr = texture.get();
-	Texture2DMap[texture->Path] = std::move(texture);
+	Texture2DMap[texture->DebugName] = std::move(texture);
+
+	return ptr;
+}
+
+Texture2D* TextureManager::LoadEquirectangularMap(const std::string& path)
+{
+	auto it = Texture2DMap.find(path);
+
+	if (it != Texture2DMap.end())
+	{
+		return it->second.get();
+	}
+
+	stbi_set_flip_vertically_on_load(true);
+	int width, height, channels;
+	float* data = stbi_loadf(path.c_str(), &width, &height, &channels, 0);
+	if (!data)
+	{
+		std::cerr << "[TextureManager] Failed to load texture: " << path << std::endl;
+		stbi_image_free(data);
+		return nullptr;
+	}
+
+	std::cout << "Load texture: " << path << std::endl;
+
+	auto texture = std::make_unique<Texture2D>();
+	texture->DebugName = path;
+	texture->Bind();
+	UploadEquirectangularMap(width, height, channels, data);
+
+	stbi_image_free(data);
+
+	Texture2D* ptr = texture.get();
+	Texture2DMap[texture->DebugName] = std::move(texture);
 
 	return ptr;
 }
@@ -128,7 +136,7 @@ void TextureManager::ShutDown()
 	Texture2DMap.clear();
 }
 
-unsigned int TextureManager::CreateGLTexture(int width, int height, int nrChannels, unsigned char* data, aiTextureType type)
+void TextureManager::UploadGLTextureData(int width, int height, int nrChannels, unsigned char* data, aiTextureType type)
 {
 	GLenum internalFormat;
 	GLenum dataFormat;
@@ -160,10 +168,6 @@ unsigned int TextureManager::CreateGLTexture(int width, int height, int nrChanne
 		internalFormat = (nrChannels == 4) ? GL_SRGB8_ALPHA8 : GL_SRGB8;
 	}
 
-	unsigned int textureID;
-	glGenTextures(1, &textureID);
-	glBindTexture(GL_TEXTURE_2D, textureID);
-
 	glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, width, height, 0, dataFormat, GL_UNSIGNED_BYTE, data);
 
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
@@ -172,23 +176,16 @@ unsigned int TextureManager::CreateGLTexture(int width, int height, int nrChanne
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
 	glGenerateMipmap(GL_TEXTURE_2D);
-
-	return textureID;
 }
 
-unsigned int TextureManager::CreateGLTexture(int width, int height, int nrChannels, float* data)
+void TextureManager::UploadEquirectangularMap(int width, int height, int nrChannels, float* data)
 {
-	unsigned int textureID;
-	glGenTextures(1, &textureID);
-	glBindTexture(GL_TEXTURE_2D, textureID);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F, width, height, 0, GL_RGB, GL_FLOAT, data);
 
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-	return textureID;
 }
 
 GLuint TextureManager::CreateSolidTexture(float r, float g, float b, float a)

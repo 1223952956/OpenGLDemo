@@ -14,6 +14,40 @@ Mesh::Mesh(std::vector<Vertex>& vertices,std::vector<unsigned int>& indices, Mat
 	SetupMesh();
 }
 
+Mesh::~Mesh()
+{
+	Release();
+}
+
+Mesh::Mesh(Mesh&& other) noexcept
+	: Name(std::move(other.Name))
+	, Vertices(std::move(other.Vertices))
+	, Indices(std::move(other.Indices))
+	, MaterialPtr(std::exchange(other.MaterialPtr, nullptr))
+	, VAO(std::exchange(other.VAO, 0))
+	, VBO(std::exchange(other.VBO, 0))
+	, EBO(std::exchange(other.EBO, 0))
+{
+}
+
+Mesh& Mesh::operator=(Mesh&& other) noexcept
+{
+	if (this != &other)
+	{
+		Release();
+
+		Name = std::move(other.Name);
+		Vertices = std::move(other.Vertices);
+		Indices = std::move(other.Indices);
+		MaterialPtr = std::exchange(other.MaterialPtr, nullptr);
+		VAO = std::exchange(other.VAO, 0);
+		VBO = std::exchange(other.VBO, 0);
+		EBO = std::exchange(other.EBO, 0);
+	}
+
+	return *this;
+}
+
 void Mesh::Draw(Shader* shader)
 {
 	MaterialPtr->Bind(shader);
@@ -50,4 +84,20 @@ void Mesh::SetupMesh()
 	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, TexCoords));
 
 	glBindVertexArray(0);
+}
+
+void Mesh::Release()
+{
+	if (EBO != 0)
+		glDeleteBuffers(1, &EBO);
+
+	if (VBO != 0)
+		glDeleteBuffers(1, &VBO);
+
+	if (VAO != 0)
+		glDeleteVertexArrays(1, &VAO);
+
+	VAO = 0;
+	VBO = 0;
+	EBO = 0;
 }

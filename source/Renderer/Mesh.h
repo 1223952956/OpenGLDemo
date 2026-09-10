@@ -20,8 +20,13 @@ class Mesh
 {
 public:
     Mesh(std::vector<Vertex>& vertices, std::vector<unsigned int>& indices, Material* material, const std::string& name = "");
+    ~Mesh();
     
-    // Needs a destructor to free VAO blabla, but I'm kinda lazy...
+    Mesh(const Mesh&) = delete;
+    Mesh& operator=(const Mesh&) = delete;
+
+    Mesh(Mesh&& other) noexcept;
+    Mesh& operator=(Mesh&& other) noexcept;
     
     void Draw(Shader* shader);
 
@@ -39,5 +44,7 @@ private:
     unsigned int VAO, VBO, EBO;
 
     void SetupMesh();
+
+    void Release();
 };
 

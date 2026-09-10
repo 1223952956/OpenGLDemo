@@ -4,11 +4,25 @@
 #include <glad/glad.h>
 
 
+struct Texture2DData
+{
+	const void* Data = nullptr;
+	uint32_t Width = 0;
+	uint32_t Height = 0;	
+
+	GLenum InternalFormat = GL_RGBA8;
+	GLenum DataFormat = GL_RGBA;
+	GLenum DataType = GL_UNSIGNED_BYTE;
+	GLenum WarpParam = GL_REPEAT;
+
+	bool GenerateMipmaps = true;
+
+	std::string DebugName;
+};
+
 class Texture
 {
 public:
-	std::string DebugName;
-
     Texture()
     {
 		glGenTextures(1, &ID);
@@ -55,6 +69,7 @@ public:
 
 protected:
 	GLuint ID = 0;
+	std::string DebugName;
 };
 
 class Texture2D : public Texture
@@ -62,22 +77,16 @@ class Texture2D : public Texture
 public:
 	Texture2D() = default;
 
-	void Bind()
-	{
-		glBindTexture(GL_TEXTURE_2D, ID);
-	}
+	void Bind() { glBindTexture(GL_TEXTURE_2D, ID); }
 
-	
-};
+	void SetData(const Texture2DData& data);
+};	
 
 class Cubemap : public Texture
 {
 public:
 	Cubemap() = default;
 
-	void Bind()
-	{
-		glBindTexture(GL_TEXTURE_CUBE_MAP, ID);
-	}
+	void Bind() { glBindTexture(GL_TEXTURE_CUBE_MAP, ID); }
 };
 

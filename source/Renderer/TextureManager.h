@@ -31,9 +31,8 @@ private:
 
 	static std::unordered_map<std::string, std::unique_ptr<Texture2D>> Texture2DMap;
 
-	static void UploadGLTextureData(int width, int height, int nrChannels, unsigned char* data, aiTextureType type);
-
-	static void UploadEquirectangularMap(int width, int height, int nrChannels, float* data);
+	static GLenum GetInternalFormat(int channels, aiTextureType type);
+	static GLenum GetDataFormat(int channels);
 
 	static GLuint CreateSolidTexture(float r, float g, float b, float a);
 };

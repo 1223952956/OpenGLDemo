@@ -30,19 +30,19 @@ std::unique_ptr<IBLMaterial> IBLBaker::Bake(const std::string& path)
 
     iblMat->EnvCubeMap->Bind();
     UploadEnvCubemap(hdrTex, iblMat->EnvCubeMap.get());
-    iblMat->EnvCubeMap->DebugName = hdrTex->DebugName + "::" + "EnvCubeMap";
+    iblMat->EnvCubeMap->SetDebugName(hdrTex->GetDebugName() + "::" + "EnvCubeMap");
 
 	iblMat->IrradianceMap->Bind();
 	UploadIrradianceMap(iblMat->EnvCubeMap.get(), iblMat->IrradianceMap.get());
-	iblMat->IrradianceMap->DebugName = hdrTex->DebugName + "::" + "IrradianceMap";
+	iblMat->IrradianceMap->SetDebugName(hdrTex->GetDebugName() + "::" + "IrradianceMap");
 
 	iblMat->PrefilterMap->Bind();
 	UploadPrefilterMap(iblMat->EnvCubeMap.get(), iblMat->PrefilterMap.get());
-	iblMat->PrefilterMap->DebugName = hdrTex->DebugName + "::" + "PrefilterMap";
+	iblMat->PrefilterMap->SetDebugName(hdrTex->GetDebugName() + "::" + "PrefilterMap");
 
 	iblMat->BRDFLUT->Bind();
 	UploadBRDFLUT(iblMat->BRDFLUT.get());
-	iblMat->BRDFLUT->DebugName = hdrTex->DebugName + "::" + "BRDFLUT";
+	iblMat->BRDFLUT->SetDebugName(hdrTex->GetDebugName() + "::" + "BRDFLUT");
 
     return iblMat;
 }

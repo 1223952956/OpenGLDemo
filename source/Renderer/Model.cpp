@@ -120,7 +120,7 @@ void Model::LoadMaterials(const aiScene* scene)
 
 		aiString name;
 		scene->mMaterials[i]->Get(AI_MATKEY_NAME, name);
-		printf("Material[%d]: '%s'\n", i, name.C_Str());
+		printf("Load Material[%d]: '%s'\n", i, name.C_Str());
 
 		auto material = std::make_unique<Material>();
 
@@ -137,13 +137,13 @@ void Model::LoadMaterials(const aiScene* scene)
 		float metallic = 1.0f;
 		if (aiMat->Get(AI_MATKEY_METALLIC_FACTOR, metallic) == AI_SUCCESS)
 		{
-			printf("metallicFactor: %f\n", metallic);
+			//printf("metallicFactor: %f\n", metallic);
 			material->MetallicFactor = metallic;
 		}
 		float roughness = 1.0f;
 		if (aiMat->Get(AI_MATKEY_ROUGHNESS_FACTOR, roughness) == AI_SUCCESS)
 		{
-			printf("roughnessFactor: %f\n", roughness);
+			//printf("roughnessFactor: %f\n", roughness);
 			material->RoughnessFactor = roughness;
 		}
 

@@ -3,6 +3,18 @@
 #include <string>
 #include <glad/glad.h>
 
+struct TextureSamplerSpecification
+{
+	GLenum WrapS = GL_REPEAT;
+	GLenum WrapT = GL_REPEAT;
+	GLenum WrapR = GL_REPEAT;
+
+	GLenum MinFilter = GL_LINEAR;
+	GLenum MagFilter = GL_LINEAR;
+
+	GLenum CompareMode = GL_NONE;
+	GLenum CompareFunc = GL_LEQUAL;
+};
 
 struct Texture2DData
 {
@@ -13,11 +25,22 @@ struct Texture2DData
 	GLenum InternalFormat = GL_RGBA8;
 	GLenum DataFormat = GL_RGBA;
 	GLenum DataType = GL_UNSIGNED_BYTE;
-	GLenum WarpParam = GL_REPEAT;
-	GLenum MinFilter = GL_LINEAR_MIPMAP_LINEAR;
-	GLenum MagFilter = GL_LINEAR;
-
+	TextureSamplerSpecification SamplerSpec;
 	bool GenerateMipmaps = true;
+
+	std::string DebugName;
+};
+
+struct CubemapData
+{
+	uint32_t Width = 0;
+	uint32_t Height = 0;
+	uint32_t MipLevels = 1;
+
+	GLenum InternalFormat = GL_RGB16F;
+	GLenum DataFormat = GL_RGB;
+	GLenum DataType = GL_FLOAT;
+	TextureSamplerSpecification SamplerSpec;
 
 	std::string DebugName;
 };
@@ -90,5 +113,8 @@ public:
 	Cubemap() = default;
 
 	void Bind() { glBindTexture(GL_TEXTURE_CUBE_MAP, ID); }
+
+	void SetData(const CubemapData& data);
+	void GenerateMipmaps() { glGenerateTextureMipmap(ID); }
 };
 

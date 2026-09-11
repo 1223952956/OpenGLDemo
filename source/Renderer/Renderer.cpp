@@ -63,7 +63,7 @@ void Renderer::Render(Scene& scene, uint32_t screenWidth, uint32_t screenHeight,
 
 void Renderer::InitColorBuffer(uint32_t screenWidth, uint32_t screenHeight)
 {
-	FrameBufferSpecification frameBufferSpec;
+	FramebufferSpecification frameBufferSpec;
 	frameBufferSpec.Width = screenWidth;
 	frameBufferSpec.Height = screenHeight;
 	frameBufferSpec.Name = "SceneFramebuffer";
@@ -80,9 +80,10 @@ void Renderer::InitColorBuffer(uint32_t screenWidth, uint32_t screenHeight)
 		colorAttachment.InternalFormat = GL_RGB16F;
 		colorAttachment.DataFormat = GL_RGB;
 		colorAttachment.DataType = GL_FLOAT;
-		colorAttachment.WarpParam = GL_CLAMP_TO_EDGE;
-		colorAttachment.MinFilter = GL_LINEAR;
-		colorAttachment.MagFilter = GL_LINEAR;
+		colorAttachment.SamplerSpec.WrapS = GL_CLAMP_TO_EDGE;
+		colorAttachment.SamplerSpec.WrapT = GL_CLAMP_TO_EDGE;
+		colorAttachment.SamplerSpec.MinFilter = GL_LINEAR;
+		colorAttachment.SamplerSpec.MagFilter = GL_LINEAR;
 		colorAttachment.GenerateMipmaps = false;
 	}
 	frameBufferSpec.ColorAttachments[0].DebugName = "Renderer::SceneColor";

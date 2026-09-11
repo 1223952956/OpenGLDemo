@@ -19,7 +19,7 @@ struct DepthAttachmentSpecification
 	GLenum RenderbufferFormat = GL_DEPTH_COMPONENT;
 };
 
-struct FrameBufferSpecification
+struct FramebufferSpecification
 {
 	std::string Name;
 
@@ -35,8 +35,7 @@ struct FrameBufferSpecification
 class Framebuffer
 {
 public:
-	Framebuffer(const FrameBufferSpecification& spec);
-	Framebuffer(const std::string& name, unsigned int id);
+	Framebuffer(const FramebufferSpecification& spec);
 	~Framebuffer();
 
 	Framebuffer(const Framebuffer&) = delete;
@@ -44,6 +43,11 @@ public:
 
 	void Bind();
 	void UnBind();
+
+	void ResizeDepthRenderbuffer(uint32_t width, uint32_t height);
+
+	void AttachColorTexture(uint32_t index, Texture2D* data);
+	void AttachCubemapFace(uint32_t index, Cubemap* data, uint32_t face, uint32_t mipLevel = 0);
 
 	GLuint GetID() const { return ID; }
 	GLuint GetDepthMap() const;
@@ -55,7 +59,7 @@ private:
 	GLuint ID;
 	GLuint DepthRenderBufferID;
 
-	FrameBufferSpecification Spec;
+	FramebufferSpecification Spec;
 
 	std::string DebugName;
 };

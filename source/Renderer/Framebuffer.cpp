@@ -1,7 +1,7 @@
 #include "Framebuffer.h"
 
 
-Framebuffer::Framebuffer(const FrameBufferSpecification& spec)
+Framebuffer::Framebuffer(const FramebufferSpecification& spec)
 	: ID(0)
 	, DepthRenderBufferID(0)
 	, Spec(spec)
@@ -74,13 +74,6 @@ Framebuffer::Framebuffer(const FrameBufferSpecification& spec)
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
-Framebuffer::Framebuffer(const std::string& name, unsigned int id)
-	: DebugName(name)
-	, ID(id)
-	, DepthRenderBufferID(0)
-{
-}
-
 Framebuffer::~Framebuffer()
 {
 	if (ID)
@@ -103,6 +96,34 @@ void Framebuffer::Bind()
 void Framebuffer::UnBind()
 {
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+}
+
+void Framebuffer::ResizeDepthRenderbuffer(uint32_t width, uint32_t height)
+{
+	if (!DepthRenderBufferID)
+	{
+		std::cerr << "Framebuffer::ResizeDepthRenderbuffer() Error: DepthRenderBufferID is 0" << std::endl;
+		return;
+	}
+
+	glNamedRenderbufferStorage(
+		DepthRenderBufferID,
+		Spec.DepthAttachment.RenderbufferFormat,
+		width,
+		height);
+
+	Spec.Width = width;
+	Spec.Height = height;
+}
+
+void Framebuffer::AttachColorTexture(uint32_t index, Texture2D* data)
+{
+	glNamedFramebufferTexture(ID, GL_COLOR_ATTACHMENT0 + index, data->GetID(), 0);
+}
+
+void Framebuffer::AttachCubemapFace(uint32_t index, Cubemap* data, uint32_t face, uint32_t mipLevel)
+{
+	glNamedFramebufferTextureLayer(ID, GL_COLOR_ATTACHMENT0 + index, data->GetID(), mipLevel, face);
 }
 
 GLuint Framebuffer::GetDepthMap() const

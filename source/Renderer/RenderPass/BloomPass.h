@@ -22,6 +22,6 @@ private:
     void InitPingPongBuffer(uint32_t screenWidth, uint32_t screenHeight);
     void Blur(RenderContext& context);
 
-	FrameBufferSpecification CreateSpecification(uint32_t screenWidth, uint32_t screenHeight, 
+	FramebufferSpecification CreateSpecification(uint32_t screenWidth, uint32_t screenHeight, 
         const std::string& framebufferName, const std::string& textureName);
 };

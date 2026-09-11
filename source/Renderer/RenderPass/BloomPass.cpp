@@ -65,9 +65,9 @@ void BloomPass::Blur(RenderContext& context)
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
-FrameBufferSpecification BloomPass::CreateSpecification(uint32_t screenWidth, uint32_t screenHeight, const std::string& framebufferName, const std::string& textureName)
+FramebufferSpecification BloomPass::CreateSpecification(uint32_t screenWidth, uint32_t screenHeight, const std::string& framebufferName, const std::string& textureName)
 {
-    FrameBufferSpecification spec;
+    FramebufferSpecification spec;
     spec.Name = framebufferName;
     spec.Width = screenWidth;
     spec.Height = screenHeight;
@@ -80,9 +80,10 @@ FrameBufferSpecification BloomPass::CreateSpecification(uint32_t screenWidth, ui
     colorAttachment.InternalFormat = GL_RGBA16F;
     colorAttachment.DataFormat = GL_RGBA;
     colorAttachment.DataType = GL_FLOAT;
-    colorAttachment.WarpParam = GL_CLAMP_TO_EDGE;
-    colorAttachment.MinFilter = GL_LINEAR;
-    colorAttachment.MagFilter = GL_LINEAR;
+    colorAttachment.SamplerSpec.WrapS = GL_CLAMP_TO_EDGE;
+    colorAttachment.SamplerSpec.WrapT = GL_CLAMP_TO_EDGE;
+    colorAttachment.SamplerSpec.MinFilter = GL_LINEAR;
+    colorAttachment.SamplerSpec.MagFilter = GL_LINEAR;
     colorAttachment.GenerateMipmaps = false;
     colorAttachment.DebugName = textureName;
 

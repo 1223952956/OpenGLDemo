@@ -16,9 +16,8 @@ void Texture2D::SetData(const Texture2DData& data)
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, data.WarpParam);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, data.WarpParam);
 
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, 
-		data.GenerateMipmaps ? GL_LINEAR_MIPMAP_LINEAR : GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, data.MinFilter);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, data.MagFilter);
 
 	if (data.GenerateMipmaps)
 	{
@@ -26,4 +25,6 @@ void Texture2D::SetData(const Texture2DData& data)
 	}
 
 	DebugName = data.DebugName;
+
+	glBindTexture(GL_TEXTURE_2D, 0);
 }

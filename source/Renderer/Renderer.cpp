@@ -31,7 +31,7 @@ void Renderer::Init(Scene& scene, uint32_t screenWidth, uint32_t screenHeight)
 	context.Scene = &scene;
 	context.ScreenWidth = screenWidth;
 	context.ScreenHeight = screenHeight;
-	context.SceneFramebuffer = SceneFramebuffer;
+	context.SceneFramebuffer = SceneFramebuffer.get();
 
 	for (auto& pass : RenderPasses)
 	{
@@ -50,7 +50,7 @@ void Renderer::Render(Scene& scene, uint32_t screenWidth, uint32_t screenHeight,
 	context.DeltaTime = deltaTime;
 	context.ScreenWidth = screenWidth;
 	context.ScreenHeight = screenHeight;
-	context.SceneFramebuffer = SceneFramebuffer;
+	context.SceneFramebuffer = SceneFramebuffer.get();
 
 	for (auto& pass : RenderPasses)
 	{
@@ -63,63 +63,40 @@ void Renderer::Render(Scene& scene, uint32_t screenWidth, uint32_t screenHeight,
 
 void Renderer::InitColorBuffer(uint32_t screenWidth, uint32_t screenHeight)
 {
-	// Set up floating point framebuffer to render scene to
-	GLuint sceneFBO;
-	glGenFramebuffers(1, &sceneFBO);
-	glBindFramebuffer(GL_FRAMEBUFFER, sceneFBO);
+	FrameBufferSpecification frameBufferSpec;
+	frameBufferSpec.Width = screenWidth;
+	frameBufferSpec.Height = screenHeight;
+	frameBufferSpec.Name = "SceneFramebuffer";
+	frameBufferSpec.DepthAttachment.Type = DepthAttachmentType::Renderbuffer;
+	frameBufferSpec.DepthAttachment.RenderbufferFormat = GL_DEPTH_COMPONENT;
 
-	auto sceneColor = std::make_shared<Texture2D>();
-	sceneColor->SetDebugName("Renderer::SceneColor");
-
-	auto brightColor = std::make_shared<Texture2D>();
-	brightColor->SetDebugName("Renderer::BrightColor");
-
-	std::shared_ptr<Texture2D> colorBuffers[] = { sceneColor, brightColor };
-
-	for (GLuint i = 0; i < 2; i++)
+	for (size_t i = 0; i < 2; ++i)
 	{
-		colorBuffers[i]->Bind();
-		glTexImage2D(
-			GL_TEXTURE_2D, 0, GL_RGB16F, screenWidth, screenHeight, 0, GL_RGB, GL_FLOAT, NULL
-		);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-		// attach texture to framebuffer
-		glFramebufferTexture2D(
-			GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + i, GL_TEXTURE_2D, colorBuffers[i]->GetID(), 0
-		);
+		frameBufferSpec.ColorAttachments.emplace_back();
+		auto& colorAttachment = frameBufferSpec.ColorAttachments.back();
+
+		colorAttachment.Width = frameBufferSpec.Width;
+		colorAttachment.Height = frameBufferSpec.Height;
+		colorAttachment.InternalFormat = GL_RGB16F;
+		colorAttachment.DataFormat = GL_RGB;
+		colorAttachment.DataType = GL_FLOAT;
+		colorAttachment.WarpParam = GL_CLAMP_TO_EDGE;
+		colorAttachment.MinFilter = GL_LINEAR;
+		colorAttachment.MagFilter = GL_LINEAR;
+		colorAttachment.GenerateMipmaps = false;
 	}
+	frameBufferSpec.ColorAttachments[0].DebugName = "Renderer::SceneColor";
+	frameBufferSpec.ColorAttachments[1].DebugName = "Renderer::BrightColor";
 
-	unsigned int rboDepth;
-	glGenRenderbuffers(1, &rboDepth);
-	glBindRenderbuffer(GL_RENDERBUFFER, rboDepth);
-	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, screenWidth, screenHeight);
-	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, rboDepth);
-
-	GLuint attachments[2] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1 };
-	glDrawBuffers(2, attachments);
-
-	// finally check if framebuffer is complete
-	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
-	{
-		std::cout << "Framebuffer not complete!" << std::endl;
-	}
-
-	SceneFramebuffer = std::make_shared<Framebuffer>("Renderer::SceneFramebuffer", sceneFBO);
-
-	SceneFramebuffer->ColorAttachments = { sceneColor, brightColor };
-
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	SceneFramebuffer = std::make_unique<Framebuffer>(frameBufferSpec);
 }
 
 void Renderer::DrawDebugQuad(Scene& scene)
 {
-	DebugQuadShader->use();
-	DebugQuadShader->setFloat("near_plane", 1.0f);
-	DebugQuadShader->setFloat("far_plane", 7.5f);
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, scene.DirectionalLights[0].Shadow.DepthMap);
-	RenderPrimitives::RenderQuad();
+	//DebugQuadShader->use();
+	//DebugQuadShader->setFloat("near_plane", 1.0f);
+	//DebugQuadShader->setFloat("far_plane", 7.5f);
+	//glActiveTexture(GL_TEXTURE0);
+	//glBindTexture(GL_TEXTURE_2D, scene.DirectionalLights[0].Shadow.DepthMap);
+	//RenderPrimitives::RenderQuad();
 }

@@ -1,20 +1,22 @@
 #pragma once
 #include <glm/gtc/matrix_transform.hpp>
+#include "Renderer/Framebuffer.h"
 
-// TODO
-// Release GPU resource
-class ShadowMap
+
+class ShadowMap2D
 {
 public:
-	unsigned int DepthMapFBO = 0;
+	ShadowMap2D(uint32_t width = 1024, uint32_t height = 1024);
 
-	// TODO
-	// Use Texture2D
-	unsigned int DepthMap = 0;
+	GLuint GetDepthMap() const { return Target->GetDepthMap(); }
+	Framebuffer* GetFramebuffer() const { return Target.get(); }
 
-	unsigned int Width = 1024;
-	unsigned int Height = 1024;
+	uint32_t Width = 1024;
+	uint32_t Height = 1024;
 
 	glm::mat4 LightSpaceMatrix;
+
+private:
+	std::unique_ptr<Framebuffer> Target;
 };
 

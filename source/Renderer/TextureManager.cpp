@@ -53,6 +53,8 @@ Texture2D* TextureManager::Load(const std::string& path, aiTextureType type)
 	dataToSet.DataFormat = dataFormat;
 	dataToSet.DataType = GL_UNSIGNED_BYTE;
 	dataToSet.WarpParam = GL_REPEAT;
+	dataToSet.MinFilter = GL_LINEAR_MIPMAP_LINEAR;
+	dataToSet.MagFilter = GL_LINEAR;
 	dataToSet.GenerateMipmaps = true;
 	dataToSet.DebugName = path;
 
@@ -111,6 +113,8 @@ Texture2D* TextureManager::Load(const std::string& texNum, const std::string& di
 	dataToSet.DataFormat = dataFormat;
 	dataToSet.DataType = GL_UNSIGNED_BYTE;
 	dataToSet.WarpParam = GL_REPEAT;	
+	dataToSet.MinFilter = GL_LINEAR_MIPMAP_LINEAR;
+	dataToSet.MagFilter = GL_LINEAR;
 	dataToSet.GenerateMipmaps = true;
 	dataToSet.DebugName = dictionary + "/" + tex->mFilename.C_Str();
 	
@@ -155,6 +159,8 @@ Texture2D* TextureManager::LoadEquirectangularMap(const std::string& path)
 	dataToSet.DataFormat = GL_RGB;
 	dataToSet.DataType = GL_FLOAT;
 	dataToSet.WarpParam = GL_CLAMP_TO_EDGE;
+	dataToSet.MinFilter = GL_LINEAR;
+	dataToSet.MagFilter = GL_LINEAR;
 	dataToSet.GenerateMipmaps = false;
 
 	texture->SetData(dataToSet);

@@ -1,7 +1,6 @@
 #pragma once
 #include "Scene.h"
 #include "Renderer/IBLBaker.h"
-#include "Renderer/ShadowMapBaker.h"
 #include "ShaderManager.h"
 #include "Renderer/RenderPass/RenderPass.h"
 #include "Renderer/Framebuffer.h"
@@ -16,7 +15,7 @@ public:
 private:
     std::vector<std::unique_ptr<RenderPass>> RenderPasses;
 
-    std::shared_ptr<Framebuffer> SceneFramebuffer;
+    std::unique_ptr<Framebuffer> SceneFramebuffer;
 
     void InitColorBuffer(uint32_t screenWidth, uint32_t screenHeight);
 

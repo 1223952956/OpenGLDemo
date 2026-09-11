@@ -26,43 +26,10 @@ void BloomPass::Execute(RenderContext& context)
 
 void BloomPass::InitPingPongBuffer(uint32_t screenWidth, uint32_t screenHeight)
 {
-    GLuint pingpongFBO[2];
-    glGenFramebuffers(2, pingpongFBO);
-
-    auto blurPing = std::make_shared<Texture2D>();
-    auto blurPong = std::make_shared<Texture2D>();
-    blurPing->SetDebugName("BloomPass::BlurPing");
-    blurPong->SetDebugName("BloomPass::BlurPong");
-
-    GLuint pingpongBuffer[2] = { blurPing->GetID(), blurPong->GetID() };
-
-    for (GLuint i = 0; i < 2; i++)
-    {
-        glBindFramebuffer(GL_FRAMEBUFFER, pingpongFBO[i]);
-        glBindTexture(GL_TEXTURE_2D, pingpongBuffer[i]);
-        glTexImage2D(
-            GL_TEXTURE_2D, 0, GL_RGBA16F, screenWidth, screenHeight, 0, GL_RGBA, GL_FLOAT, NULL
-        );
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-        glFramebufferTexture2D(
-            GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, pingpongBuffer[i], 0
-        );
-        if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
-        {
-            std::cout << "Framebuffer not complete!" << std::endl;
-        }
-    }
-
-    BufferPing = std::make_shared<Framebuffer>("BloomPass::BufferPing", pingpongFBO[0]);
-    BufferPong = std::make_shared<Framebuffer>("BloomPass::BufferPong", pingpongFBO[1]);
-
-    BufferPing->ColorAttachments = { blurPing };
-    BufferPong->ColorAttachments = { blurPong };
-
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    BufferPing = std::make_unique<Framebuffer>(CreateSpecification(screenWidth, screenHeight, 
+        "BloomPass::BufferPing", "BloomPass::BlurPing"));
+    BufferPong = std::make_unique<Framebuffer>(CreateSpecification(screenWidth, screenHeight, 
+        "BloomPass::BufferPong", "BloomPass::BlurPong"));
 }
 
 void BloomPass::Blur(RenderContext& context)
@@ -93,7 +60,31 @@ void BloomPass::Blur(RenderContext& context)
         isHorizontal = !isHorizontal;
     }
 
-    context.BlurColor = isHorizontal ? BufferPing->ColorAttachments[0] : BufferPong->ColorAttachments[0];
+    context.BlurColor = isHorizontal ? BufferPing->ColorAttachments[0].get() : BufferPong->ColorAttachments[0].get();
 
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
+}
+
+FrameBufferSpecification BloomPass::CreateSpecification(uint32_t screenWidth, uint32_t screenHeight, const std::string& framebufferName, const std::string& textureName)
+{
+    FrameBufferSpecification spec;
+    spec.Name = framebufferName;
+    spec.Width = screenWidth;
+    spec.Height = screenHeight;
+
+    spec.ColorAttachments.emplace_back();
+    auto& colorAttachment = spec.ColorAttachments.back();
+
+    colorAttachment.Width = screenWidth;
+    colorAttachment.Height = screenHeight;
+    colorAttachment.InternalFormat = GL_RGBA16F;
+    colorAttachment.DataFormat = GL_RGBA;
+    colorAttachment.DataType = GL_FLOAT;
+    colorAttachment.WarpParam = GL_CLAMP_TO_EDGE;
+    colorAttachment.MinFilter = GL_LINEAR;
+    colorAttachment.MagFilter = GL_LINEAR;
+    colorAttachment.GenerateMipmaps = false;
+    colorAttachment.DebugName = textureName;
+
+    return spec;
 }

@@ -1,6 +1,5 @@
 #pragma once
 #include "RenderPass.h"
-#include "Renderer/ShadowMapBaker.h"
 
 class ShadowPass :
     public RenderPass
@@ -12,10 +11,15 @@ public:
     void Execute(RenderContext& context) override;
 
 private:
+    void Bake(Scene* scene);
+
+    glm::mat4 ComputeLightSpaceMatrix(glm::vec3 lightPos);
+    void DrawPieces(Scene* scene);
     //TODO
     // Use a different shader
     std::shared_ptr<Shader> PBRShader;
+    std::shared_ptr<Shader> SimpleDepthShader;
 
-    ShadowMapBaker ShadowBaker;
+    std::vector<std::unique_ptr<ShadowMap2D>> DirectionalShadows;
 };
 

@@ -16,7 +16,7 @@ public:
 
 	Scene* Scene;
 
-	std::shared_ptr<Framebuffer> SceneFramebuffer;
-	std::shared_ptr<Texture2D> BlurColor;
+	Framebuffer* SceneFramebuffer;
+	Texture2D* BlurColor;
 };
 

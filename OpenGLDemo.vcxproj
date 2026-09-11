@@ -179,7 +179,6 @@
     <ClCompile Include="source\Renderer\Shader.cpp" />
     <ClCompile Include="source\Renderer\ShaderManager.cpp" />
     <ClCompile Include="source\Renderer\ShadowMap.cpp" />
-    <ClCompile Include="source\Renderer\ShadowMapBaker.cpp" />
     <ClCompile Include="source\Renderer\Texture.cpp" />
     <ClCompile Include="source\Renderer\TextureManager.cpp" />
     <ClCompile Include="source\Scene.cpp" />
@@ -211,7 +210,6 @@
     <ClInclude Include="source\Renderer\Shader.h" />
     <ClInclude Include="source\Renderer\ShaderManager.h" />
     <ClInclude Include="source\Renderer\ShadowMap.h" />
-    <ClInclude Include="source\Renderer\ShadowMapBaker.h" />
     <ClInclude Include="source\Renderer\Texture.h" />
     <ClInclude Include="source\Renderer\TextureManager.h" />
     <ClInclude Include="source\Scene.h" />

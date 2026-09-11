@@ -10,8 +10,6 @@ public:
     void Upload(Shader* shader, const std::string& name) override;
     glm::vec3 const GetDirection() { return Direction; };
 
-    ShadowMap Shadow;
-
 private:
     glm::vec3 Direction;
 

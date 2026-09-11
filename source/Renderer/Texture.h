@@ -14,6 +14,8 @@ struct Texture2DData
 	GLenum DataFormat = GL_RGBA;
 	GLenum DataType = GL_UNSIGNED_BYTE;
 	GLenum WarpParam = GL_REPEAT;
+	GLenum MinFilter = GL_LINEAR_MIPMAP_LINEAR;
+	GLenum MagFilter = GL_LINEAR;
 
 	bool GenerateMipmaps = true;
 

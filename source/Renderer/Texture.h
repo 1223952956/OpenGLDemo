@@ -31,6 +31,7 @@ struct Texture2DData
 	std::string DebugName;
 };
 
+// TODO add MipMode
 struct CubemapData
 {
 	uint32_t Width = 0;

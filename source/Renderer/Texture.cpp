@@ -52,7 +52,11 @@ void Cubemap::SetData(const CubemapData& data)
 		}
 	}
 
-	glTexParameteri( GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAX_LEVEL, data.MipLevels - 1);
+	// Not a good way to determine if mipmaps are generated
+	if (data.MipLevels > 1)
+	{
+		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAX_LEVEL, data.MipLevels - 1);
+	}
 
 	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, data.SamplerSpec.WrapS);
 	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, data.SamplerSpec.WrapT);

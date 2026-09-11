@@ -12,6 +12,7 @@ void ToneMappingPass::Init(RenderContext& context)
 	ToneMappingShader->use();
 	ToneMappingShader->setInt("scene", 0);
 	ToneMappingShader->setInt("bloomBlur", 1);
+	ToneMappingShader->setFloat("bloomStrength", 0.1f);
 }
 
 void ToneMappingPass::Resize(unsigned int width, unsigned int height)

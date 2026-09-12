@@ -195,9 +195,6 @@ vec3 CalcLightRadiance(Light light, vec3 fragPos, vec3 N, vec3 V,
 
 
 
-
-
-
 void main()
 {
     vec3 norm = normalize(Normal);

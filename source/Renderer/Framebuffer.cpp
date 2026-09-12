@@ -98,6 +98,48 @@ void Framebuffer::UnBind()
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
+void Framebuffer::Resize(uint32_t width, uint32_t height)
+{
+	if (width == 0 || height == 0)
+	{
+		std::cerr << "Framebuffer::Resize() Error: Invalid size: " << width << "x" << height << std::endl;
+		return;
+	}
+
+	if (Spec.Width == width && Spec.Height == height)
+	{
+		return;
+	}
+
+	Spec.Width = width;
+	Spec.Height = height;
+
+	for (size_t i = 0; i < ColorAttachments.size(); ++i)
+	{
+		auto& attachmentSpec = Spec.ColorAttachments[i];
+		attachmentSpec.Width = width;
+		attachmentSpec.Height = height;
+		ColorAttachments[i]->SetData(attachmentSpec);
+	}
+
+	if (Spec.DepthAttachment.Type == DepthAttachmentType::Renderbuffer)
+	{
+		ResizeDepthRenderbuffer(width, height);
+	}
+	else if (Spec.DepthAttachment.Type == DepthAttachmentType::Texture2D)
+	{
+		auto& attachmentSpec = Spec.DepthAttachment.Texture;
+		attachmentSpec.Width = width;
+		attachmentSpec.Height = height;
+		DepthAttachment->SetData(attachmentSpec);
+	}
+
+	if (glCheckNamedFramebufferStatus(ID, GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+	{
+		std::cerr << "Framebuffer incomplete after resize: " << DebugName << '\n';
+	}
+}
+
 void Framebuffer::ResizeDepthRenderbuffer(uint32_t width, uint32_t height)
 {
 	if (!DepthRenderBufferID)
@@ -111,6 +153,7 @@ void Framebuffer::ResizeDepthRenderbuffer(uint32_t width, uint32_t height)
 		Spec.DepthAttachment.RenderbufferFormat,
 		width,
 		height);
+
 
 	Spec.Width = width;
 	Spec.Height = height;

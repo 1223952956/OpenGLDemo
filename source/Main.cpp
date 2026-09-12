@@ -7,6 +7,8 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
+#include <spdlog/spdlog.h>
+#include <spdlog/sinks/stdout_color_sinks.h>
 
 //#include "imgui.h"
 //#include "imgui_impl_glfw.h"
@@ -26,6 +28,7 @@
 
 uint32_t screenWidth = 1920.0f;
 uint32_t screenHeight = 1080.0f;
+bool framebufferResized = false;
 float blend = 0.2f;
 
 float lastMouseX = static_cast<float>(screenWidth) / 2.0f;
@@ -36,7 +39,9 @@ Camera MainCamera;
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 {
-	glViewport(0, 0, width, height);
+	screenWidth = static_cast<uint32_t>(width);
+	screenHeight = static_cast<uint32_t>(height);
+	framebufferResized = true;
 }
 
 void processInput(GLFWwindow* window, float deltaTime)
@@ -114,6 +119,15 @@ void APIENTRY MessageCallback(GLenum source, GLenum type, GLuint id, GLenum seve
 
 int main(void)
 {
+	// Initialize logger
+	auto logger = spdlog::stdout_color_mt("console");
+
+	logger->set_pattern("%^[%H:%M:%S] [%l]%$ %v");
+	logger->set_level(spdlog::level::debug);
+
+	spdlog::set_default_logger(logger);
+
+	// Initialize OpenGL context and window
 	glfwInit();
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
@@ -122,7 +136,7 @@ int main(void)
 	GLFWwindow* window = glfwCreateWindow(screenWidth, screenHeight, "LearnOpenGL", NULL, NULL);
 	if (window == NULL)
 	{
-		std::cout << "Failed to create GLFW window" << std::endl;
+		spdlog::error("Failed to create GLFW window");
 		glfwTerminate();
 		return -1;
 	}
@@ -130,7 +144,7 @@ int main(void)
 
 	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
 	{
-		std::cout << "Failed to initialize GLAD" << std::endl;
+		spdlog::error("Failed to initialize GLAD");
 		glfwTerminate();
 		return -1;
 	}
@@ -158,6 +172,7 @@ int main(void)
 	glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DEBUG_SEVERITY_NOTIFICATION, 0, nullptr, GL_FALSE);
 	glDebugMessageControl(GL_DONT_CARE, GL_DEBUG_TYPE_PERFORMANCE, GL_DONT_CARE, 0, nullptr, GL_FALSE);
 
+	// Initialize
 	TextureManager::Init();
 
 	ShaderManager shaderManager;
@@ -205,6 +220,8 @@ int main(void)
 	float deltaTime = 0.0f;
 	float lastFrameTime = 0.0f;
 
+	spdlog::info("Starting render loop...");
+
 	// render loop
 	while (!glfwWindowShouldClose(window))
 	{
@@ -214,35 +231,26 @@ int main(void)
 
 		processInput(window, deltaTime);
 
+		if (framebufferResized)
+		{
+			glViewport(0, 0, screenWidth, screenHeight);
+			renderer.Resize(screenWidth, screenHeight);
+			framebufferResized = false;
+		}
+
 		renderer.Render(scene, screenWidth, screenHeight, lastFrameTime, deltaTime);
-
-
-		// Draw light position
-		//glm::mat4 view = MainCamera.GetViewMatrix();
-		//for (int j = 0; j < 4; ++j)
-		//{
-		//	glm::mat4 model = glm::mat4(1.0f);
-		//	model = glm::translate(model, pointLightPositions[j]);
-		//	model = glm::scale(model, glm::vec3(0.2f));
-
-		//	lightProgram.use();
-		//	lightProgram.setMat4("projection", 1, GL_FALSE, glm::value_ptr(projection));
-		//	lightProgram.setMat4("model", 1, GL_FALSE, glm::value_ptr(model));
-		//	lightProgram.setMat4("view", 1, GL_FALSE, glm::value_ptr(view));
-		//	renderSphere();
-		//}
-
-
 
 		glfwSwapBuffers(window);
 		glfwPollEvents();
 	}
 
-	// Release textures
+	// Release resources
 	TextureManager::ShutDown();
 	shaderManager.ShutDown();
 
 	glfwTerminate();
+	spdlog::shutdown();
+
 	return 0;
 }
 

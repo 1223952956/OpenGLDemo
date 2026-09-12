@@ -11,7 +11,6 @@ out vec3 Normal;
 out vec4 FragPosLightSpace[MAX_DIR_LIGHTS];
 
 
-
 uniform mat4 model;
 uniform mat4 model_normal;
 uniform mat4 view;

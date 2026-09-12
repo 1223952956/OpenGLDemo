@@ -60,6 +60,22 @@ void Renderer::Render(Scene& scene, uint32_t screenWidth, uint32_t screenHeight,
 	// DrawDebugQuad(scene);
 }
 
+void Renderer::Resize(uint32_t screenWidth, uint32_t screenHeight)
+{
+	if (screenWidth == 0 || screenHeight == 0)
+	{
+		std::cerr << "Renderer::Resize() Error: Invalid screen size: " << screenWidth << "x" << screenHeight << std::endl;
+		return;
+	}
+
+	SceneFramebuffer->Resize(screenWidth, screenHeight);
+
+	for (auto& pass : RenderPasses)
+	{
+		pass->Resize(screenWidth, screenHeight);
+	}
+}
+
 
 void Renderer::InitColorBuffer(uint32_t screenWidth, uint32_t screenHeight)
 {

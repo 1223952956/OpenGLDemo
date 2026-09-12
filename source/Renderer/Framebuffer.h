@@ -44,6 +44,7 @@ public:
 	void Bind();
 	void UnBind();
 
+	void Resize(uint32_t width, uint32_t height);
 	void ResizeDepthRenderbuffer(uint32_t width, uint32_t height);
 
 	void AttachColorTexture(uint32_t index, Texture2D* data);

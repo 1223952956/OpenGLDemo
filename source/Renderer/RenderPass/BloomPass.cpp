@@ -16,6 +16,14 @@ void BloomPass::Init(RenderContext& context)
 
 void BloomPass::Resize(unsigned int width, unsigned int height)
 {
+    if (BufferPing)
+    {
+		BufferPing->Resize(width, height);
+    }
+    if (BufferPong)
+    {
+		BufferPong->Resize(width, height);
+    }
 }
 
 void BloomPass::Execute(RenderContext& context)

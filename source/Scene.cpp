@@ -3,7 +3,7 @@
 void Scene::Initialize()
 {
 	MainCamera = std::make_unique<Camera>();
-	MainCamera->Pos = glm::vec3(0.0f, 0.0f, 3.0f);
+	MainCamera->Pos = glm::vec3(0.0f, 0.4f, 1.8f);
 
 	glm::vec3 pointLightPositions[] = {
 		glm::vec3(2.5f,  3.0f,  2.0f),
@@ -30,10 +30,10 @@ void Scene::Initialize()
 	}
 
 	// Light Initialize
-	DirectionalLights.emplace_back(DirectionalLight(glm::vec3(-2.0f, -2.0f, -1.0f), glm::vec3(1.0f, 0.95f, 0.90f), 2.0f));
+	DirectionalLights.emplace_back(DirectionalLight(glm::vec3(-2.0f, -2.0f, -1.0f), glm::vec3(1.0f, 0.95f, 0.90f), 4.0f));
 	for (int i = 0; i < 4; ++i)
 	{
-		PointLights.emplace_back(PointLight(pointLightPositions[i], glm::vec3(1.0f, 0.97f, 0.92f), 10.f, 10.0f));
+		PointLights.emplace_back(PointLight(pointLightPositions[i], glm::vec3(1.0f, 0.97f, 0.92f), 10.f, 0.0f));
 	}
 }
 

@@ -72,6 +72,7 @@ bool ChessApplication::Initialize()
 		return false;
 	}
 
+	InitializeManagers();
 	InitializeScene();
 	InitializeRenderer();
 
@@ -161,6 +162,7 @@ void ChessApplication::Uninitialize()
 {
 	UninitializeRenderer();
 	UninitializeScene();
+	UninitializeManagers();
 	UninitializeOpenGL();
 	UninitializeWindow();
 	UninitializeLogger();

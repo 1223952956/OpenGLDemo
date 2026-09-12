@@ -231,10 +231,10 @@ void main()
     // Temp breathing light effect
     emissive = (1.0 + (sin(curr_time * 2.0) * 0.5 + 0.5) * 15.0) * emissive;
 
-    vec3 color = emissive + Lo + kD * ambient;
+    vec3 color = emissive + Lo + kD * ambient * 0.8;
 
     FragColor = vec4(color, 1.0);
 
     float brightness = dot(color, vec3(0.2126, 0.7152, 0.0722));
-    BrightColor = brightness > 1.0 ? vec4(color, 1.0) : vec4(0.0);
+    BrightColor = brightness > 2.0 ? vec4(color, 1.0) : vec4(0.0);
 }

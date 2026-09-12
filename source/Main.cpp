@@ -122,7 +122,7 @@ int main(void)
 	// Initialize logger
 	auto logger = spdlog::stdout_color_mt("console");
 
-	logger->set_pattern("%^[%H:%M:%S] [%l]%$ %v");
+	logger->set_pattern("%^[%H:%M:%S.%e] [%l]%$ %v");
 	logger->set_level(spdlog::level::debug);
 
 	spdlog::set_default_logger(logger);

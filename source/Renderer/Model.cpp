@@ -1,5 +1,6 @@
 #include "Model.h"
 #include <stb_image.h>
+#include "spdlog/spdlog.h"
 
 #include "TextureManager.h"
 
@@ -27,7 +28,7 @@ void Model::LoadModel(const std::string& path)
 	
 	if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
 	{
-		std::cerr << "[Model] ASSIMP::" << importer.GetErrorString() << std::endl;
+		spdlog::error("[Model] ASSIMP::{}", importer.GetErrorString());
 		return;
 	}
 	Directory = path.substr(0, path.find_last_of('/'));

@@ -1,6 +1,7 @@
 #include "Renderer.h"
 
 #include <glm/gtc/type_ptr.hpp>
+#include "spdlog/spdlog.h"
 
 #include "RenderPrimitives.h"
 #include "RenderPass/ShadowPass.h"
@@ -64,7 +65,7 @@ void Renderer::Resize(uint32_t screenWidth, uint32_t screenHeight)
 {
 	if (screenWidth == 0 || screenHeight == 0)
 	{
-		std::cerr << "Renderer::Resize() Error: Invalid screen size: " << screenWidth << "x" << screenHeight << std::endl;
+		spdlog::error("Renderer::Resize() Error: Invalid screen size: {}x{}", screenWidth, screenHeight);
 		return;
 	}
 

@@ -5,6 +5,7 @@
 #include <glad/glad.h>
 #include <glm/glm.hpp>
 #include <stb_image.h>
+#include <spdlog/spdlog.h>
 
 std::unordered_map<std::string, std::unique_ptr<Texture2D>>TextureManager::Texture2DMap;
 GLuint TextureManager::WhiteTexture;
@@ -33,12 +34,12 @@ Texture2D* TextureManager::Load(const std::string& path, aiTextureType type)
 
 	if (!data)
 	{
-		std::cerr << "[TextureManager] Failed to load texture: " << path << std::endl;
+		spdlog::error("[TextureManager] Failed to load texture: {}", path);
 		stbi_image_free(data);
 		return nullptr;
 	}
 
-	std::cout << "Load texture: " << path << std::endl;
+	spdlog::info("[TextureManager] Load texture: {}", path);
 
 	GLenum internalFormat = TextureManager::GetInternalFormat(channels, type);
 	GLenum dataFormat = TextureManager::GetDataFormat(channels);
@@ -94,12 +95,12 @@ Texture2D* TextureManager::Load(const std::string& texNum, const std::string& di
 
 	if (!data)
 	{
-		std::cerr << "[TextureManager] Failed to load texture: " << texNum << std::endl;
+		spdlog::error("[TextureManager] Failed to load texture: {}", texNum);
 		stbi_image_free(data);
 		return nullptr;
 	}
 
-	std::cout << "Load texture: " << tex->mFilename.C_Str() << std::endl;
+	spdlog::info("[TextureManager] Load texture: {}", tex->mFilename.C_Str());
 
 	GLenum internalFormat = TextureManager::GetInternalFormat(channels, type);
 	GLenum dataFormat = TextureManager::GetDataFormat(channels);
@@ -145,12 +146,12 @@ Texture2D* TextureManager::LoadEquirectangularMap(const std::string& path)
 	float* data = stbi_loadf(path.c_str(), &width, &height, &channels, 0);
 	if (!data)
 	{
-		std::cerr << "[TextureManager] Failed to load texture: " << path << std::endl;
+		spdlog::error("[TextureManager] Failed to load texture: {}", path);
 		stbi_image_free(data);
 		return nullptr;
 	}
 
-	std::cout << "Load texture: " << path << std::endl;
+	spdlog::info("[TextureManager] Load texture: {}", path);
 
 	auto texture = std::make_unique<Texture2D>();
 	Texture2DData dataToSet;

@@ -1,5 +1,7 @@
 #include "Framebuffer.h"
 
+#include "spdlog/spdlog.h"
+
 
 Framebuffer::Framebuffer(const FramebufferSpecification& spec)
 	: ID(0)
@@ -102,7 +104,7 @@ void Framebuffer::Resize(uint32_t width, uint32_t height)
 {
 	if (width == 0 || height == 0)
 	{
-		std::cerr << "Framebuffer::Resize() Error: Invalid size: " << width << "x" << height << std::endl;
+		spdlog::error("Framebuffer::Resize() Error: Invalid size: {}x{}", width, height);
 		return;
 	}
 
@@ -136,7 +138,7 @@ void Framebuffer::Resize(uint32_t width, uint32_t height)
 
 	if (glCheckNamedFramebufferStatus(ID, GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
 	{
-		std::cerr << "Framebuffer incomplete after resize: " << DebugName << '\n';
+		spdlog::error("Framebuffer incomplete after resize: {}", DebugName);
 	}
 }
 
@@ -144,7 +146,7 @@ void Framebuffer::ResizeDepthRenderbuffer(uint32_t width, uint32_t height)
 {
 	if (!DepthRenderBufferID)
 	{
-		std::cerr << "Framebuffer::ResizeDepthRenderbuffer() Error: DepthRenderBufferID is 0" << std::endl;
+		spdlog::error("Framebuffer::ResizeDepthRenderbuffer() Error: DepthRenderBufferID is 0");
 		return;
 	}
 

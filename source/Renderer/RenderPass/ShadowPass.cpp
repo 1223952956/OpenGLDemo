@@ -2,11 +2,11 @@
 
 #include <glm/gtc/type_ptr.hpp>
 
-ShadowPass::ShadowPass(const std::string& name, ShaderManager& shaderManager)
+ShadowPass::ShadowPass(const std::string& name, ShaderManager* shaderManager)
 	: RenderPass(name)
 {
-	PBRShader = shaderManager.Get("PBRShader");
-	SimpleDepthShader = shaderManager.Get("SimpleDepthShader");
+	PBRShader = shaderManager->Get("PBRShader");
+	SimpleDepthShader = shaderManager->Get("SimpleDepthShader");
 }
 
 void ShadowPass::Init(RenderContext& context)

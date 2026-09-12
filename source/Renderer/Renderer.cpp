@@ -9,19 +9,28 @@
 #include "RenderPass/SkyboxPass.h"
 #include "RenderPass/BloomPass.h"
 #include "RenderPass/ToneMappingPass.h"
+#include "ShaderManager.h"
 
-Renderer::Renderer(ShaderManager& shaderManager)
+Renderer::Renderer()
 {
-	DebugQuadShader = shaderManager.Get("DebugQuadShader");
+	CShaderManager = std::make_unique<ShaderManager>();
+	CShaderManager->Init();
 
-	RenderPasses.emplace_back(std::make_unique<ShadowPass>("ShadowPass", shaderManager));
-	RenderPasses.emplace_back(std::make_unique<LightingPass>("LightingPass", shaderManager));
-	RenderPasses.emplace_back(std::make_unique<BloomPass>("BloomPass", shaderManager));
-	RenderPasses.emplace_back(std::make_unique<SkyboxPass>("SkyboxPass", shaderManager));
-	RenderPasses.emplace_back(std::make_unique<ToneMappingPass>("ToneMappingPass", shaderManager));
+	DebugQuadShader = CShaderManager->Get("DebugQuadShader");
+
+	RenderPasses.emplace_back(std::make_unique<ShadowPass>("ShadowPass", CShaderManager.get()));
+	RenderPasses.emplace_back(std::make_unique<LightingPass>("LightingPass", CShaderManager.get()));
+	RenderPasses.emplace_back(std::make_unique<BloomPass>("BloomPass", CShaderManager.get()));
+	RenderPasses.emplace_back(std::make_unique<SkyboxPass>("SkyboxPass", CShaderManager.get()));
+	RenderPasses.emplace_back(std::make_unique<ToneMappingPass>("ToneMappingPass", CShaderManager.get()));
 }
 
-void Renderer::Init(Scene& scene, uint32_t screenWidth, uint32_t screenHeight)
+Renderer::~Renderer()
+{
+	CShaderManager->ShutDown();
+}
+
+void Renderer::Initialize(Scene* scene, uint32_t screenWidth, uint32_t screenHeight)
 {
 	DebugQuadShader->use();
 	DebugQuadShader->setInt("depthMap", 0);
@@ -29,7 +38,7 @@ void Renderer::Init(Scene& scene, uint32_t screenWidth, uint32_t screenHeight)
 	InitColorBuffer(screenWidth, screenHeight);
 
 	RenderContext context;
-	context.Scene = &scene;
+	context.Scene = scene;
 	context.ScreenWidth = screenWidth;
 	context.ScreenHeight = screenHeight;
 	context.SceneFramebuffer = SceneFramebuffer.get();
@@ -40,13 +49,13 @@ void Renderer::Init(Scene& scene, uint32_t screenWidth, uint32_t screenHeight)
 	}
 }
 
-void Renderer::Render(Scene& scene, uint32_t screenWidth, uint32_t screenHeight, float currTime, float deltaTime)
+void Renderer::Render(Scene* scene, uint32_t screenWidth, uint32_t screenHeight, float currTime, float deltaTime)
 {
 	glClearColor(0.f, 0.f, 0.f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	RenderContext context;
-	context.Scene = &scene;
+	context.Scene = scene;
 	context.CurrTime = currTime;
 	context.DeltaTime = deltaTime;
 	context.ScreenWidth = screenWidth;

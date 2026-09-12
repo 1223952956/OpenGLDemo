@@ -5,7 +5,7 @@ class ShadowPass :
     public RenderPass
 {
 public:
-    ShadowPass(const std::string& name, ShaderManager& shaderManager);
+    ShadowPass(const std::string& name, ShaderManager* shaderManager);
     void Init(RenderContext& context) override;
     void Resize(unsigned int width, unsigned int height) override;
     void Execute(RenderContext& context) override;

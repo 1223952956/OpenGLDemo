@@ -4,7 +4,7 @@ class GeometryPass :
     public RenderPass
 {
 public:
-    GeometryPass(const std::string& name, ShaderManager& shaderManager);
+    GeometryPass(const std::string& name, ShaderManager* shaderManager);
 
     void Init(RenderContext& context) override;
     void Resize(unsigned int width, unsigned int height) override;

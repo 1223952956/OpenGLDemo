@@ -4,7 +4,7 @@ class SkyboxPass :
     public RenderPass
 {
 public:
-    SkyboxPass(const std::string& name, ShaderManager& shaderManager);
+    SkyboxPass(const std::string& name, ShaderManager* shaderManager);
 
     void Init(RenderContext& context) override;
     void Resize(unsigned int width, unsigned int height) override;

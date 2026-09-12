@@ -2,11 +2,11 @@
 
 #include <glm/gtc/type_ptr.hpp>
 
-LightingPass::LightingPass(const std::string& name, ShaderManager& shaderManager)
+LightingPass::LightingPass(const std::string& name, ShaderManager* shaderManager)
 	:RenderPass(name),
 	IBLBaker(shaderManager)
 {
-	PBRShader = shaderManager.Get("PBRShader");
+	PBRShader = shaderManager->Get("PBRShader");
 }
 
 void LightingPass::Init(RenderContext& context)

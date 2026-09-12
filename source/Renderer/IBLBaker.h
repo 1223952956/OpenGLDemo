@@ -12,7 +12,7 @@
 class IBLBaker
 {
 public:
-    IBLBaker(ShaderManager& shaderManager);
+    IBLBaker(ShaderManager* shaderManager);
     void Init();
     std::unique_ptr<IBLMaterial> Bake(const std::string& path);
 

@@ -6,12 +6,12 @@
 #include "RenderPrimitives.h"
 #include "Renderer/Framebuffer.h"
 
-IBLBaker::IBLBaker(ShaderManager& shaderManager)
+IBLBaker::IBLBaker(ShaderManager* shaderManager)
 {
-    EquirectToCubemapShader = shaderManager.Get("EquirectToCubemapShader");
-    IrradianceShader = shaderManager.Get("IrradianceShader");
-    PrefilterShader = shaderManager.Get("PrefilterShader");
-    BRDFLUTShader = shaderManager.Get("BRDFLUTShader");
+    EquirectToCubemapShader = shaderManager->Get("EquirectToCubemapShader");
+    IrradianceShader = shaderManager->Get("IrradianceShader");
+    PrefilterShader = shaderManager->Get("PrefilterShader");
+    BRDFLUTShader = shaderManager->Get("BRDFLUTShader");
 }
 
 void IBLBaker::Init()

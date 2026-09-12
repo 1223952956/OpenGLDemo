@@ -19,8 +19,9 @@ public:
 
 	std::unique_ptr<IBLMaterial>  Enviroment;
 
-	Camera* MainCamera = nullptr;
+	std::unique_ptr<Camera> MainCamera;
 
+	void Initialize();
 	void Update(float deltaTime);
 	Piece& CreatePiece();
 };

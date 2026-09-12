@@ -1,10 +1,10 @@
 #include "ToneMappingPass.h"
 #include "Renderer/RenderPrimitives.h"
 
-ToneMappingPass::ToneMappingPass(const std::string& name, ShaderManager& shaderManager)
+ToneMappingPass::ToneMappingPass(const std::string& name, ShaderManager* shaderManager)
 	:RenderPass(name)
 {
-	ToneMappingShader = shaderManager.Get("ToneMappingShader");
+	ToneMappingShader = shaderManager->Get("ToneMappingShader");
 }
 
 void ToneMappingPass::Init(RenderContext& context)

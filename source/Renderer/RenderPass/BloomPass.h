@@ -7,7 +7,7 @@ class BloomPass :
     public RenderPass
 {
 public:
-    BloomPass(const std::string& name, ShaderManager& shaderManager);
+    BloomPass(const std::string& name, ShaderManager* shaderManager);
 
     void Init(RenderContext& context) override;
     void Resize(unsigned int width, unsigned int height) override;

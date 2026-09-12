@@ -8,7 +8,7 @@ class LightingPass :
     public RenderPass
 {
 public:
-    LightingPass(const std::string& name, ShaderManager& shaderManager);
+    LightingPass(const std::string& name, ShaderManager* shaderManager);
 
     void Init(RenderContext& context) override;
     void Resize(unsigned int width, unsigned int height) override;

@@ -1,10 +1,10 @@
 #include "BloomPass.h"
 #include "Renderer/RenderPrimitives.h"
 
-BloomPass::BloomPass(const std::string& name, ShaderManager& shaderManager)
+BloomPass::BloomPass(const std::string& name, ShaderManager* shaderManager)
 	:RenderPass(name)
 {
-    GaussianBlurShader = shaderManager.Get("GaussianBlurShader");
+    GaussianBlurShader = shaderManager->Get("GaussianBlurShader");
 }
 
 void BloomPass::Init(RenderContext& context)

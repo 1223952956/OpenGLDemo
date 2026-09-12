@@ -1,9 +1,9 @@
 #include "GeometryPass.h"
 
-GeometryPass::GeometryPass(const std::string& name, ShaderManager& shaderManager)
+GeometryPass::GeometryPass(const std::string& name, ShaderManager* shaderManager)
 	:RenderPass(name)
 {
-	PBRShader = shaderManager.Get("PBRShader");
+	PBRShader = shaderManager->Get("PBRShader");
 }
 
 void GeometryPass::Init(RenderContext& context)

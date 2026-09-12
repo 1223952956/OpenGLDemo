@@ -4,10 +4,10 @@
 
 #include "Renderer/RenderPrimitives.h"
 
-SkyboxPass::SkyboxPass(const std::string& name, ShaderManager& shaderManager)
+SkyboxPass::SkyboxPass(const std::string& name, ShaderManager* shaderManager)
 	:RenderPass(name)
 {
-	SkyboxShader = shaderManager.Get("SkyboxShader");
+	SkyboxShader = shaderManager->Get("SkyboxShader");
 }
 
 void SkyboxPass::Init(RenderContext& context)

@@ -1,4 +1,5 @@
 #include "Scene.h"
+#include "Scene/Components/ModelComponent.h"
 
 void Scene::Initialize()
 {
@@ -13,12 +14,18 @@ void Scene::Initialize()
 	};
 
 	// Model Initialize
+
+	auto ChessBoardModelPtr = std::make_shared<Model>("content/models/ChessBoard.glb");
+	auto BlackQueenModelPtr = std::make_shared<Model>("content/models/BlackQueen.glb");
+	auto WhiteRookModelPtr = std::make_shared<Model>("content/models/WhiteKnight.glb");
+
 	auto& ChessBoard = CreatePiece();
-	ChessBoard.ModelPtr = std::make_shared<Model>("content/models/ChessBoard.glb");
 	auto& BlackQueen = CreatePiece();
-	BlackQueen.ModelPtr = std::make_shared<Model>("content/models/BlackQueen.glb");
 	auto& WhiteRook = CreatePiece();
-	WhiteRook.ModelPtr = std::make_shared<Model>("content/models/WhiteKnight.glb");
+	
+	ChessBoard.SetRootComponent(&ChessBoard.AddComponent<ModelComponent>(ChessBoardModelPtr));
+	BlackQueen.SetRootComponent(&BlackQueen.AddComponent<ModelComponent>(BlackQueenModelPtr));
+	WhiteRook.SetRootComponent(&WhiteRook.AddComponent<ModelComponent>(WhiteRookModelPtr));
 
 	glm::mat4 model = glm::mat4(1.0f);
 	model = glm::translate(model, glm::vec3(0.f, 0.f, 0.f));
@@ -26,7 +33,8 @@ void Scene::Initialize()
 	glm::mat4 model_normal = glm::transpose(glm::inverse(model));
 	for (int i = 0; i < Pieces.size(); ++i)
 	{
-		Pieces[i]->Transform = model;
+		auto comp = dynamic_cast<ModelComponent*>(Pieces[i]->GetRootComponent());
+		comp->SetLocalTransform(model);
 	}
 
 	// Light Initialize

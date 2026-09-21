@@ -183,6 +183,10 @@
     <ClCompile Include="source\Renderer\Texture.cpp" />
     <ClCompile Include="source\Renderer\TextureManager.cpp" />
     <ClCompile Include="source\Scene.cpp" />
+    <ClCompile Include="source\Scene\Components\ModelComponent.cpp" />
+    <ClCompile Include="source\Scene\Components\PieceComponent.cpp" />
+    <ClCompile Include="source\Scene\Components\PrimitiveComponent.cpp" />
+    <ClCompile Include="source\Scene\Components\SceneComponent.cpp" />
     <ClCompile Include="source\stb_image_wrap.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -215,6 +219,10 @@
     <ClInclude Include="source\Renderer\Texture.h" />
     <ClInclude Include="source\Renderer\TextureManager.h" />
     <ClInclude Include="source\Scene.h" />
+    <ClInclude Include="source\Scene\Components\ModelComponent.h" />
+    <ClInclude Include="source\Scene\Components\PieceComponent.h" />
+    <ClInclude Include="source\Scene\Components\PrimitiveComponent.h" />
+    <ClInclude Include="source\Scene\Components\SceneComponent.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="content\models\BlackQueen.glb" />

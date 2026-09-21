@@ -1,6 +1,7 @@
 #include "ShadowPass.h"
 
 #include <glm/gtc/type_ptr.hpp>
+#include "Scene/Components/ModelComponent.h"
 
 ShadowPass::ShadowPass(const std::string& name, ShaderManager* shaderManager)
 	: RenderPass(name)
@@ -93,7 +94,8 @@ void ShadowPass::DrawPieces(Scene* scene)
 
 	for (int i = 0; i < scene->Pieces.size(); ++i)
 	{
-		SimpleDepthShader->setMat4("model", 1, GL_FALSE, glm::value_ptr(scene->Pieces[i]->Transform));
-		scene->Pieces[i]->ModelPtr->Draw(SimpleDepthShader.get());
+		SimpleDepthShader->setMat4("model", 1, GL_FALSE, glm::value_ptr(scene->Pieces[i]->GetLocalTransform()));
+		auto modelComp = dynamic_cast<ModelComponent*>(scene->Pieces[i]->GetRootComponent());
+		modelComp->GetModel()->Draw(SimpleDepthShader.get());
 	}
 }

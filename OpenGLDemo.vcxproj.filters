@@ -43,6 +43,18 @@
     <Filter Include="Source Files\Renderer\RenderPass">
       <UniqueIdentifier>{e270c44d-7e1d-4472-b99d-90710ed35bfd}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Scene">
+      <UniqueIdentifier>{297020a2-9a6d-45b7-9136-dd8b2ff71b48}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Scene">
+      <UniqueIdentifier>{f95ae9d5-6420-4839-b849-9eeb6473a9e7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Scene\Components">
+      <UniqueIdentifier>{41ccc891-0a9b-47c6-a354-b555930c5e3c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Scene\Components">
+      <UniqueIdentifier>{1dbc2289-7848-4283-8fdd-dc393b3d65e4}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="source\Camera.cpp">
@@ -159,6 +171,21 @@
     <ClCompile Include="source\Renderer\Texture.cpp">
       <Filter>Source Files\Renderer</Filter>
     </ClCompile>
+    <ClCompile Include="source\ChessApplication.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="source\Scene\Components\PieceComponent.cpp">
+      <Filter>Source Files\Scene\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="source\Scene\Components\SceneComponent.cpp">
+      <Filter>Source Files\Scene\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="source\Scene\Components\PrimitiveComponent.cpp">
+      <Filter>Source Files\Scene\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="source\Scene\Components\ModelComponent.cpp">
+      <Filter>Source Files\Scene\Components</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="source\Camera.h">
@@ -244,6 +271,21 @@
     </ClInclude>
     <ClInclude Include="source\Renderer\ShaderManager.h">
       <Filter>Header Files\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="source\ChessApplication.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="source\Scene\Components\PieceComponent.h">
+      <Filter>Header Files\Scene\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="source\Scene\Components\SceneComponent.h">
+      <Filter>Header Files\Scene\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="source\Scene\Components\PrimitiveComponent.h">
+      <Filter>Header Files\Scene\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="source\Scene\Components\ModelComponent.h">
+      <Filter>Header Files\Scene\Components</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

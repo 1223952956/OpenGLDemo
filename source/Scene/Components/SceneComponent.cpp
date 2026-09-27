@@ -14,7 +14,7 @@ void SceneComponent::AttachToComponent(SceneComponent* parent)
 	}
 }
 
-glm::mat4 SceneComponent::GetWorldTransform() const
+Math::Transform SceneComponent::GetWorldTransform() const
 {
 	if (Parent)
 	{

@@ -2,6 +2,7 @@
 
 #include <glm/gtc/type_ptr.hpp>
 #include "Scene/Components/ModelComponent.h"
+#include "Math/GlmInterop.h"
 
 LightingPass::LightingPass(const std::string& name, ShaderManager* shaderManager)
 	:RenderPass(name),
@@ -97,9 +98,11 @@ void LightingPass::DrawPieces(RenderContext& context)
 
 	for (int i = 0; i < scene->Pieces.size(); ++i)
 	{
-		glm::mat4 model_normal = glm::transpose(glm::inverse(scene->Pieces[i]->GetLocalTransform()));
+		glm::mat4 model_normal = glm::transpose(
+			glm::inverse(
+				Math::ToGlm(scene->Pieces[i]->GetWorldTransform().ToMatrix())));
 
-		PBRShader->setMat4("model", 1, GL_FALSE, glm::value_ptr(scene->Pieces[i]->GetLocalTransform()));
+		PBRShader->setMat4("model", 1, GL_FALSE, scene->Pieces[i]->GetWorldTransform().ToMatrix().Data());
 		PBRShader->setMat4("model_normal", 1, GL_FALSE, glm::value_ptr(model_normal));
 
 		auto modelComponent = dynamic_cast<ModelComponent*>(scene->Pieces[i]->GetRootComponent());

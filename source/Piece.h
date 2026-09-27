@@ -2,13 +2,16 @@
 #include <vector>
 #include <memory>
 
-#include <glm/gtc/matrix_transform.hpp>
-
 #include "Scene/Components/PieceComponent.h"
+#include "Math/Transform.h"
+#include "UUID.h"
 
 class Piece
 {
 public:
+	Piece() = default;
+	Piece(UUID id) : ID(id) {}
+
 	void Initialize();
 	void Update(float dt);
 	void Uninitialize();
@@ -23,10 +26,16 @@ public:
 	template<class T>
 	std::vector<T*> GetComponents();
 
-	glm::mat4 GetLocalTransform() const;
-	void SetLocalTransform(const glm::mat4& transform);
+	Math::Transform GetLocalTransform() const;
+	void SetLocalTransform(const Math::Transform& transform);
+
+	Math::Transform GetWorldTransform() const;
+
+	UUID GetID() const { return ID; }
 
 private:
+	UUID ID;
+
 	std::vector<std::unique_ptr<PieceComponent>> Components;
 	PieceComponent* RootComponent = nullptr;
 

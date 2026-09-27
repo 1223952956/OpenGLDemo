@@ -14,17 +14,17 @@ void Piece::Uninitialize()
 {}
 
 
-glm::mat4 Piece::GetLocalTransform() const
+Math::Transform Piece::GetLocalTransform() const
 {
 	SceneComponent* sceneComponent = dynamic_cast<SceneComponent*>(RootComponent);
 	if (!sceneComponent)
 	{
-		return glm::mat4(1.0f);
+		return Math::Transform();
 	}
 	return sceneComponent->GetLocalTransform();
 }
 
-void Piece::SetLocalTransform(const glm::mat4& transform)
+void Piece::SetLocalTransform(const Math::Transform& transform)
 {
 	SceneComponent* sceneComponent = dynamic_cast<SceneComponent*>(RootComponent);
 	if (!sceneComponent)
@@ -32,6 +32,16 @@ void Piece::SetLocalTransform(const glm::mat4& transform)
 		return;
 	}
 	sceneComponent->SetLocalTransform(transform);
+}
+
+Math::Transform Piece::GetWorldTransform() const
+{
+	SceneComponent* sceneComponent = dynamic_cast<SceneComponent*>(RootComponent);
+	if (!sceneComponent)
+	{
+		return Math::Transform();
+	}
+	return sceneComponent->GetWorldTransform();
 }
 
 

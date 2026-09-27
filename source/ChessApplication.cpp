@@ -189,7 +189,10 @@ void ChessApplication::UninitializeManagers()
 }
 
 void ChessApplication::UninitializeScene()
-{}
+{
+	CScene->Uninitialize();
+	CScene.reset();
+}
 
 void ChessApplication::UninitializeRenderer()
 {}
@@ -209,6 +212,8 @@ void ChessApplication::MainLoop()
 		lastFrameTime = currFrameTime;
 
 		ProcessInput(deltaTime);
+
+		CScene->Update(deltaTime);
 
 		if (FramebufferResized)
 		{

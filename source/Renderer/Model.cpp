@@ -42,21 +42,13 @@ void Model::LoadModel(const std::string& path)
 
 void Model::ProcessNode(aiNode* node, const aiScene* scene, glm::mat4 parentTransform, int depth)
 {
-	for (int i = 0; i < depth; ++i)
-	{
-		std::cout << "    ";
-	}
-	std::cout << node->mName.C_Str() << '\n';
+	spdlog::info("Processing node: {}", node->mName.C_Str());
 
 	glm::mat4 nodeTransform = ConvertMatrix(node->mTransformation);
 	glm::mat4 globalTransform = parentTransform * nodeTransform;
 
 	for (unsigned int i = 0; i < node->mNumMeshes; ++i)
 	{
-		for (int i = 0; i < depth + 1; ++i)
-		{
-			std::cout << "    ";
-		}
 		aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
 		Meshes.emplace_back(ProcessMesh(mesh, scene, globalTransform));
 	}
@@ -69,7 +61,16 @@ void Model::ProcessNode(aiNode* node, const aiScene* scene, glm::mat4 parentTran
 
 Mesh Model::ProcessMesh(aiMesh* mesh, const aiScene* scene, glm::mat4 globalTransform)
 {
-	std::cout << "Mesh: " << mesh->mName.C_Str() << '\n';
+	spdlog::info("Processing mesh: {}", mesh->mName.C_Str());
+	spdlog::info("globalTransform:\n"
+		"{} {} {} {}\n"
+		"{} {} {} {}\n"
+		"{} {} {} {}\n"
+		"{} {} {} {}",
+		globalTransform[0][0], globalTransform[1][0], globalTransform[2][0], globalTransform[3][0],
+		globalTransform[0][1], globalTransform[1][1], globalTransform[2][1], globalTransform[3][1],
+		globalTransform[0][2], globalTransform[1][2], globalTransform[2][2], globalTransform[3][2],
+		globalTransform[0][3], globalTransform[1][3], globalTransform[2][3], globalTransform[3][3]);
 
 	std::vector<Vertex> vertices;
 	std::vector<unsigned int> indices;

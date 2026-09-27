@@ -23,6 +23,7 @@ public:
 
 	void Initialize();
 	void Update(float deltaTime);
+	void Uninitialize();
 	Piece& CreatePiece();
 };
 

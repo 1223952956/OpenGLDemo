@@ -1,5 +1,6 @@
 #include "Scene.h"
 #include "Scene/Components/ModelComponent.h"
+#include "Math/Transform.h"
 
 void Scene::Initialize()
 {
@@ -27,14 +28,12 @@ void Scene::Initialize()
 	BlackQueen.SetRootComponent(&BlackQueen.AddComponent<ModelComponent>(BlackQueenModelPtr));
 	WhiteRook.SetRootComponent(&WhiteRook.AddComponent<ModelComponent>(WhiteRookModelPtr));
 
-	glm::mat4 model = glm::mat4(1.0f);
-	model = glm::translate(model, glm::vec3(0.f, 0.f, 0.f));
-	model = glm::scale(model, glm::vec3(1.f, 1.f, 1.f));
-	glm::mat4 model_normal = glm::transpose(glm::inverse(model));
+	Math::Transform model;
+
 	for (int i = 0; i < Pieces.size(); ++i)
 	{
-		auto comp = dynamic_cast<ModelComponent*>(Pieces[i]->GetRootComponent());
-		comp->SetLocalTransform(model);
+		Pieces[i]->SetLocalTransform(model);
+		Pieces[i]->Initialize();
 	}
 
 	// Light Initialize
@@ -47,7 +46,18 @@ void Scene::Initialize()
 
 void Scene::Update(float deltaTime)
 {
+	for (auto& piece : Pieces)
+	{
+		piece->Update(deltaTime);
+	}
+}
 
+void Scene::Uninitialize()
+{
+	for (auto& piece : Pieces)
+	{
+		piece->Uninitialize();
+	}
 }
 
 Piece& Scene::CreatePiece()

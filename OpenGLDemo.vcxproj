@@ -160,6 +160,11 @@
     <ClCompile Include="source\Light\PointLight.cpp" />
     <ClCompile Include="source\Light\SpotLight.cpp" />
     <ClCompile Include="source\Main.cpp" />
+    <ClCompile Include="source\Math\Matrix.cpp" />
+    <ClCompile Include="source\Math\Quaternion.cpp" />
+    <ClCompile Include="source\Math\Rotation.cpp" />
+    <ClCompile Include="source\Math\Transform.cpp" />
+    <ClCompile Include="source\Math\Vector.cpp" />
     <ClCompile Include="source\Piece.cpp" />
     <ClCompile Include="source\Renderer\Framebuffer.cpp" />
     <ClCompile Include="source\Renderer\IBLBaker.cpp" />
@@ -187,7 +192,9 @@
     <ClCompile Include="source\Scene\Components\PieceComponent.cpp" />
     <ClCompile Include="source\Scene\Components\PrimitiveComponent.cpp" />
     <ClCompile Include="source\Scene\Components\SceneComponent.cpp" />
+    <ClCompile Include="source\Scene\SceneSerializer.cpp" />
     <ClCompile Include="source\stb_image_wrap.cpp" />
+    <ClCompile Include="source\UUID.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="source\ChessApplication.h" />
@@ -196,6 +203,12 @@
     <ClInclude Include="source\Light\Light.h" />
     <ClInclude Include="source\Light\PointLight.h" />
     <ClInclude Include="source\Light\SpotLight.h" />
+    <ClInclude Include="source\Math\GlmInterop.h" />
+    <ClInclude Include="source\Math\Matrix.h" />
+    <ClInclude Include="source\Math\Quaternion.h" />
+    <ClInclude Include="source\Math\Rotation.h" />
+    <ClInclude Include="source\Math\Transform.h" />
+    <ClInclude Include="source\Math\Vector.h" />
     <ClInclude Include="source\Piece.h" />
     <ClInclude Include="source\Renderer\Framebuffer.h" />
     <ClInclude Include="source\Renderer\IBLBaker.h" />
@@ -223,6 +236,8 @@
     <ClInclude Include="source\Scene\Components\PieceComponent.h" />
     <ClInclude Include="source\Scene\Components\PrimitiveComponent.h" />
     <ClInclude Include="source\Scene\Components\SceneComponent.h" />
+    <ClInclude Include="source\Scene\SceneSerializer.h" />
+    <ClInclude Include="source\UUID.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="content\models\BlackQueen.glb" />

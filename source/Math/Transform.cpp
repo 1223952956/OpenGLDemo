@@ -19,10 +19,10 @@ namespace Math
 	Mat4 Transform::TranslationMatrix() const
 	{
 		std::array<float, 16> elements = {
-			1.f, 0.f, 0.f, Position.x,
-			0.f, 1.f, 0.f, Position.y,
-			0.f, 0.f, 1.f, Position.z,
-			0.f, 0.f, 0.f, 1.f
+			1.f,		0.f,		0.f,		0.f,
+			0.f,		1.f,		0.f,		0.f,
+			0.f,		0.f,		1.f,		0.f,
+			Position.x, Position.y, Position.z, 1.f
 		};
 		return Mat4(elements);
 	}
@@ -46,9 +46,9 @@ namespace Math
 		const float wz = w * z;
 
 		std::array<float, 16> elements = {
-			1.f - 2.f * (yy + zz), 2.f * (xy - wz),       2.f * (xz + wy),       0.f,
-			2.f * (xy + wz),       1.f - 2.f * (xx + zz), 2.f * (yz - wx),       0.f,
-			2.f * (xz - wy),       2.f * (yz + wx),       1.f - 2.f * (xx + yy), 0.f,
+			1.f - 2.f * (yy + zz), 2.f * (xy + wz),       2.f * (xz - wy),       0.f,
+			2.f * (xy - wz),       1.f - 2.f * (xx + zz), 2.f * (yz + wx),       0.f,
+			2.f * (xz + wy),       2.f * (yz - wx),       1.f - 2.f * (xx + yy), 0.f,
 			0.f,                   0.f,                   0.f,                   1.f
 		};
 

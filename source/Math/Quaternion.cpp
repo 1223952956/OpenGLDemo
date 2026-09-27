@@ -12,13 +12,16 @@ namespace Math
     {
 		Quat result = *this;
         float len = length();
-        if (len > 0.0f)
-        {
-            result.w /= len;
-            result.x /= len;
-            result.y /= len;
-            result.z /= len;
-        }
+		if (len <= 1.0e-6f)
+		{
+			return Quat(1.f, 0.f, 0.f, 0.f);
+		}
+
+		result.w /= len;
+		result.x /= len;
+		result.y /= len;
+		result.z /= len;
+
         return result;
     }
     Quat Quat::operator*(const Quat& other) const

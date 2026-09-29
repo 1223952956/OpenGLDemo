@@ -25,10 +25,13 @@ public:
     void Draw(Shader* shader);
     void Draw(Shader* shader, const std::string& name);
 
+    const std::string& GetSourcePath() const { return SourcePath; }
+
 private:
     std::vector<Mesh> Meshes;
     std::vector<std::unique_ptr<Material>> Materials;
-    std::string Directory;
+    std::string SourcePath;
+    std::string SourceDirectory;
 
     void LoadModel(const std::string& path);
     void ProcessNode(aiNode* node, const aiScene* scene, glm::mat4 parentTransform, int depth);

@@ -1,6 +1,8 @@
 #pragma once
 #include "RenderPass.h"
 
+class ShadowMap2D;
+
 class ShadowPass :
     public RenderPass
 {

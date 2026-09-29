@@ -14,5 +14,7 @@ public:
 
 	void Upload(Shader& shader);
 	void Bind();
+
+	std::string SourcePath;
 };
 

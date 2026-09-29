@@ -17,7 +17,8 @@ public:
 	std::vector<PointLight> PointLights;
 	std::vector<SpotLight> SpotLights;
 
-	std::unique_ptr<IBLMaterial>  Enviroment;
+	std::string EnvironmentPath;
+	std::unique_ptr<IBLMaterial> Environment;
 
 	std::unique_ptr<Camera> MainCamera;
 
@@ -25,5 +26,9 @@ public:
 	void Update(float deltaTime);
 	void Uninitialize();
 	Piece& CreatePiece();
+	Piece& CreatePiece(UUID id);
+
+private:
+	void CreateDefaultScene();
 };
 

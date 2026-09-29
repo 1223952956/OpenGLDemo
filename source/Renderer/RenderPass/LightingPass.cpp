@@ -25,7 +25,7 @@ void LightingPass::Init(RenderContext& context)
 	}
 
 	IBLBaker.Init();
-	context.Scene->Enviroment = std::move(IBLBaker.Bake("content/images/brown_photostudio_02_2k.hdr"));
+	context.Scene->Environment = std::move(IBLBaker.Bake(context.Scene->EnvironmentPath));
 }
 
 void LightingPass::Resize(unsigned int width, unsigned int height)
@@ -37,7 +37,7 @@ void LightingPass::Execute(RenderContext& context)
 	context.SceneFramebuffer->Bind();
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	context.Scene->Enviroment->Bind();
+	context.Scene->Environment->Bind();
 	PBRShader->use();
 	PBRShader->setFloat("curr_time", context.CurrTime);
 
@@ -79,8 +79,8 @@ void LightingPass::UploadLight(RenderContext& context)
 
 	for (; i < scene->SpotLights.size(); ++i)
 	{
-		scene->SpotLights[i].SetPosition(scene->MainCamera->Pos);
-		scene->SpotLights[i].SetDirection(scene->MainCamera->GetFront());
+		scene->SpotLights[i].SetPosition(Math::FromGlm(scene->MainCamera->Pos));
+		scene->SpotLights[i].SetDirection(Math::FromGlm(scene->MainCamera->GetFront()));
 		name = "lights[" + std::to_string(i) + "]";
 		scene->SpotLights[i].Upload(PBRShader.get(), name);
 	}

@@ -1,7 +1,8 @@
 #include "DirectionalLight.h"
+#include "Math/GlmInterop.h"
 
-DirectionalLight::DirectionalLight(glm::vec3 direction, glm::vec3 color, float intensity)
-	:Light(glm::vec3(0.f), color, intensity)
+DirectionalLight::DirectionalLight(Math::Vec3 direction, Math::Vec3 color, float intensity)
+	:Light(Math::Vec3(0.f), color, intensity)
 	,Direction(direction)
 {
 }
@@ -9,6 +10,6 @@ DirectionalLight::DirectionalLight(glm::vec3 direction, glm::vec3 color, float i
 void DirectionalLight::Upload(Shader* shader, const std::string& name)
 {
 	Light::Upload(shader, name);
-	shader->setVec3(name + ".direction", Direction);
+	shader->setVec3(name + ".direction", Math::ToGlm(Direction));
 	shader->setInt(name + ".type", 1);
 }

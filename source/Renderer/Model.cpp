@@ -31,7 +31,8 @@ void Model::LoadModel(const std::string& path)
 		spdlog::error("[Model] ASSIMP::{}", importer.GetErrorString());
 		return;
 	}
-	Directory = path.substr(0, path.find_last_of('/'));
+	SourcePath = path;
+	SourceDirectory = path.substr(0, path.find_last_of('/'));
 
 	glm::mat4 rootTransform = glm::mat4(1.f);
 
@@ -172,11 +173,11 @@ Texture2D* Model::LoadTexture(aiMaterial* mat, aiTextureType type, const aiScene
 
 	if (str.C_Str()[0] == '*')
 	{
-		return TextureManager::Load(str.C_Str(), Directory, scene, type);
+		return TextureManager::Load(str.C_Str(), SourceDirectory, scene, type);
 	}
 	else
 	{
-		std::string path = Directory + "/" + str.C_Str();
+		std::string path = SourceDirectory + "/" + str.C_Str();
 		return TextureManager::Load(path, type);
 	}
 }

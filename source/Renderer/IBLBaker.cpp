@@ -23,6 +23,7 @@ std::unique_ptr<IBLMaterial> IBLBaker::Bake(const std::string& path)
     Texture2D* hdrTex = TextureManager::LoadEquirectangularMap(path);
 
     auto iblMat = std::make_unique<IBLMaterial>();
+	iblMat->SourcePath = path;
 
 	iblMat->EnvCubeMap = std::make_unique<Cubemap>();
 	iblMat->IrradianceMap = std::make_unique<Cubemap>();

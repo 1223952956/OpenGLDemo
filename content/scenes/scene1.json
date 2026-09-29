@@ -1,0 +1,129 @@
+{
+    "camera": {
+        "fov": 45.0,
+        "position": [
+            0.0,
+            0.4000000059604645,
+            1.7999999523162842
+        ]
+    },
+    "environment": {
+        "hdrPath": "content/images/brown_photostudio_02_2k.hdr"
+    },
+    "lights": [
+        {
+            "color": [
+                1.0,
+                0.949999988079071,
+                0.8999999761581421
+            ],
+            "direction": [
+                -2.0,
+                -2.0,
+                -1.0
+            ],
+            "intensity": 4.0,
+            "type": "directional"
+        }
+    ],
+    "name": "ChessScene",
+    "pieces": [
+        {
+            "components": [
+                {
+                    "castShadow": true,
+                    "id": "7979742289925353953",
+                    "modelPath": "content/models/ChessBoard.glb",
+                    "parent": null,
+                    "transform": {
+                        "position": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "rotation": [
+                            0.0,
+                            0.0,
+                            0.0,
+                            1.0
+                        ],
+                        "scale": [
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    "type": "ModelComponent",
+                    "visible": true
+                }
+            ],
+            "id": "3794183627632342056",
+            "rootComponent": "7979742289925353953"
+        },
+        {
+            "components": [
+                {
+                    "castShadow": true,
+                    "id": "8431447901411746389",
+                    "modelPath": "content/models/BlackQueen.glb",
+                    "parent": null,
+                    "transform": {
+                        "position": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "rotation": [
+                            0.0,
+                            0.0,
+                            0.0,
+                            1.0
+                        ],
+                        "scale": [
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    "type": "ModelComponent",
+                    "visible": true
+                }
+            ],
+            "id": "16145116522097955408",
+            "rootComponent": "8431447901411746389"
+        },
+        {
+            "components": [
+                {
+                    "castShadow": true,
+                    "id": "17079634081593736648",
+                    "modelPath": "content/models/WhiteKnight.glb",
+                    "parent": null,
+                    "transform": {
+                        "position": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "rotation": [
+                            0.0,
+                            0.0,
+                            0.0,
+                            1.0
+                        ],
+                        "scale": [
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    "type": "ModelComponent",
+                    "visible": true
+                }
+            ],
+            "id": "11300840791316723605",
+            "rootComponent": "17079634081593736648"
+        }
+    ],
+    "version": 1
+}

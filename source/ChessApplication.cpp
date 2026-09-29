@@ -7,9 +7,12 @@
 #include <glm/gtc/type_ptr.hpp>
 #include <spdlog/spdlog.h>
 #include <spdlog/sinks/stdout_color_sinks.h>
+#include "imgui.h"
+#include "backends/imgui_impl_glfw.h"
+#include "backends/imgui_impl_opengl3.h"
 
 #include "Renderer/Renderer.h"
-#include "Scene.h"
+#include "Scene/SceneSerializer.h"
 #include "Camera.h"
 #include "Renderer/ShaderManager.h"
 #include "Renderer/TextureManager.h"
@@ -72,6 +75,7 @@ bool ChessApplication::Initialize()
 		return false;
 	}
 
+	InitializeImGui();
 	InitializeManagers();
 	InitializeScene();
 	InitializeRenderer();
@@ -114,7 +118,7 @@ bool ChessApplication::InitializeWindow()
 
 	glViewport(0, 0, ScreenWidth, ScreenHeight);
 
-	glfwSetInputMode(CWindow, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+	SetMouseCaptured(true);
 	glfwSetWindowUserPointer(CWindow, this);
 
 	glfwSetFramebufferSizeCallback(CWindow, FramebufferSizeCallback);
@@ -141,6 +145,16 @@ bool ChessApplication::InitializeOpenGL()
 	return true;
 }
 
+void ChessApplication::InitializeImGui()
+{
+	IMGUI_CHECKVERSION();
+	ImGui::CreateContext();
+	ImGui::StyleColorsDark();
+
+	ImGui_ImplGlfw_InitForOpenGL(CWindow, true);
+	ImGui_ImplOpenGL3_Init("#version 460 core");
+}
+
 void ChessApplication::InitializeManagers()
 {
 	TextureManager::Init();
@@ -148,7 +162,15 @@ void ChessApplication::InitializeManagers()
 
 void ChessApplication::InitializeScene()
 {
-	CScene = std::make_unique<Scene>();
+	std::string SceneError;
+	CScene = SceneSerializer::Deserialize("content/scenes/scene.json", SceneError);
+
+	if (!CScene)
+	{
+		spdlog::error("Failed to deserialize scene: {}", SceneError);
+		return;
+	}
+
 	CScene->Initialize();
 }
 
@@ -163,6 +185,7 @@ void ChessApplication::Uninitialize()
 	UninitializeRenderer();
 	UninitializeScene();
 	UninitializeManagers();
+	UninitializeImGui();
 	UninitializeOpenGL();
 	UninitializeWindow();
 	UninitializeLogger();
@@ -181,6 +204,13 @@ void ChessApplication::UninitializeWindow()
 void ChessApplication::UninitializeOpenGL()
 {
 	
+}
+
+void ChessApplication::UninitializeImGui()
+{
+	ImGui_ImplOpenGL3_Shutdown();
+	ImGui_ImplGlfw_Shutdown();
+	ImGui::DestroyContext();
 }
 
 void ChessApplication::UninitializeManagers()
@@ -207,11 +237,14 @@ void ChessApplication::MainLoop()
 	// render loop
 	while (!glfwWindowShouldClose(CWindow))
 	{
+		glfwSwapBuffers(CWindow);
+
 		double currFrameTime = glfwGetTime();
 		deltaTime = static_cast<float>(currFrameTime - lastFrameTime);
 		lastFrameTime = currFrameTime;
 
 		ProcessInput(deltaTime);
+		CreateImGui();
 
 		CScene->Update(deltaTime);
 
@@ -223,18 +256,40 @@ void ChessApplication::MainLoop()
 		}
 
 		CRenderer->Render(CScene.get(), ScreenWidth, ScreenHeight, lastFrameTime, deltaTime);
+		RenderImGui();
 
-		glfwSwapBuffers(CWindow);
 		glfwPollEvents();
 	}
 }
 
 void ChessApplication::ProcessInput(float deltaTime)
 {
-	if (glfwGetKey(CWindow, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+	const bool f1KeyPressed = glfwGetKey(CWindow, GLFW_KEY_F1) == GLFW_PRESS;
+	if (f1KeyPressed && !F1KeyPressed)
 	{
-		glfwSetWindowShouldClose(CWindow, true);
+		SetMouseCaptured(!MouseCaptured);
 	}
+	F1KeyPressed = f1KeyPressed;
+
+	const bool escapeKeyPressed = glfwGetKey(CWindow, GLFW_KEY_ESCAPE) == GLFW_PRESS;
+	if (escapeKeyPressed && !EscapeKeyPressed)
+	{
+		if (MouseCaptured)
+		{
+			SetMouseCaptured(false);
+		}
+		else
+		{
+			glfwSetWindowShouldClose(CWindow, true);
+		}
+	}
+	EscapeKeyPressed = escapeKeyPressed;
+
+	if (!MouseCaptured || ImGui::GetIO().WantCaptureMouse || ImGui::GetIO().WantCaptureKeyboard)
+	{
+		return;
+	}
+
 	if (glfwGetKey(CWindow, GLFW_KEY_F) == GLFW_PRESS)
 	{
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
@@ -261,6 +316,31 @@ void ChessApplication::ProcessInput(float deltaTime)
 	}
 }
 
+void ChessApplication::CreateImGui()
+{
+	ImGui_ImplOpenGL3_NewFrame();
+	ImGui_ImplGlfw_NewFrame();
+	ImGui::NewFrame();
+
+	ImGui::Begin("Debug");
+	ImGui::Text("Scene Serializer");
+
+	ImGui::InputText("Scene Name", SceneNameInput, IM_ARRAYSIZE(SceneNameInput));
+
+	if (ImGui::Button("Save Scene"))
+	{
+		SerializeScene(SceneNameInput);
+	}
+
+	ImGui::End();
+}
+
+void ChessApplication::RenderImGui()
+{
+	ImGui::Render();
+	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+}
+
 ChessApplication* ChessApplication::FromWindow(GLFWwindow* window)
 {
 	return static_cast<ChessApplication*>(glfwGetWindowUserPointer(window));
@@ -281,6 +361,8 @@ void ChessApplication::MouseCallback(GLFWwindow * window, double xpos, double yp
 {
 	ChessApplication* app = FromWindow(window);
 	if (!app) return;
+
+	if (!app->MouseCaptured) return;
 
 	if (app->FirstMouse)
 	{
@@ -303,5 +385,28 @@ void ChessApplication::ScrollCallback(GLFWwindow * window, double xoffset, doubl
 	ChessApplication* app = FromWindow(window);
 	if (!app) return;
 
+	if (!app->MouseCaptured) return;
+
 	app->CScene->MainCamera->Zoom(yoffset);
+}
+
+void ChessApplication::SetMouseCaptured(bool captured)
+{
+	if (MouseCaptured == captured)
+		return;
+
+	MouseCaptured = captured;
+	FirstMouse = true;
+
+	glfwSetInputMode(CWindow, GLFW_CURSOR, captured ? GLFW_CURSOR_DISABLED : GLFW_CURSOR_NORMAL);
+
+	if (glfwRawMouseMotionSupported())
+	{
+		glfwSetInputMode(CWindow, GLFW_RAW_MOUSE_MOTION, captured ? GLFW_TRUE : GLFW_FALSE);
+	}
+}
+
+void ChessApplication::SerializeScene(const std::string& sceneName)
+{
+	SceneSerializer::Serialize(CScene.get(), "content/scenes/" + sceneName + ".json");
 }

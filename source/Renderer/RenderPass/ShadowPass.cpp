@@ -2,6 +2,8 @@
 
 #include <glm/gtc/type_ptr.hpp>
 #include "Scene/Components/ModelComponent.h"
+#include "Renderer/ShadowMap.h"
+#include "Math/GlmInterop.h"
 
 ShadowPass::ShadowPass(const std::string& name, ShaderManager* shaderManager)
 	: RenderPass(name)
@@ -56,7 +58,7 @@ void ShadowPass::Bake(Scene* scene)
 
 		glm::mat4 lightProjection, lightView;
 
-		dirShadow->LightSpaceMatrix = ComputeLightSpaceMatrix(-scene->DirectionalLights[i].GetDirection());
+		dirShadow->LightSpaceMatrix = ComputeLightSpaceMatrix(Math::ToGlm(-scene->DirectionalLights[i].GetDirection()));
 
 		SimpleDepthShader->setMat4("lightSpaceMatrix", 1, GL_FALSE,
 			glm::value_ptr(dirShadow->LightSpaceMatrix));

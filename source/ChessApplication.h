@@ -31,6 +31,7 @@ private:
 	void InitializeLogger();
 	bool InitializeWindow();
 	bool InitializeOpenGL();
+	void InitializeImGui();
 	void InitializeManagers();
 	void InitializeScene();
 	void InitializeRenderer();
@@ -39,17 +40,23 @@ private:
 	void UninitializeLogger();
 	void UninitializeWindow();
 	void UninitializeOpenGL();
+	void UninitializeImGui();
 	void UninitializeManagers();
 	void UninitializeScene();
 	void UninitializeRenderer();
 
 	void MainLoop();
 	void ProcessInput(float deltaTime);
+	void CreateImGui();
+	void RenderImGui();
 
 	static ChessApplication* FromWindow(GLFWwindow* window);
 	static void FramebufferSizeCallback(GLFWwindow* window, int width, int height);
 	static void MouseCallback(GLFWwindow* window, double xpos, double ypos);
 	static void ScrollCallback(GLFWwindow* window, double xoffset, double yoffset);
+
+	void SetMouseCaptured(bool captured);
+	void SerializeScene(const std::string& sceneName);
 
 	ApplicationSpecification Specification;
 	GLFWwindow* CWindow = nullptr;
@@ -61,6 +68,11 @@ private:
 	bool FirstMouse = true;
 	double LastMouseX;
 	double LastMouseY;
+	bool MouseCaptured = false;
+	bool F1KeyPressed = false;
+	bool EscapeKeyPressed = false;
+
+	char SceneNameInput[128] = "scene";
 
 	std::unique_ptr<Renderer> CRenderer;
 	std::unique_ptr<Scene> CScene;

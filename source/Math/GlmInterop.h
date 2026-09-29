@@ -1,6 +1,8 @@
 #pragma once
 #include "Matrix.h"
+#include "Vector.h"
 #include <glm/mat4x4.hpp>
+#include <glm/vec3.hpp>
 
 namespace Math
 {
@@ -31,5 +33,13 @@ namespace Math
 		}
 
 		return result;
+	}
+	inline Vec3 FromGlm(const glm::vec3& glmVec)
+	{
+		return Vec3(glmVec.x, glmVec.y, glmVec.z);
+	}
+	inline glm::vec3 ToGlm(const Vec3& mathVec)
+	{
+		return glm::vec3(mathVec.x, mathVec.y, mathVec.z);
 	}
 }

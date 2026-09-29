@@ -1,6 +1,7 @@
 #include "Light.h"
+#include "Math/GlmInterop.h"
 
-Light::Light(glm::vec3 position, glm::vec3 color, float intensity)
+Light::Light(Math::Vec3 position, Math::Vec3 color, float intensity)
 	: Position(position)
 	, Color(color)
 	, Intensity(intensity)
@@ -9,11 +10,11 @@ Light::Light(glm::vec3 position, glm::vec3 color, float intensity)
 
 void Light::Upload(Shader* shader, const std::string& name)
 {
-	shader->setVec3(name + ".color", Color);
+	shader->setVec3(name + ".color", Math::ToGlm(Color));
 	shader->setFloat(name + ".intensity", Intensity);
 }
 
-void Light::SetPosition(glm::vec3 newPos)
+void Light::SetPosition(Math::Vec3 newPos)
 {
 	Position = newPos;
 }

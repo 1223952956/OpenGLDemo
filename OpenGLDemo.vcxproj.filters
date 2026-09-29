@@ -13,9 +13,6 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
-    <Filter Include="Source Files\imgui">
-      <UniqueIdentifier>{be3a8cdd-568a-4209-b2fa-8090d2cb4843}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Header Files\Light">
       <UniqueIdentifier>{a199123b-5f72-4110-8eae-fc55c77ad897}</UniqueIdentifier>
     </Filter>
@@ -71,27 +68,6 @@
     </ClCompile>
     <ClCompile Include="source\stb_image_wrap.cpp">
       <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="libs\imgui\imgui_demo.cpp">
-      <Filter>Source Files\imgui</Filter>
-    </ClCompile>
-    <ClCompile Include="libs\imgui\imgui_draw.cpp">
-      <Filter>Source Files\imgui</Filter>
-    </ClCompile>
-    <ClCompile Include="libs\imgui\imgui_tables.cpp">
-      <Filter>Source Files\imgui</Filter>
-    </ClCompile>
-    <ClCompile Include="libs\imgui\imgui_widgets.cpp">
-      <Filter>Source Files\imgui</Filter>
-    </ClCompile>
-    <ClCompile Include="libs\imgui\imgui.cpp">
-      <Filter>Source Files\imgui</Filter>
-    </ClCompile>
-    <ClCompile Include="libs\imgui\imgui_impl_glfw.cpp">
-      <Filter>Source Files\imgui</Filter>
-    </ClCompile>
-    <ClCompile Include="libs\imgui\imgui_impl_opengl3.cpp">
-      <Filter>Source Files\imgui</Filter>
     </ClCompile>
     <ClCompile Include="source\Light\Light.cpp">
       <Filter>Source Files\LIght</Filter>
@@ -192,9 +168,6 @@
     <ClCompile Include="source\Scene\Components\ModelComponent.cpp">
       <Filter>Source Files\Scene\Components</Filter>
     </ClCompile>
-    <ClCompile Include="source\Scene\SceneSerializer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="source\UUID.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -212,6 +185,9 @@
     </ClCompile>
     <ClCompile Include="source\Math\Rotation.cpp">
       <Filter>Source Files\Math</Filter>
+    </ClCompile>
+    <ClCompile Include="source\Scene\SceneSerializer.cpp">
+      <Filter>Source Files\Scene</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -314,9 +290,6 @@
     <ClInclude Include="source\Scene\Components\ModelComponent.h">
       <Filter>Header Files\Scene\Components</Filter>
     </ClInclude>
-    <ClInclude Include="source\Scene\SceneSerializer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="source\UUID.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -337,6 +310,9 @@
     </ClInclude>
     <ClInclude Include="source\Math\GlmInterop.h">
       <Filter>Header Files\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="source\Scene\SceneSerializer.h">
+      <Filter>Header Files\Scene</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

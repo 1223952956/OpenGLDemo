@@ -1,6 +1,7 @@
 #include "SkyboxPass.h"
 
 #include <glm/gtc/type_ptr.hpp>
+#include <glm/gtc/matrix_transform.hpp>
 
 #include "Renderer/RenderPrimitives.h"
 
@@ -48,7 +49,7 @@ void SkyboxPass::DrawSkybox(RenderContext& context)
 
 	SkyboxShader->setMat4("view", 1, GL_FALSE, glm::value_ptr(view));
 	glActiveTexture(GL_TEXTURE0);
-	context.Scene->Enviroment->EnvCubeMap->Bind();
+	context.Scene->Environment->EnvCubeMap->Bind();
 	RenderPrimitives::RenderCube();
 
 	glDepthFunc(GL_LESS);

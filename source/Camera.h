@@ -48,6 +48,7 @@ public:
 	void Zoom(float value);
 	glm::mat4 GetViewMatrix();
 	float GetFoV() const { return FoV; }
+	void SetFoV(float newFoV) { FoV = newFoV; }
 	glm::vec3 GetFront() const { return Front; }
 };
 

@@ -1,6 +1,7 @@
 #include "SpotLight.h"
+#include "Math/GlmInterop.h"
 
-SpotLight::SpotLight(glm::vec3 position, glm::vec3 direction, glm::vec3 color, float cutOff, float outerCutOff, float range, float intensity)
+SpotLight::SpotLight(Math::Vec3 position, Math::Vec3 direction, Math::Vec3 color, float cutOff, float outerCutOff, float range, float intensity)
 	:Light(position, color, intensity)
 	,Direction(direction)
 	,InnerCos(cutOff)
@@ -12,8 +13,8 @@ SpotLight::SpotLight(glm::vec3 position, glm::vec3 direction, glm::vec3 color, f
 void SpotLight::Upload(Shader* shader, const std::string& name)
 {
 	Light::Upload(shader, name);
-	shader->setVec3(name + ".position", Position);
-	shader->setVec3(name + ".direction", Direction);
+	shader->setVec3(name + ".position", Math::ToGlm(Position));
+	shader->setVec3(name + ".direction", Math::ToGlm(Direction));
 	shader->setFloat(name + ".innerCos", InnerCos);
 	shader->setFloat(name + ".outerCos", OuterCos);
 
@@ -21,7 +22,7 @@ void SpotLight::Upload(Shader* shader, const std::string& name)
 	shader->setFloat(name + ".range", Range);
 }
 
-void SpotLight::SetDirection(glm::vec3 newDir)
+void SpotLight::SetDirection(Math::Vec3 newDir)
 {
 	Direction = newDir;
 }

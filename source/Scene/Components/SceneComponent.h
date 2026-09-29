@@ -8,6 +8,7 @@ class SceneComponent :
 {
 public:
 	SceneComponent(Piece* piece) : PieceComponent(piece) {}
+	SceneComponent(Piece* piece, UUID id) : PieceComponent(piece, id) {}
 
 	void AttachToComponent(SceneComponent* parent);
 	SceneComponent* GetParent() const { return Parent; }

@@ -2,17 +2,22 @@
 #include <glm/glm.hpp>
 #include <string>
 #include "Renderer/Shader.h"
+#include "Math/Vector.h"
 
 
 class Light
 {
 protected:
-	glm::vec3 Position;
-	glm::vec3 Color;
+	Math::Vec3 Position;
+	Math::Vec3 Color;
 	float Intensity;
 public:
-	Light(glm::vec3 position, glm::vec3 color, float intensity);
+	Light(Math::Vec3 position, Math::Vec3 color, float intensity);
 	virtual void Upload(Shader* shader, const std::string& name);
-	void SetPosition(glm::vec3 newPos);
+
+	void SetPosition(Math::Vec3 newPos);
+	Math::Vec3 GetPosition() const { return Position; }
+	Math::Vec3 GetColor() const { return Color; }
+	float GetIntensity() const { return Intensity; }
 };
 

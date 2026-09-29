@@ -1,17 +1,16 @@
 #pragma once
 #include "Light.h"
-#include "Renderer/ShadowMap.h"
+
 
 class DirectionalLight :
     public Light
 {
 public:
-    DirectionalLight(glm::vec3 direction, glm::vec3 color, float intensity);
+    DirectionalLight(Math::Vec3 direction, Math::Vec3 color, float intensity);
     void Upload(Shader* shader, const std::string& name) override;
-    glm::vec3 const GetDirection() { return Direction; };
+    Math::Vec3 GetDirection() const { return Direction; };
 
 private:
-    glm::vec3 Direction;
-
+    Math::Vec3 Direction;
 };
 

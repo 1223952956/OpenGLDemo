@@ -37,8 +37,8 @@ void Camera::UpdateAxis()
 
 glm::mat4 Camera::LookAt()
 {
-	glm::mat4 rotation;
-	glm::mat4 translation;
+	glm::mat4 rotation(1.0f);
+	glm::mat4 translation(1.0f);
 	// 1. Position = known
 	// 2. Calculate cameraDirection
 	glm::vec3 zaxis = glm::normalize(Pos - (Pos + Front));

@@ -16,6 +16,9 @@ Renderer::Renderer()
 	CShaderManager = std::make_unique<ShaderManager>();
 	CShaderManager->Init();
 
+	CIBLBaker = std::make_unique<IBLBaker>(CShaderManager.get());
+	CIBLBaker->Init();
+
 	DebugQuadShader = CShaderManager->Get("DebugQuadShader");
 
 	RenderPasses.emplace_back(std::make_unique<ShadowPass>("ShadowPass", CShaderManager.get()));
@@ -36,6 +39,8 @@ void Renderer::Initialize(Scene* scene, uint32_t screenWidth, uint32_t screenHei
 	DebugQuadShader->setInt("depthMap", 0);
 
 	InitColorBuffer(screenWidth, screenHeight);
+
+	BakeIBL(scene);
 
 	RenderContext context;
 	context.Scene = scene;
@@ -83,6 +88,22 @@ void Renderer::Resize(uint32_t screenWidth, uint32_t screenHeight)
 	for (auto& pass : RenderPasses)
 	{
 		pass->Resize(screenWidth, screenHeight);
+	}
+}
+
+void Renderer::BakeIBL(Scene* scene)
+{
+	scene->Environment = std::move(CIBLBaker->Bake(scene->EnvironmentPath));
+}
+
+void Renderer::InitShadowMaps(Scene* scene)
+{
+	for (auto& pass : RenderPasses)
+	{
+		if (auto shadowPass = dynamic_cast<ShadowPass*>(pass.get()))
+		{
+			shadowPass->InitShadowMaps(scene);
+		}
 	}
 }
 

@@ -12,6 +12,8 @@ public:
     void Resize(unsigned int width, unsigned int height) override;
     void Execute(RenderContext& context) override;
 
+    void InitShadowMaps(Scene* scene);
+
 private:
     void Bake(Scene* scene);
 

@@ -2,6 +2,8 @@
 #include <cstdint>
 #include <string>
 #include <memory>
+#include <optional>
+#include <filesystem>
 
 
 struct GLFWwindow;
@@ -57,6 +59,10 @@ private:
 
 	void SetMouseCaptured(bool captured);
 	void SerializeScene(const std::string& sceneName);
+	void DeserializeScene(const std::string& sceneName);
+
+	void RequestSceneSwitch(const std::filesystem::path& path);
+	void ApplyPendingSceneSwitch();
 
 	ApplicationSpecification Specification;
 	GLFWwindow* CWindow = nullptr;
@@ -73,6 +79,9 @@ private:
 	bool EscapeKeyPressed = false;
 
 	char SceneNameInput[128] = "scene";
+	char LoadSceneNameInput[128] = "scene";
+
+	std::optional<std::filesystem::path> PendingScenePath;
 
 	std::unique_ptr<Renderer> CRenderer;
 	std::unique_ptr<Scene> CScene;

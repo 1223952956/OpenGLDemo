@@ -3,10 +3,10 @@
 #include <glm/gtc/type_ptr.hpp>
 #include "Scene/Components/ModelComponent.h"
 #include "Math/GlmInterop.h"
+#include <glm/gtc/matrix_transform.hpp>
 
 LightingPass::LightingPass(const std::string& name, ShaderManager* shaderManager)
-	:RenderPass(name),
-	IBLBaker(shaderManager)
+	:RenderPass(name)
 {
 	PBRShader = shaderManager->Get("PBRShader");
 }
@@ -23,9 +23,6 @@ void LightingPass::Init(RenderContext& context)
 		std::string dirLightName = "dirLightDepthMaps[" + std::to_string(i) + "]";
 		PBRShader->setInt(dirLightName, 13 + i);
 	}
-
-	IBLBaker.Init();
-	context.Scene->Environment = std::move(IBLBaker.Bake(context.Scene->EnvironmentPath));
 }
 
 void LightingPass::Resize(unsigned int width, unsigned int height)

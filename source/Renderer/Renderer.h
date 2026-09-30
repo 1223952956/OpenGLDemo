@@ -14,6 +14,8 @@ public:
     void Initialize(Scene* scene, uint32_t screenWidth, uint32_t screenHeight);
 	void Render(Scene* scene, uint32_t screenWidth, uint32_t screenHeight, float currTime, float deltaTime);
 	void Resize(uint32_t screenWidth, uint32_t screenHeight);
+	void BakeIBL(Scene* scene);
+	void InitShadowMaps(Scene* scene);
 private:
     std::unique_ptr<ShaderManager> CShaderManager;
 
@@ -26,5 +28,7 @@ private:
     // DEBUG
     void DrawDebugQuad(Scene& scene);
     std::shared_ptr<Shader> DebugQuadShader;
+
+	std::unique_ptr<IBLBaker> CIBLBaker;
 };
 

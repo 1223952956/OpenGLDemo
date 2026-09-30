@@ -164,6 +164,8 @@ void ChessApplication::InitializeScene()
 {
 	std::string SceneError;
 	CScene = SceneSerializer::Deserialize("content/scenes/scene.json", SceneError);
+	//CScene = std::make_unique<Scene>();
+	//CScene->CreateDefaultScene();
 
 	if (!CScene)
 	{
@@ -237,6 +239,8 @@ void ChessApplication::MainLoop()
 	// render loop
 	while (!glfwWindowShouldClose(CWindow))
 	{
+		ApplyPendingSceneSwitch();
+
 		glfwSwapBuffers(CWindow);
 
 		double currFrameTime = glfwGetTime();
@@ -332,6 +336,14 @@ void ChessApplication::CreateImGui()
 		SerializeScene(SceneNameInput);
 	}
 
+	ImGui::InputText("Load Scene Name", LoadSceneNameInput, IM_ARRAYSIZE(LoadSceneNameInput));
+
+	if (ImGui::Button("Load Scene"))
+	{
+		RequestSceneSwitch(
+			std::filesystem::path("content/scenes") / (std::string(LoadSceneNameInput) + ".json"));
+	}
+
 	ImGui::End();
 }
 
@@ -409,4 +421,50 @@ void ChessApplication::SetMouseCaptured(bool captured)
 void ChessApplication::SerializeScene(const std::string& sceneName)
 {
 	SceneSerializer::Serialize(CScene.get(), "content/scenes/" + sceneName + ".json");
+}
+
+void ChessApplication::DeserializeScene(const std::string& sceneName)
+{
+	
+}
+
+void ChessApplication::RequestSceneSwitch(const std::filesystem::path& path)
+{
+	PendingScenePath = path;
+}
+
+void ChessApplication::ApplyPendingSceneSwitch()
+{
+	if (!PendingScenePath.has_value())
+	{
+		return;
+	}
+
+	const std::filesystem::path path = std::move(PendingScenePath.value());
+	PendingScenePath.reset();
+
+	std::string error;
+
+	std::unique_ptr<Scene> cadidate = SceneSerializer::Deserialize(path.string(), error);
+
+	if (!cadidate)
+	{
+		spdlog::error("Failed to deserialize scene: {} : {}", path.string(), error);
+		return;
+	}
+
+	cadidate->Initialize();
+
+	CRenderer->BakeIBL(cadidate.get());
+	CRenderer->InitShadowMaps(cadidate.get());
+
+	CScene.swap(cadidate);
+
+	if (cadidate)
+	{
+		cadidate->Uninitialize();
+		cadidate.reset();
+	}
+
+	spdlog::info("Scene switched to '{}'", path.string());
 }

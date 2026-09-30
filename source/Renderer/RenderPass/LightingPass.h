@@ -1,6 +1,5 @@
 #pragma once
 #include "RenderPass.h"
-#include "Renderer/IBLBaker.h"
 
 // TODO
 // Implement deferred rendering to truly split LightingPass and GeometryPass
@@ -16,7 +15,6 @@ public:
 
 private:
     std::shared_ptr<Shader> PBRShader;
-    IBLBaker IBLBaker;
 
     void UploadCamera(RenderContext& context);
     void UploadLight(RenderContext& context);

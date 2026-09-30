@@ -15,10 +15,7 @@ ShadowPass::ShadowPass(const std::string& name, ShaderManager* shaderManager)
 void ShadowPass::Init(RenderContext& context)
 {
 	auto scene = context.Scene;
-	for (int i = 0; i < scene->DirectionalLights.size(); ++i)
-	{
-		DirectionalShadows.emplace_back(std::make_unique<ShadowMap2D>());
-	}
+	InitShadowMaps(scene);
 }
 
 void ShadowPass::Resize(unsigned int width, unsigned int height)
@@ -40,6 +37,15 @@ void ShadowPass::Execute(RenderContext& context)
 		PBRShader->setMat4(dirLightName, 1, GL_FALSE, glm::value_ptr(DirectionalShadows[i]->LightSpaceMatrix));
 		glActiveTexture(GL_TEXTURE13 + i);
 		glBindTexture(GL_TEXTURE_2D, DirectionalShadows[i]->GetDepthMap());
+	}
+}
+
+void ShadowPass::InitShadowMaps(Scene* scene)
+{
+	DirectionalShadows.clear();
+	for (int i = 0; i < scene->DirectionalLights.size(); ++i)
+	{
+		DirectionalShadows.emplace_back(std::make_unique<ShadowMap2D>());
 	}
 }
 

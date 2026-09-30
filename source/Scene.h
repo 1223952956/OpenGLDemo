@@ -28,7 +28,6 @@ public:
 	Piece& CreatePiece();
 	Piece& CreatePiece(UUID id);
 
-private:
 	void CreateDefaultScene();
 };
 
